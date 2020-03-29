@@ -1,0 +1,8 @@
+{
+  "domain": "solis",
+  "name": "Solis Inverter",
+  "documentation": "https://github.com/hultenvp/solis-sensor/blob/master/README.md",
+  "dependencies": [],
+  "codeowners": [],
+  "requirements": []
+}
