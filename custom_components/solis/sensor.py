@@ -118,7 +118,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
   # Prepare the sensor entities.
   hass_sensors = []
-  for sensor_type in config[CONF_SENSORS].items():
+  for sensor_type, subtypes in config[CONF_SENSORS].items():
     _LOGGER.debug("Creating solis sensor: %s", sensor_type)
     hass_sensors.append(SolisSensor(inverter_name, sensor_type))
 
