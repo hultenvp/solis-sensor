@@ -1,5 +1,5 @@
 # solis-sensor
-HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com). It logs in to the plaform and exposes the data retrieved as sensors.
+HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com). It logs in to the platform and exposes the data retrieved as sensors.
 
 > Platform V2 is used by Ginlong and MyEvolveCloud and seem to be supporting different PV brands. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well.
 
