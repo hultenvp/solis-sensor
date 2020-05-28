@@ -1,6 +1,6 @@
 {
-  "domain": "solis_test",
-  "name": "Solis Inverter Test",
+  "domain": "solis",
+  "name": "Solis Inverter",
   "documentation": "https://github.com/hultenvp/solis-sensor/blob/master/README.md",
   "dependencies": [],
   "codeowners": [],
