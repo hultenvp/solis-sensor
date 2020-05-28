@@ -1,7 +1,7 @@
 # solis-sensor
 HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com). It logs in to the plaform and exposes the data retrieved as sensors.
 
-> Platform V2 is used by Ginlong and MyEvolveCloud and seem to be supporting different PV brands. I've only tested it in context of Solis with the Ginlong platfomr. Let me know if it works with for other inverter types as well.
+> Platform V2 is used by Ginlong and MyEvolveCloud and seem to be supporting different PV brands. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well.
 
 ## Manual installation
 
@@ -55,16 +55,16 @@ Configuration variables:
 
 * **name** (Optional): Let you overwrite the name of the device in the frontend. *Default value: Solis*
 * **portal_domain** (Optional): Portal domain name *Default value: m.ginlong.com*.
-* **portal_username** (Required): Username of your platform account.
-* **portal_password** (Required): Password of the platform account. 
-> Note that the integration uses https, but the username and password are sent over in plain text!
+* **portal_username** (Required): Username of your portal account.
+* **portal_password** (Required): Password of the portal account. 
+> Note: The integration uses https to communicate with the portal, but the username and password are sent over in plain text!
 * **portal_plant_id** (Required): PlantId on the platform the inverter belongs to, log into the portal to find the pland ID under tab "plants".
 > Dutch: Tab installatie: Installatie ID. 
 * **inverter_serial** (Required): Serial # of the inverter itself, not the logger! Can be found under tab "devices" 
 * **sensors** (Required): List of values which will be presented as sensors:
   * *actualpower*: Actual power being produced
   * *energytoday*: Total energy produced today.
-  > Note that this value is not necessarily zeroed at midnight but at the moment the first value is received from the inverter again (in my case at sunrise)
+> Note: This value is not necessarily zeroed at midnight but at the moment the portal receives first value from the inverter again after midnight (in my case at sunrise when the inverter switches on. May behave differently with different inverter and/or logger models)
   * *status*: Represents portal status. Online if portal is reachable, offline if portal is unreachable
   * *temperature*: Temperature of the inverter
   * *dcinputvoltagepv1*: String 1 DC voltage (0 if not present)
