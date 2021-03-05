@@ -165,9 +165,10 @@ class InverterData(object):
         data = portaldata['result']['deviceWapper']['dataJSON']
         # We're online and we have data, so update last_updated
         # Energy_today is not reset at midnight, but in the mornging at sunrise when the inverter switches back on
-        if (self._last_updated.day != datetime.now().day)
-          # Take snapshot
-          self._energy_yesterday = self._sensor_data[INV_ENERGY_TODAY]
+        if (self._last_updated is not None):
+          if (self._last_updated.day is not datetime.now().day):
+            # Take snapshot
+            self._energy_yesterday = self._sensor_data[INV_ENERGY_TODAY]
         self._last_updated = datetime.now()
         status = ONLINE
         # Fetch all attributes from payload
@@ -286,9 +287,9 @@ class InverterData(object):
     energy = self._sensor_data['INV_ENERGY_TODAY']
     # if energy today is still the same as energy yesterday then the 
     # portal has not yet reset energy_today.
-    if (energy == self._energy_yesterday)
+    if (energy == self._energy_yesterday):
       energy = 0
-    else
+    else:
       # reset energy_yesterday and use today's value.
       self._energy_yesterday = 0
     return energy;
