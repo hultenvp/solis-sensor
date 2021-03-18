@@ -47,6 +47,8 @@ MESSAGE = 'Message'
 ONLINE = 'Online'
 OFFLINE = 'Offline'
 
+MAX_CONSECUTIVE_FAILURES = 10
+
 """
   [unit of measurement, key, type, decimal precision]
 """
@@ -168,7 +170,7 @@ class InverterData(object):
         if (self._last_updated is not None):
           if (self._last_updated.day is not datetime.now().day):
             # Take snapshot
-            self._energy_yesterday = self._sensor_data[INV_ENERGY_TODAY]
+            self._energy_yesterday = self._sensor_data['INV_ENERGY_TODAY']
         self._last_updated = datetime.now()
         status = ONLINE
         # Fetch all attributes from payload
@@ -326,6 +328,7 @@ class PortalAPI():
     self._jsondata = None
     self._logintime = None
     self._deviceid = None
+    self._consecutive_failed_calls = 0
     # Default english
     self._language = 2
 
@@ -369,8 +372,10 @@ class PortalAPI():
         _LOGGER.error('Could not login to %s, are username and password correct?', url)
         self._logintime = None
     else:
-      _LOGGER.error('%s', result[MESSAGE])
       self._logintime = None
+      if (self._consecutive_failed_calls == MAX_CONSECUTIVE_FAILURES):
+        _LOGGER.error('Failed to communicate with server %s times, last error: %s', MAX_CONSECUTIVE_FAILURES, result[MESSAGE])
+
 
   async def update_device_id(self):
     """
@@ -402,9 +407,9 @@ class PortalAPI():
       if (self._deviceid is None):
         _LOGGER.error('Unable to find inverter with serial %s in plant %s', self.config.serial_number, self.config.plantid)
     else:
-      # We get here quite often  with  confusing msg.
-      _LOGGER.error('%s', result[MESSAGE])
       self._logintime = None
+      if (self._consecutive_failed_calls == MAX_CONSECUTIVE_FAILURES):
+        _LOGGER.error('Failed to communicate with server %s times, last error: %s', MAX_CONSECUTIVE_FAILURES, result[MESSAGE])
 
 
   async def update_inverter_details(self):
@@ -424,8 +429,9 @@ class PortalAPI():
     if (result[SUCCESS] == True):
       self._jsondata = result[CONTENT]
     else:
-      _LOGGER.error('Unable to fetch details for device with ID: %s', self._deviceid)
-      _LOGGER.error('Message: %s', result[MESSAGE])
+      _LOGGER.info('Unable to fetch details for device with ID: %s', self._deviceid)
+      if (self._consecutive_failed_calls == MAX_CONSECUTIVE_FAILURES):
+        _LOGGER.error('Failed to communicate with server %s times, last error: %s', MAX_CONSECUTIVE_FAILURES, result[MESSAGE])
 
 
   async def _get_data(self, url, params):
@@ -442,12 +448,18 @@ class PortalAPI():
         result[CONTENT] = await resp.json()
         if resp.status == HTTP_OK:
           result[SUCCESS] = True
+          result[MESSAGE] = "OK"
         else:
           result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
-
+        self._consecutive_failed_calls = 0;
         return result
     except (asyncio.TimeoutError, aiohttp.ClientError) as err:
-      result[MESSAGE] = "%s" % err
+      result[MESSAGE] = "Exception: %s" % err.__class__
+      self._consecutive_failed_calls += 1
+      return result
+    except:
+      result[MESSAGE] = "Other exception %s occurred" % sys.exc_info()[0]
+      self._consecutive_failed_calls += 1
       return result
     finally:
       if resp is not None:
@@ -467,12 +479,14 @@ class PortalAPI():
         result[CONTENT] = await resp.json()
         if resp.status == HTTP_OK:
           result[SUCCESS] = True
+          result[MESSAGE] = "OK"
         else:
           result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
 
         return result
     except (asyncio.TimeoutError, aiohttp.ClientError) as err:
       result[MESSAGE] = "%s" % err
+      self._consecutive_failed_calls += 1
       return result
     finally:
       if resp is not None:
