@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -46,6 +46,8 @@ MESSAGE = 'Message'
 # Status constants
 ONLINE = 'Online'
 OFFLINE = 'Offline'
+
+MAX_CONSECUTIVE_FAILURES = 10
 
 """
   [unit of measurement, key, type, decimal precision]
@@ -113,6 +115,7 @@ class InverterData(object):
   def __init__(self, portal_config, hass, devices):
     """ Initialize Solis data component. """
     self._last_updated = None
+    self._energy_yesterday = 0
     self._status = OFFLINE
     self._devices = devices
     self.hass = hass
@@ -163,6 +166,13 @@ class InverterData(object):
       if (portaldata is not None):
         data = portaldata['result']['deviceWapper']['dataJSON']
         # We're online and we have data, so update last_updated
+        # Energy_today is not reset at midnight, but in the morning at sunrise when the inverter switches back on
+        # Returning zero instead of received value until we start receiving fresh values at dawn
+        # Not sure if this works in polar regions ;-)
+        if (self._last_updated is not None):
+          if (self._last_updated.day is not datetime.now().day):
+            # Take snapshot
+            self._energy_yesterday = self._sensor_data['INV_ENERGY_TODAY']
         self._last_updated = datetime.now()
         status = ONLINE
         # Fetch all attributes from payload
@@ -181,7 +191,7 @@ class InverterData(object):
     self._status  = status
 
   async def async_update(self, *_):
-    """Update the data from buienradar."""
+    """Update the data from PV Portal."""
     result = await self.interface_portal.async_update()
     if (result == SCHEDULE_OK):
       self._update_attributes()
@@ -278,7 +288,15 @@ class InverterData(object):
 
   @property
   def energytoday(self):
-    return self._sensor_data['INV_ENERGY_TODAY']
+    energy = self._sensor_data['INV_ENERGY_TODAY']
+    # if energy today is still the same as energy yesterday then the 
+    # portal has not yet reset energy_today.
+    if (energy == self._energy_yesterday):
+      energy = 0
+    else:
+      # reset energy_yesterday and use today's value.
+      self._energy_yesterday = 0
+    return energy;
 
   @property
   def energythismonth(self):
@@ -312,6 +330,7 @@ class PortalAPI():
     self._jsondata = None
     self._logintime = None
     self._deviceid = None
+    self._consecutive_failed_calls = 0
     # Default english
     self._language = 2
 
@@ -355,8 +374,10 @@ class PortalAPI():
         _LOGGER.error('Could not login to %s, are username and password correct?', url)
         self._logintime = None
     else:
-      _LOGGER.error('%s', result[MESSAGE])
       self._logintime = None
+      if (self._consecutive_failed_calls == MAX_CONSECUTIVE_FAILURES):
+        _LOGGER.error('Failed to communicate with server %s times, last error: %s', MAX_CONSECUTIVE_FAILURES, result[MESSAGE])
+
 
   async def update_device_id(self):
     """
@@ -388,13 +409,14 @@ class PortalAPI():
       if (self._deviceid is None):
         _LOGGER.error('Unable to find inverter with serial %s in plant %s', self.config.serial_number, self.config.plantid)
     else:
-      _LOGGER.error('%s', result[MESSAGE])
       self._logintime = None
+      if (self._consecutive_failed_calls == MAX_CONSECUTIVE_FAILURES):
+        _LOGGER.error('Failed to communicate with server %s times, last error: %s', MAX_CONSECUTIVE_FAILURES, result[MESSAGE])
 
 
   async def update_inverter_details(self):
     """
-     Update inverter details
+    Update inverter details
     """
 
     # Get inverter details
@@ -409,7 +431,9 @@ class PortalAPI():
     if (result[SUCCESS] == True):
       self._jsondata = result[CONTENT]
     else:
-       _LOGGER.error('Unable to fetch details for device with ID: %s', self._deviceid)
+      _LOGGER.info('Unable to fetch details for device with ID: %s', self._deviceid)
+      if (self._consecutive_failed_calls == MAX_CONSECUTIVE_FAILURES):
+        _LOGGER.error('Failed to communicate with server %s times, last error: %s', MAX_CONSECUTIVE_FAILURES, result[MESSAGE])
 
 
   async def _get_data(self, url, params):
@@ -426,12 +450,18 @@ class PortalAPI():
         result[CONTENT] = await resp.json()
         if resp.status == HTTP_OK:
           result[SUCCESS] = True
+          result[MESSAGE] = "OK"
         else:
           result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
-
+        self._consecutive_failed_calls = 0
         return result
     except (asyncio.TimeoutError, aiohttp.ClientError) as err:
-      result[MESSAGE] = "%s" % err
+      result[MESSAGE] = "Exception: %s" % err.__class__
+      self._consecutive_failed_calls += 1
+      return result
+    except:
+      result[MESSAGE] = "Other exception %s occurred" % sys.exc_info()[0]
+      self._consecutive_failed_calls += 1
       return result
     finally:
       if resp is not None:
@@ -451,12 +481,14 @@ class PortalAPI():
         result[CONTENT] = await resp.json()
         if resp.status == HTTP_OK:
           result[SUCCESS] = True
+          result[MESSAGE] = "OK"
         else:
           result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
 
         return result
     except (asyncio.TimeoutError, aiohttp.ClientError) as err:
       result[MESSAGE] = "%s" % err
+      self._consecutive_failed_calls += 1
       return result
     finally:
       if resp is not None:
