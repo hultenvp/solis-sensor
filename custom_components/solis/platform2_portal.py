@@ -166,7 +166,9 @@ class InverterData(object):
       if (portaldata is not None):
         data = portaldata['result']['deviceWapper']['dataJSON']
         # We're online and we have data, so update last_updated
-        # Energy_today is not reset at midnight, but in the mornging at sunrise when the inverter switches back on
+        # Energy_today is not reset at midnight, but in the morning at sunrise when the inverter switches back on
+        # Returning zero instead of received value until we start receiving fresh values at dawn
+        # Not sure if this works in polar regions ;-)
         if (self._last_updated is not None):
           if (self._last_updated.day is not datetime.now().day):
             # Take snapshot
@@ -451,7 +453,7 @@ class PortalAPI():
           result[MESSAGE] = "OK"
         else:
           result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
-        self._consecutive_failed_calls = 0;
+        self._consecutive_failed_calls = 0
         return result
     except (asyncio.TimeoutError, aiohttp.ClientError) as err:
       result[MESSAGE] = "Exception: %s" % err.__class__
