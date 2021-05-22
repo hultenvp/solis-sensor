@@ -24,7 +24,7 @@ from .platform2_portal import InverterData as inverter
 from .platform2_portal import PortalConfig as inverter_config
 
 # VERSION
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 _LOGGER = logging.getLogger(__name__)
 
