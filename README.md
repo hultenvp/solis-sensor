@@ -35,7 +35,7 @@ sensor:
     portal_username: "my_portal_username"
     portal_password: "my_portal_password"
     portal_plant_id: "plantId goes here"
-    portal_inverter_serial: "Serial goes here"
+    inverter_serial: "Serial goes here"
     sensors:
       actualpower:
       energytoday:
