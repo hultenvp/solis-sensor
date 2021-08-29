@@ -14,8 +14,21 @@ import voluptuous as vol
 
 from datetime import datetime
 from datetime import timedelta
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import ( EVENT_HOMEASSISTANT_STOP, CONF_NAME, CONF_SCAN_INTERVAL, TEMP_CELSIUS )
+from homeassistant.components.sensor import (
+    PLATFORM_SCHEMA,
+    STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING,
+)
+from homeassistant.const import ( 
+    EVENT_HOMEASSISTANT_STOP, 
+    CONF_NAME, 
+    CONF_SCAN_INTERVAL, 
+    TEMP_CELSIUS,
+    DEVICE_CLASS_CURRENT,
+    DEVICE_CLASS_ENERGY,
+    DEVICE_CLASS_POWER,
+    DEVICE_CLASS_VOLTAGE,
+    DEVICE_CLASS_TEMPERATURE,)
 from homeassistant.core import callback
 from homeassistant.helpers.entity import Entity
 
@@ -24,7 +37,7 @@ from .platform2_portal import InverterData as inverter
 from .platform2_portal import PortalConfig as inverter_config
 
 # VERSION
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,30 +52,30 @@ SENSOR_PREFIX = 'Solis'
 DEFAULT_DOMAIN = 'm.ginlong.com'
 
 # Supported sensor types:
-# Key: ['label', unit, icon]
+# Key: ['label', unit, icon, device class, state class]
 SENSOR_TYPES = {
-    'status':            ['Status', None, 'mdi:solar-power'],
-    'temperature':       ['Temperature', TEMP_CELSIUS, 'mdi:thermometer'],
-    'dcinputvoltagepv1': ['DC Voltage PV1', 'V', 'mdi:flash-outline'],
-    'dcinputvoltagepv2': ['DC Voltage PV2', 'V', 'mdi:flash-outline'],
-    'dcinputvoltagepv3': ['DC Voltage PV3', 'V', 'mdi:flash-outline'],
-    'dcinputvoltagepv4': ['DC Voltage PV4', 'V', 'mdi:flash-outline'],
-    'dcinputcurrentpv1': ['DC Current PV1', 'A', 'mdi:flash-outline'],
-    'dcinputcurrentpv2': ['DC Current PV2', 'A', 'mdi:flash-outline'],
-    'dcinputcurrentpv3': ['DC Current PV3', 'A', 'mdi:flash-outline'],
-    'dcinputcurrentpv4': ['DC Current PV4', 'A', 'mdi:flash-outline'],
-    'acoutputvoltage1':  ['AC Voltage R', 'V', 'mdi:flash-outline'],
-    'acoutputvoltage2':  ['AC Voltage S', 'V', 'mdi:flash-outline'],
-    'acoutputvoltage3':  ['AC Voltage T', 'V', 'mdi:flash-outline'],
-    'acoutputcurrent1':  ['AC Current R', 'A', 'mdi:flash-outline'],
-    'acoutputcurrent2':  ['AC Current S', 'A', 'mdi:flash-outline'],
-    'acoutputcurrent3':  ['AC Current T', 'A', 'mdi:flash-outline'],
-    'actualpower':       ['AC Output Total Power', 'W', 'mdi:weather-sunny'], 
-    'energylastmonth':   ['Energy Last Month', 'kWh', 'mdi:flash-outline'],
-    'energytoday':       ['Energy Today', 'kWh', 'mdi:flash-outline'],
-    'energythismonth':   ['Energy This Month', 'kWh', 'mdi:flash-outline'],
-    'energythisyear':    ['energy This Year', 'kWh', 'mdi:flash-outline'],
-    'energytotal':       ['Energy Total', 'kWh', 'mdi:flash-outline']
+    'status':            ['Status', None, 'mdi:solar-power', None, None],
+    'temperature':       ['Temperature', TEMP_CELSIUS, 'mdi:thermometer', DEVICE_CLASS_TEMPERATURE, STATE_CLASS_MEASUREMENT],
+    'dcinputvoltagepv1': ['DC Voltage PV1', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'dcinputvoltagepv2': ['DC Voltage PV2', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'dcinputvoltagepv3': ['DC Voltage PV3', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'dcinputvoltagepv4': ['DC Voltage PV4', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'dcinputcurrentpv1': ['DC Current PV1', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'dcinputcurrentpv2': ['DC Current PV2', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'dcinputcurrentpv3': ['DC Current PV3', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'dcinputcurrentpv4': ['DC Current PV4', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'acoutputvoltage1':  ['AC Voltage R', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'acoutputvoltage2':  ['AC Voltage S', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'acoutputvoltage3':  ['AC Voltage T', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
+    'acoutputcurrent1':  ['AC Current R', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'acoutputcurrent2':  ['AC Current S', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'acoutputcurrent3':  ['AC Current T', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
+    'actualpower':       ['AC Output Total Power', 'W', 'mdi:weather-sunny', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT], 
+    'energylastmonth':   ['Energy Last Month', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'energytoday':       ['Energy Today', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'energythismonth':   ['Energy This Month', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'energythisyear':    ['energy This Year', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'energytotal':       ['Energy Total', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING]
 }
 
 def _check_config_schema(conf):
@@ -145,6 +158,8 @@ class SolisSensor(Entity):
     self._name = self._inverter_name + ' ' + SENSOR_TYPES[sensor_type][0]
     self._state = None
     self._uom = SENSOR_TYPES[sensor_type][1]
+    self._device_class = SENSOR_TYPES[sensor_type][3]
+    self._state_class = SENSOR_TYPES[sensor_type][4]
 
   @callback
   def data_updated(self, data):
@@ -185,6 +200,16 @@ class SolisSensor(Entity):
       uom = None
     return uom
 
+  @property
+  def device_class
+    """ Return device class """
+    return self._device_class
+  
+  @property
+  def state_class
+    """ Return state class
+    return self._state_class
+    
   @property
   def state(self):
     """ Return the state of the sensor. """
