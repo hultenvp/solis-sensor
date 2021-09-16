@@ -13,7 +13,6 @@ import sys
 import voluptuous as vol
 
 from .const import (
-  VERSION,
   CONF_PORTAL_DOMAIN,
   CONF_USERNAME,
   CONF_PASSWORD,
@@ -33,6 +32,9 @@ from .platform2_portal import InverterData as inverter
 from .platform2_portal import PortalConfig as inverter_config
 
 _LOGGER = logging.getLogger(__name__)
+
+# VERSION
+VERSION = '0.2.0'
 
 def _check_config_schema(conf):
   """ Check if the sensors and attributes are valid. """
