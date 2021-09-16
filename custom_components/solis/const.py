@@ -20,9 +20,6 @@ from homeassistant.const import (
     DEVICE_CLASS_VOLTAGE,
     DEVICE_CLASS_TEMPERATURE,)
 
-# VERSION
-VERSION = '0.2.0'
-
 CONF_PORTAL_DOMAIN = 'portal_domain'
 CONF_USERNAME = 'portal_username'
 CONF_PASSWORD = 'portal_password'
