@@ -1,7 +1,9 @@
 # solis-sensor
 HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com). It logs in to the platform and exposes the data retrieved as sensors.
+Also confirmed to work with:
+* Solarman (home.solarman.ch)
 
-> Platform V2 is used by Ginlong and MyEvolveCloud and seem to be supporting different PV brands. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well.
+> Platform V2 is used by Ginlong and MyEvolveCloud and also supports different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 
 ## Manual installation
 
@@ -35,7 +37,7 @@ sensor:
     portal_username: "my_portal_username"
     portal_password: "my_portal_password"
     portal_plant_id: "plantId goes here"
-    portal_inverter_serial: "Serial goes here"
+    inverter_serial: "Serial goes here"
     sensors:
       actualpower:
       energytoday:
@@ -85,4 +87,3 @@ Configuration variables:
   * *energythismonth*: Total energy produced in current month
   * *energythisyear*: Total energy produced this year
   * *energytotal*: Total energy produced in the lifetime of the inverter
-
