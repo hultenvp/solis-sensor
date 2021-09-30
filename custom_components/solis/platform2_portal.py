@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -327,6 +327,7 @@ class PortalAPI():
 
     self._hass = hass
     self.config = config
+    self._session = async_get_clientsession(self._hass)
     self._jsondata = None
     self._logintime = None
     self._deviceid = None
@@ -442,9 +443,8 @@ class PortalAPI():
     result = {SUCCESS: False, MESSAGE: None, STATUS_CODE: None}
     resp = None
     try:
-      websession = async_get_clientsession(self._hass)
       with async_timeout.timeout(10):
-        resp = await websession.get(url, params=params)
+        resp = await self._session.get(url, params=params)
 
         result[STATUS_CODE] = resp.status
         result[CONTENT] = await resp.json()
@@ -473,9 +473,8 @@ class PortalAPI():
     result = {SUCCESS: False, MESSAGE: None}
     resp = None
     try:
-      websession = async_get_clientsession(self._hass)
       with async_timeout.timeout(10):
-        resp = await websession.post(url, params=params)
+        resp = await self._session.post(url, params=params)
 
         result[STATUS_CODE] = resp.status
         result[CONTENT] = await resp.json()
