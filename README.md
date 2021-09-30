@@ -64,7 +64,6 @@ Configuration variables:
 * **sensors** (Required): List of values which will be presented as sensors:
   * *actualpower*: Actual power being produced
   * *energytoday*: Total energy produced today.
-> Note: This value is not necessarily zeroed at midnight but at the moment the portal receives first value from the inverter again after midnight (in my case at sunrise when the inverter switches on. May behave differently with different inverter and/or logger models)
   * *status*: Represents portal status. Online if portal is reachable, offline if portal is unreachable
   * *temperature*: Temperature of the inverter
   * *dcinputvoltagepv1*: String 1 DC voltage (0 if not present)
@@ -86,3 +85,6 @@ Configuration variables:
   * *energythisyear*: Total energy produced this year
   * *energytotal*: Total energy produced in the lifetime of the inverter
 
+# Energy dashboard
+The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
+> Note: This integration requires Home Assistant version 2021.9 or higher
