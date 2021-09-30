@@ -4,6 +4,8 @@
 
   For more information: https://github.com/hultenvp/solis-sensor/
 """
+from __future__ import annotations
+
 import binascii
 import hashlib
 import homeassistant.helpers.config_validation as cv
@@ -26,7 +28,18 @@ from .const import (
 from datetime import datetime
 from datetime import timedelta
 from homeassistant.core import callback
-from homeassistant.helpers.entity import Entity
+#from homeassistant.helpers.entity import Entity
+from homeassistant.components.sensor import (
+    PLATFORM_SCHEMA,
+    SensorEntity,
+)
+
+from homeassistant.const import ( 
+    EVENT_HOMEASSISTANT_STOP, 
+    CONF_NAME, 
+    CONF_SCAN_INTERVAL, 
+)
+
 
 from .platform2_portal import InverterData as inverter
 from .platform2_portal import PortalConfig as inverter_config
@@ -103,7 +116,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
   await data.schedule_update(1)
 
-class SolisSensor(Entity):
+class SolisSensor(SensorEntity):
   """ Representation of a Solis sensor. """
 
   def __init__(self, inverter_name, sensor_type):
@@ -114,10 +127,12 @@ class SolisSensor(Entity):
     # Properties
     self._icon = SENSOR_TYPES[sensor_type][2]
     self._name = self._inverter_name + ' ' + SENSOR_TYPES[sensor_type][0]
-    self._state = None
-    self._uom = SENSOR_TYPES[sensor_type][1]
-    self._device_class = SENSOR_TYPES[sensor_type][3]
-    self._state_class = SENSOR_TYPES[sensor_type][4]
+    #self._state = None
+    #self._uom = SENSOR_TYPES[sensor_type][1]
+    self._attr_native_value = None
+    self._attr_native_unit_of_measurement = SENSOR_TYPES[sensor_type][1]
+    self._attr_device_class = SENSOR_TYPES[sensor_type][3]
+    self._attr_state_class = SENSOR_TYPES[sensor_type][4]
 
   @callback
   def data_updated(self, data):
@@ -136,7 +151,7 @@ class SolisSensor(Entity):
       return False
 
     # Property name in data interface must be equal to sensor type
-    self._state = getattr(data, self._type)
+    self._attr_native_value = getattr(data, self._type)
     self._measured = data.last_updated
     return True
 
@@ -151,30 +166,7 @@ class SolisSensor(Entity):
     return self._name
 
   @property
-  def unit_of_measurement(self):
-    """ Return the unit the value is expressed in. """
-    uom = self._uom
-    if(self._state is None):
-      uom = None
-    return uom
-
-  @property
-  def device_class(self):
-    """ Return device class """
-    return self._device_class
-  
-  @property
-  def state_class(self):
-    """ Return state class """
-    return self._state_class
-    
-  @property
-  def state(self):
-    """ Return the state of the sensor. """
-    return self._state
-
-  @property
   def should_poll(self):
     """No polling needed."""
     return False
-
+  
