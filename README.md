@@ -12,6 +12,7 @@ Install this component by copying the files in [`/custom_components/solis/`]
 
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/__init__.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/manifest.json"
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/const.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/sensor.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/platform2_portal.py"
 
@@ -22,6 +23,7 @@ custom_components
 │   ├── __init__.py
 │   ├── manifest.json
 │   ├── platform2_portal.py
+│   ├── const.py
 │   └── sensor.py
 ```
 
@@ -66,7 +68,6 @@ Configuration variables:
 * **sensors** (Required): List of values which will be presented as sensors:
   * *actualpower*: Actual power being produced
   * *energytoday*: Total energy produced today.
-> Note: This value is not necessarily zeroed at midnight but at the moment the portal receives first value from the inverter again after midnight (in my case at sunrise when the inverter switches on. May behave differently with different inverter and/or logger models)
   * *status*: Represents portal status. Online if portal is reachable, offline if portal is unreachable
   * *temperature*: Temperature of the inverter
   * *dcinputvoltagepv1*: String 1 DC voltage (0 if not present)
@@ -87,3 +88,10 @@ Configuration variables:
   * *energythismonth*: Total energy produced in current month
   * *energythisyear*: Total energy produced this year
   * *energytotal*: Total energy produced in the lifetime of the inverter
+
+# Energy dashboard
+The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
+> Note: This integration requires Home Assistant version 2021.9 or higher
+
+![dashboard integration](./energy_dashboard_integration.GIF)
+![energy production](./solar_production_energy_dashboard.GIF)

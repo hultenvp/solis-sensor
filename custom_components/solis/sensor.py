@@ -4,6 +4,8 @@
 
   For more information: https://github.com/hultenvp/solis-sensor/
 """
+from __future__ import annotations
+
 import binascii
 import hashlib
 import homeassistant.helpers.config_validation as cv
@@ -12,58 +14,40 @@ import struct
 import sys
 import voluptuous as vol
 
+from .const import (
+  CONF_PORTAL_DOMAIN,
+  CONF_USERNAME,
+  CONF_PASSWORD,
+  CONF_PLANT_ID,
+  CONF_INVERTER_SERIAL,
+  CONF_SENSORS,
+  SENSOR_PREFIX,
+  DEFAULT_DOMAIN, 
+  SENSOR_TYPES,
+)
 from datetime import datetime
 from datetime import timedelta
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import ( EVENT_HOMEASSISTANT_STOP, CONF_NAME, CONF_SCAN_INTERVAL, TEMP_CELSIUS )
 from homeassistant.core import callback
-from homeassistant.helpers.entity import Entity
+#from homeassistant.helpers.entity import Entity
+from homeassistant.components.sensor import (
+    PLATFORM_SCHEMA,
+    SensorEntity,
+)
+
+from homeassistant.const import ( 
+    EVENT_HOMEASSISTANT_STOP, 
+    CONF_NAME, 
+    CONF_SCAN_INTERVAL, 
+)
 
 
 from .platform2_portal import InverterData as inverter
 from .platform2_portal import PortalConfig as inverter_config
 
-# VERSION
-VERSION = '0.1.0'
-
 _LOGGER = logging.getLogger(__name__)
 
-CONF_PORTAL_DOMAIN = 'portal_domain'
-CONF_USERNAME = 'portal_username'
-CONF_PASSWORD = 'portal_password'
-CONF_PLANT_ID = 'portal_plant_id'
-CONF_INVERTER_SERIAL = 'inverter_serial'
-CONF_SENSORS = 'sensors'
-
-SENSOR_PREFIX = 'Solis'
-DEFAULT_DOMAIN = 'm.ginlong.com'
-
-# Supported sensor types:
-# Key: ['label', unit, icon]
-SENSOR_TYPES = {
-    'status':            ['Status', None, 'mdi:solar-power'],
-    'temperature':       ['Temperature', TEMP_CELSIUS, 'mdi:thermometer'],
-    'dcinputvoltagepv1': ['DC Voltage PV1', 'V', 'mdi:flash-outline'],
-    'dcinputvoltagepv2': ['DC Voltage PV2', 'V', 'mdi:flash-outline'],
-    'dcinputvoltagepv3': ['DC Voltage PV3', 'V', 'mdi:flash-outline'],
-    'dcinputvoltagepv4': ['DC Voltage PV4', 'V', 'mdi:flash-outline'],
-    'dcinputcurrentpv1': ['DC Current PV1', 'A', 'mdi:flash-outline'],
-    'dcinputcurrentpv2': ['DC Current PV2', 'A', 'mdi:flash-outline'],
-    'dcinputcurrentpv3': ['DC Current PV3', 'A', 'mdi:flash-outline'],
-    'dcinputcurrentpv4': ['DC Current PV4', 'A', 'mdi:flash-outline'],
-    'acoutputvoltage1':  ['AC Voltage R', 'V', 'mdi:flash-outline'],
-    'acoutputvoltage2':  ['AC Voltage S', 'V', 'mdi:flash-outline'],
-    'acoutputvoltage3':  ['AC Voltage T', 'V', 'mdi:flash-outline'],
-    'acoutputcurrent1':  ['AC Current R', 'A', 'mdi:flash-outline'],
-    'acoutputcurrent2':  ['AC Current S', 'A', 'mdi:flash-outline'],
-    'acoutputcurrent3':  ['AC Current T', 'A', 'mdi:flash-outline'],
-    'actualpower':       ['AC Output Total Power', 'W', 'mdi:weather-sunny'], 
-    'energylastmonth':   ['Energy Last Month', 'kWh', 'mdi:flash-outline'],
-    'energytoday':       ['Energy Today', 'kWh', 'mdi:flash-outline'],
-    'energythismonth':   ['Energy This Month', 'kWh', 'mdi:flash-outline'],
-    'energythisyear':    ['energy This Year', 'kWh', 'mdi:flash-outline'],
-    'energytotal':       ['Energy Total', 'kWh', 'mdi:flash-outline']
-}
+# VERSION
+VERSION = '0.2.0'
 
 def _check_config_schema(conf):
   """ Check if the sensors and attributes are valid. """
@@ -132,7 +116,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
   await data.schedule_update(1)
 
-class SolisSensor(Entity):
+class SolisSensor(SensorEntity):
   """ Representation of a Solis sensor. """
 
   def __init__(self, inverter_name, sensor_type):
@@ -143,8 +127,12 @@ class SolisSensor(Entity):
     # Properties
     self._icon = SENSOR_TYPES[sensor_type][2]
     self._name = self._inverter_name + ' ' + SENSOR_TYPES[sensor_type][0]
-    self._state = None
-    self._uom = SENSOR_TYPES[sensor_type][1]
+    #self._state = None
+    #self._uom = SENSOR_TYPES[sensor_type][1]
+    self._attr_native_value = None
+    self._attr_native_unit_of_measurement = SENSOR_TYPES[sensor_type][1]
+    self._attr_device_class = SENSOR_TYPES[sensor_type][3]
+    self._attr_state_class = SENSOR_TYPES[sensor_type][4]
 
   @callback
   def data_updated(self, data):
@@ -163,7 +151,7 @@ class SolisSensor(Entity):
       return False
 
     # Property name in data interface must be equal to sensor type
-    self._state = getattr(data, self._type)
+    self._attr_native_value = getattr(data, self._type)
     self._measured = data.last_updated
     return True
 
@@ -178,20 +166,7 @@ class SolisSensor(Entity):
     return self._name
 
   @property
-  def unit_of_measurement(self):
-    """ Return the unit the value is expressed in. """
-    uom = self._uom
-    if(self._state is None):
-      uom = None
-    return uom
-
-  @property
-  def state(self):
-    """ Return the state of the sensor. """
-    return self._state
-
-  @property
   def should_poll(self):
     """No polling needed."""
     return False
-
+  
