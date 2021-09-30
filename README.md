@@ -10,6 +10,7 @@ Install this component by copying the files in [`/custom_components/solis/`]
 
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/__init__.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/manifest.json"
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/const.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/sensor.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/platform2_portal.py"
 
@@ -20,6 +21,7 @@ custom_components
 │   ├── __init__.py
 │   ├── manifest.json
 │   ├── platform2_portal.py
+│   ├── const.py
 │   └── sensor.py
 ```
 
@@ -88,3 +90,6 @@ Configuration variables:
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
 > Note: This integration requires Home Assistant version 2021.9 or higher
+
+![dashboard integration](./energy_dashboard_integration.GIF)
+![energy production](./solar_production_energy_dashboard.GIF)
