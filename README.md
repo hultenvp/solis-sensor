@@ -1,7 +1,9 @@
 # solis-sensor
 HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com). It logs in to the platform and exposes the data retrieved as sensors.
+Also confirmed to work with:
+* Solarman (home.solarman.ch)
 
-> Platform V2 is used by Ginlong and MyEvolveCloud and seem to be supporting different PV brands. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well.
+> Platform V2 is used by Ginlong and MyEvolveCloud and also supports different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 
 ## Manual installation
 
@@ -10,6 +12,7 @@ Install this component by copying the files in [`/custom_components/solis/`]
 
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/__init__.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/manifest.json"
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/const.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/sensor.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/platform2_portal.py"
 
@@ -20,6 +23,7 @@ custom_components
 │   ├── __init__.py
 │   ├── manifest.json
 │   ├── platform2_portal.py
+│   ├── const.py
 │   └── sensor.py
 ```
 
@@ -35,7 +39,7 @@ sensor:
     portal_username: "my_portal_username"
     portal_password: "my_portal_password"
     portal_plant_id: "plantId goes here"
-    portal_inverter_serial: "Serial goes here"
+    inverter_serial: "Serial goes here"
     sensors:
       actualpower:
       energytoday:
@@ -64,7 +68,6 @@ Configuration variables:
 * **sensors** (Required): List of values which will be presented as sensors:
   * *actualpower*: Actual power being produced
   * *energytoday*: Total energy produced today.
-> Note: This value is not necessarily zeroed at midnight but at the moment the portal receives first value from the inverter again after midnight (in my case at sunrise when the inverter switches on. May behave differently with different inverter and/or logger models)
   * *status*: Represents portal status. Online if portal is reachable, offline if portal is unreachable
   * *temperature*: Temperature of the inverter
   * *dcinputvoltagepv1*: String 1 DC voltage (0 if not present)
@@ -86,3 +89,9 @@ Configuration variables:
   * *energythisyear*: Total energy produced this year
   * *energytotal*: Total energy produced in the lifetime of the inverter
 
+# Energy dashboard
+The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
+> Note: This integration requires Home Assistant version 2021.9 or higher
+
+![dashboard integration](./energy_dashboard_integration.GIF)
+![energy production](./solar_production_energy_dashboard.GIF)
