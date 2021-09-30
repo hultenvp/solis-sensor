@@ -4,15 +4,11 @@
   For more information: https://github.com/hultenvp/solis-sensor/
 """
 from homeassistant.components.sensor import (
-    PLATFORM_SCHEMA,
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
 )
 
 from homeassistant.const import ( 
-    EVENT_HOMEASSISTANT_STOP, 
-    CONF_NAME, 
-    CONF_SCAN_INTERVAL, 
     TEMP_CELSIUS,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
