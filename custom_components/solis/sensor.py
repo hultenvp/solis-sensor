@@ -47,7 +47,7 @@ from .platform2_portal import PortalConfig as inverter_config
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.0'
+VERSION = '0.2.2'
 
 def _check_config_schema(conf):
   """ Check if the sensors and attributes are valid. """
@@ -104,7 +104,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
   hass_sensors = []
   for sensor_type, subtypes in config[CONF_SENSORS].items():
     _LOGGER.debug("Creating solis sensor: %s", sensor_type)
-    hass_sensors.append(SolisSensor(inverter_name, sensor_type))
+    hass_sensors.append(SolisSensor(inverter_name, inverter_sn, sensor_type))
 
   async_add_entities(hass_sensors)
   # schedule the first update in 1 minute from now:
@@ -119,7 +119,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class SolisSensor(SensorEntity):
   """ Representation of a Solis sensor. """
 
-  def __init__(self, inverter_name, sensor_type):
+  def __init__(self, inverter_name, inverter_sn, sensor_type):
     # Initialize the sensor.
     self._inverter_name = inverter_name
     self._type = sensor_type
@@ -127,12 +127,11 @@ class SolisSensor(SensorEntity):
     # Properties
     self._icon = SENSOR_TYPES[sensor_type][2]
     self._name = self._inverter_name + ' ' + SENSOR_TYPES[sensor_type][0]
-    #self._state = None
-    #self._uom = SENSOR_TYPES[sensor_type][1]
     self._attr_native_value = None
     self._attr_native_unit_of_measurement = SENSOR_TYPES[sensor_type][1]
     self._attr_device_class = SENSOR_TYPES[sensor_type][3]
     self._attr_state_class = SENSOR_TYPES[sensor_type][4]
+    self._attr_unique_id = f"{inverter_sn}{self._name}".replace(" ", "_")
 
   @callback
   def data_updated(self, data):
