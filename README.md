@@ -53,6 +53,9 @@ sensor:
       energythismonth:
       energythisyear:
       energytotal:
+      batcapacityremaining:  
+      battotalenergycharged:
+      battotalenergydischarged:
 ```
 
 Configuration variables:
@@ -88,6 +91,10 @@ Configuration variables:
   * *energythismonth*: Total energy produced in current month
   * *energythisyear*: Total energy produced this year
   * *energytotal*: Total energy produced in the lifetime of the inverter
+  * *batcapacityremaining*: Remaining battery capacity 
+  * *battotalenergycharged*: Total battery energy charged
+  * *battotalenergydischarged*: Total battery energy discharged
+
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
