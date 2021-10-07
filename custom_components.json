@@ -1,6 +1,6 @@
 {
   "solis": {
-    "version": "0.2.0",
+    "version": "0.2.2",
     "local_location": "/custom_components/solis/sensor.py",
     "remote_location": "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/sensor.py",
     "visit_repo": "https://github.com/hultenvp/solis-sensor",

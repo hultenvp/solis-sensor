@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -53,29 +53,32 @@ MAX_CONSECUTIVE_FAILURES = 10
   [unit of measurement, key, type, decimal precision]
 """
 PORTAL_INVERTER_CONST = {
-    'INV_DEVICE_ID':         [None, 'zf', str, None],
-    'INV_DATALOGGER_SERIAL': [None, 'za', str, None],
-    'INV_TEMPERATURE':       ['°C', '1df',float, 1],
-    'LINE_1_VDC':            ['V', '1a', float, 2],
-    'LINE_2_VDC':            ['V', '1b', float, 2],
-    'LINE_3_VDC':            ['V', '1c', float, 2],
-    'LINE_4_VDC':            ['V', '1d', float, 2],
-    'LINE_1_ADC':            ['A', '1j', float, 2],
-    'LINE_2_ADC':            ['A', '1k', float, 2],
-    'LINE_3_ADC':            ['A', '1l', float, 2],
-    'LINE_4_ADC':            ['A', '1m', float, 2],
-    'PHASE_1_VAC':           ['V', '1af', float, 2],
-    'PHASE_2_VAC':           ['V', '1ag', float, 2],
-    'PHASE_3_VAC':           ['V', '1ah', float, 2],
-    'PHASE_1_AAC':           ['A', '1ai', float, 2],
-    'PHASE_2_AAC':           ['A', '1aj', float, 2],
-    'PHASE_3_AAC':           ['A', '1ak', float, 2],
-    'INV_POWER_AC':          ['W', '1ao', float, 2],
-    'INV_ENERGY_LAST_MONTH': ['kWh', '1ru', float, 2],
-    'INV_ENERGY_TODAY':      ['kWh', '1bd', float, 2],
-    'INV_ENERGY_THIS_MONTH': ['kWh', '1be', float, 2],
-    'INV_ENERGY_THIS_YEAR':  ['kWh', '1bf', float, 2],
-    'INV_ENERGY_TOTAL_LIFE': ['kWh', '1bc', float, 2]
+    'INV_DEVICE_ID':               [None, 'zf', str, None],
+    'INV_DATALOGGER_SERIAL':       [None, 'za', str, None],
+    'INV_TEMPERATURE':             ['°C', '1df',float, 1],
+    'LINE_1_VDC':                  ['V', '1a', float, 2],
+    'LINE_2_VDC':                  ['V', '1b', float, 2],
+    'LINE_3_VDC':                  ['V', '1c', float, 2],
+    'LINE_4_VDC':                  ['V', '1d', float, 2],
+    'LINE_1_ADC':                  ['A', '1j', float, 2],
+    'LINE_2_ADC':                  ['A', '1k', float, 2],
+    'LINE_3_ADC':                  ['A', '1l', float, 2],
+    'LINE_4_ADC':                  ['A', '1m', float, 2],
+    'PHASE_1_VAC':                 ['V', '1af', float, 2],
+    'PHASE_2_VAC':                 ['V', '1ag', float, 2],
+    'PHASE_3_VAC':                 ['V', '1ah', float, 2],
+    'PHASE_1_AAC':                 ['A', '1ai', float, 2],
+    'PHASE_2_AAC':                 ['A', '1aj', float, 2],
+    'PHASE_3_AAC':                 ['A', '1ak', float, 2],
+    'INV_POWER_AC':                ['W', '1ao', float, 2],
+    'INV_ENERGY_LAST_MONTH':       ['kWh', '1ru', float, 2],
+    'INV_ENERGY_TODAY':            ['kWh', '1bd', float, 2],
+    'INV_ENERGY_THIS_MONTH':       ['kWh', '1be', float, 2],
+    'INV_ENERGY_THIS_YEAR':        ['kWh', '1bf', float, 2],
+    'INV_ENERGY_TOTAL_LIFE':       ['kWh', '1bc', float, 2],
+    'BAT_REMAINING_CAPACITY':      ['%', '1cv', float, 2],
+    'BAT_TOTAL_ENERGY_CHARGED':    ['kWh', '1cx', float, 2],
+    'BAT_TOTAL_ENERGY_DISCHARGED': ['kWh', '1cy', float, 2],
 }
 
 class PortalConfig:
@@ -318,6 +321,17 @@ class InverterData(object):
   def datalogger_serial(self):
     return self._sensor_data['INV_DATALOGGER_SERIAL']
 
+  @property
+  def batcapacityremaining(self):
+    return self._sensor_data['BAT_REMAINING_CAPACITY']
+
+  @property
+  def battotalenergycharged(self):
+    return self._sensor_data['BAT_TOTAL_ENERGY_CHARGED']
+
+  @property
+  def battotalenergydischarged(self):
+    return self._sensor_data['BAT_TOTAL_ENERGY_DISCHARGED']
 
 class PortalAPI():
   """ Class with functions for reading data from the Platform 2.0 portal. """
@@ -520,4 +534,3 @@ class PortalAPI():
         self._logintime = None
 
     return result
-
