@@ -1,0 +1,2 @@
+- name: HACS Action
+  uses: hacs/action@21.2.2
