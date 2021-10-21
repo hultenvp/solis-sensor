@@ -47,7 +47,7 @@ from .platform2_portal import PortalConfig as inverter_config
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.2'
+VERSION = '0.3.0'
 
 def _check_config_schema(conf):
   """ Check if the sensors and attributes are valid. """
