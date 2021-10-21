@@ -2,7 +2,7 @@
   "domain": "solis",
   "version": "0.3.0",
   "name": "Solis Inverter",
-  "documentation": "https://github.com/hultenvp/solis-sensor/blob/master/README.md",
+  "documentation": "https://github.com/hultenvp/solis-sensor/",
   "issue_tracker": "https://github.com/hultenvp/solis-sensor/issues",
   "dependencies": [],
   "codeowners": ["@hultenvp"],
