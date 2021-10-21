@@ -1,0 +1,5 @@
+{
+  "name": "Solis PV portal integration",
+  "render_readme": true,
+  "homeassistant": "2021.9.0"
+}
