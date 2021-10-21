@@ -53,7 +53,7 @@ sensor:
       energythismonth:
       energythisyear:
       energytotal:
-      batcapacityremaining:  
+      batcapacityremaining:
       battotalenergycharged:
       battotalenergydischarged:
 ```
