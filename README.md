@@ -1,9 +1,14 @@
-# solis-sensor
-HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com). It logs in to the platform and exposes the data retrieved as sensors.
+# Solis sensor integration
+HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com) backend. It logs in to the platform and exposes the data retrieved as sensors.
 Also confirmed to work with:
 * Solarman (home.solarman.ch)
 
-> Platform V2 is used by Ginlong and MyEvolveCloud and also supports different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
+> Platform V2 backend is used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
+> :warning: This integration does not work with SolisCloud. See [Issue #18](https://github.com/hultenvp/solis-sensor/issues/18) for more details how to move to m.ginlong.com.
+
+## HACS installation
+
+The use of HACS is supported and is the preferred means of installing this integration.
 
 ## Manual installation
 
@@ -65,7 +70,7 @@ Configuration variables:
 * **portal_username** (Required): Username of your portal account.
 * **portal_password** (Required): Password of the portal account. 
 > Note: The integration uses https to communicate with the portal, but the username and password are sent over in plain text!
-* **portal_plant_id** (Required): PlantId on the platform the inverter belongs to, log into the portal to find the pland ID under tab "plants".
+* **portal_plant_id** (Required): PlantId on the platform the inverter belongs to, log into the portal to find the pland ID under tab "plants". The plantID must be a decimal value. 
 > Dutch: Tab installatie: Installatie ID. 
 * **inverter_serial** (Required): Serial # of the inverter itself, not the logger! Can be found under tab "devices" 
 * **sensors** (Required): List of values which will be presented as sensors:
@@ -100,5 +105,5 @@ Configuration variables:
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
 > Note: This integration requires Home Assistant version 2021.9 or higher
 
-![dashboard integration](./energy_dashboard_integration.GIF)
-![energy production](./solar_production_energy_dashboard.GIF)
+![dashboard integration](./image/energy_dashboard_integration.GIF)
+![energy production](./image/solar_production_energy_dashboard.GIF)
