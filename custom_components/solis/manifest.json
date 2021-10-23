@@ -6,6 +6,5 @@
   "documentation": "https://github.com/hultenvp/solis-sensor/",
   "issue_tracker": "https://github.com/hultenvp/solis-sensor/issues",
   "dependencies": [],
-  "codeowners": ["@hultenvp"],
-  "requirements": [],
+  "codeowners": ["@hultenvp"]
 }
