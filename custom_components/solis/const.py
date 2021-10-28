@@ -55,4 +55,6 @@ SENSOR_TYPES = {
     'batcapacityremaining':     ['Remaining battery capacity', '%', 'mdi:battery', DEVICE_CLASS_BATTERY, STATE_CLASS_MEASUREMENT],
     'battotalenergycharged':    ['Total Energy Charged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
     'battotalenergydischarged': ['Total Energy Discharged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'batdailyenergycharged':    ['Daily Energy Charged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'batdailyenergydischarged': ['Daily Energy Discharged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
 }
