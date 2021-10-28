@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.0.5'
+VERSION = '0.1.0'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -79,6 +79,8 @@ PORTAL_INVERTER_CONST = {
     'BAT_REMAINING_CAPACITY':      ['%', '1cv', float, 2],
     'BAT_TOTAL_ENERGY_CHARGED':    ['kWh', '1cx', float, 2],
     'BAT_TOTAL_ENERGY_DISCHARGED': ['kWh', '1cy', float, 2],
+    'BAT_DAILY_ENERGY_CHARGED':    ['kWh', '1cz', float, 2],
+    'BAT_DAILY_ENERGY_DISCHARGED': ['kWh', '1da', float, 2],
 }
 
 class PortalConfig:
@@ -168,6 +170,7 @@ class InverterData(object):
       portaldata = self.interface_portal.get_portal_data()
       if (portaldata is not None):
         data = portaldata['result']['deviceWapper']['dataJSON']
+        _LOGGER.debug("Data received: %s", data)
         # We're online and we have data, so update last_updated
         # Energy_today is not reset at midnight, but in the morning at sunrise when the inverter switches back on
         # Returning zero instead of received value until we start receiving fresh values at dawn
