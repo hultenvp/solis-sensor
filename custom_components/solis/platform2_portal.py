@@ -336,6 +336,14 @@ class InverterData(object):
   def battotalenergydischarged(self):
     return self._sensor_data['BAT_TOTAL_ENERGY_DISCHARGED']
 
+  @property
+  def batdailyenergycharged(self):
+    return self._sensor_data['BAT_DAILY_ENERGY_CHARGED']
+
+  @property
+  def batdailyenergydischarged(self):
+    return self._sensor_data['BAT_DAILY_ENERGY_DISCHARGED']
+
 class PortalAPI():
   """ Class with functions for reading data from the Platform 2.0 portal. """
 
