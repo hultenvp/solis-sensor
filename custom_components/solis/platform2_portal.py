@@ -169,8 +169,8 @@ class InverterData(object):
     if (self.interface_portal.is_online()):
       portaldata = self.interface_portal.get_portal_data()
       if (portaldata is not None):
+        _LOGGER.debug("Data received: %s", portaldata)
         data = portaldata['result']['deviceWapper']['dataJSON']
-        _LOGGER.debug("Data received: %s", data)
         # We're online and we have data, so update last_updated
         # Energy_today is not reset at midnight, but in the morning at sunrise when the inverter switches back on
         # Returning zero instead of received value until we start receiving fresh values at dawn
