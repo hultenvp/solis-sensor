@@ -57,4 +57,7 @@ SENSOR_TYPES = {
     'battotalenergydischarged': ['Total Energy Discharged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
     'batdailyenergycharged':    ['Daily Energy Charged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
     'batdailyenergydischarged': ['Daily Energy Discharged', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'griddailyongridenergy':    ['Daily On-grid Energy', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'griddailyenergypurchased': ['Daily Grid Energy Purchased', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'griddailyenergyused':      ['Daily Grid Energy Used', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
 }
