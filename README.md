@@ -58,11 +58,6 @@ sensor:
       energythismonth:
       energythisyear:
       energytotal:
-      batcapacityremaining:
-      battotalenergycharged:
-      battotalenergydischarged:
-      batdailyenergycharged:
-      batdailyenergydischarged:
 ```
 
 Configuration variables:
@@ -98,12 +93,15 @@ Configuration variables:
   * *energythismonth*: Total energy produced in current month
   * *energythisyear*: Total energy produced this year
   * *energytotal*: Total energy produced in the lifetime of the inverter
+  > :warning: All the following sensors only work if you have a hybrid inverter with battery:
   * *batcapacityremaining*: Remaining battery capacity 
-  * *battotalenergycharged*: Total battery energy charged (precision: 1kWh)
-  * *battotalenergydischarged*: Total battery energy discharged (precision: 1kWh)
-  * *batdailyenergycharged*: Daily battery energy charged (precision: 0.1 kWh)
-  * *batdailyenergydischarged*: Daily battery energy discharged (precision: 0.1 kWh)
-> Note: Daily battery statistics are recommended for energy dashboard due to better precision
+  * *battotalenergycharged*: Total battery energy charged (not recommended for energy dashboard: precision = 1kWh)
+  * *battotalenergydischarged*: Total battery energy discharged (not recommended for energy dashboard: precision = 1kWh)
+  * *batdailyenergycharged*: Daily battery energy charged (recommended for energy dashboard: precision = 0.1 kWh)
+  * *batdailyenergydischarged*: Daily battery energy discharged (recommended for energy dashboard: precision = 0.1 kWh)
+  * *griddailyongridenergy*: Daily energy on-grid
+  * *griddailyenergypurchased*: Daily energy purchased
+  * *griddailyenergyused*: Daily energy used
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
