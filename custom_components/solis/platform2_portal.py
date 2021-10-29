@@ -81,6 +81,9 @@ PORTAL_INVERTER_CONST = {
     'BAT_TOTAL_ENERGY_DISCHARGED': ['kWh', '1cy', float, 2],
     'BAT_DAILY_ENERGY_CHARGED':    ['kWh', '1cz', float, 2],
     'BAT_DAILY_ENERGY_DISCHARGED': ['kWh', '1da', float, 2],
+    'GRID_DAILY_ON_GRID_ENERGY':   ['kWh', '1bw', float, 2],
+    'GRID_DAILY_ENERGY_PURCHASED': ['kWh', '1bx', float, 2],
+    'GRID_DAILY_ENERGY_USED':      ['kWh', '1co', float, 2],
 }
 
 class PortalConfig:
@@ -344,6 +347,18 @@ class InverterData(object):
   def batdailyenergydischarged(self):
     return self._sensor_data['BAT_DAILY_ENERGY_DISCHARGED']
 
+  @property
+  def griddailyongridenergy(self):
+    return self._sensor_data['GRID_DAILY_ON_GRID_ENERGY']
+
+  @property
+  def griddailyenergypurchased(self):
+    return self._sensor_data['GRID_DAILY_ENERGY_PURCHASED']
+
+  @property
+  def griddailyenergyused(self):
+    return self._sensor_data['GRID_DAILY_ENERGY_USED']
+    
 class PortalAPI():
   """ Class with functions for reading data from the Platform 2.0 portal. """
 
