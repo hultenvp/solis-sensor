@@ -363,7 +363,7 @@ class InverterData(object):
     
   @property
   def gridpowergridtotalpower(self):
-    return self._sensor_data['GRID_DTOTAL_POWER']
+    return self._sensor_data['GRID_TOTAL_POWER']
     
   @property
   def gridtotalconsumptionpower(self):
