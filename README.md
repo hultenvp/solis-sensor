@@ -99,8 +99,8 @@ Configuration variables:
   * *battotalenergydischarged*: Total battery energy discharged (not recommended for energy dashboard: precision = 1kWh)
   * *batdailyenergycharged*: Daily battery energy charged (recommended for energy dashboard: precision = 0.1 kWh)
   * *batdailyenergydischarged*: Daily battery energy discharged (recommended for energy dashboard: precision = 0.1 kWh)
-  * *griddailyongridenergy*: Daily energy on-grid
-  * *griddailyenergypurchased*: Daily energy purchased
+  * *griddailyongridenergy*: Daily energy oreturned to grid
+  * *griddailyenergypurchased*: Daily energy purchased from grid
   * *griddailyenergyused*: Daily energy used
   * *gridpowergridtotalpower*: Power Grid total power
   * *gridtotalconsumptionpower*: Total Consumption power
