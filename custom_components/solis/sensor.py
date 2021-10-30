@@ -49,6 +49,12 @@ _LOGGER = logging.getLogger(__name__)
 # VERSION
 VERSION = '0.3.3'
 
+LAST_UPDATED = 'Last updated;
+
+EMPTY_ATTR = {
+  LAST_UPDATED: [None],
+}
+
 def _check_config_schema(conf):
   """ Check if the sensors and attributes are valid. """
 
@@ -124,6 +130,7 @@ class SolisSensor(SensorEntity):
     self._inverter_name = inverter_name
     self._type = sensor_type
     self._measured = None
+    self._attributes = EMPTY_ATTR
     # Properties
     self._icon = SENSOR_TYPES[sensor_type][2]
     self._name = self._inverter_name + ' ' + SENSOR_TYPES[sensor_type][0]
@@ -152,6 +159,7 @@ class SolisSensor(SensorEntity):
     # Property name in data interface must be equal to sensor type
     self._attr_native_value = getattr(data, self._type)
     self._measured = data.last_updated
+    self._attributes[LAST_UPDATED] = data.last_updated
     return True
 
   @property
@@ -168,4 +176,10 @@ class SolisSensor(SensorEntity):
   def should_poll(self):
     """No polling needed."""
     return False
+  
+  @property
+  def extra_state_attributes(self):
+    """Return entity specific state attributes."""
+    return self._attributes
+  
   
