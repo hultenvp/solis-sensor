@@ -49,7 +49,7 @@ _LOGGER = logging.getLogger(__name__)
 # VERSION
 VERSION = '0.3.3'
 
-LAST_UPDATED = 'Last updated;
+LAST_UPDATED = 'Last updated'
 
 EMPTY_ATTR = {
   LAST_UPDATED: [None],
