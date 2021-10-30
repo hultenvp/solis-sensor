@@ -60,4 +60,6 @@ SENSOR_TYPES = {
     'griddailyongridenergy':    ['Daily On-grid Energy', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
     'griddailyenergypurchased': ['Daily Grid Energy Purchased', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
     'griddailyenergyused':      ['Daily Grid Energy Used', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
+    'gridpowergridtotalpower':  ['Power Grid total power', 'W', 'mdi:flash-outline', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
+    'gridtotalconsumptionpower':['Total Consumption power', 'W', 'mdi:flash-outline', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
 }
