@@ -102,6 +102,8 @@ Configuration variables:
   * *griddailyongridenergy*: Daily energy on-grid
   * *griddailyenergypurchased*: Daily energy purchased
   * *griddailyenergyused*: Daily energy used
+  * *gridpowergridtotalpower*: Power Grid total power
+  * *gridtotalconsumptionpower*: Total Consumption power
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
