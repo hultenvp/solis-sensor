@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.0.5'
+VERSION = '0.1.0'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -79,6 +79,13 @@ PORTAL_INVERTER_CONST = {
     'BAT_REMAINING_CAPACITY':      ['%', '1cv', float, 2],
     'BAT_TOTAL_ENERGY_CHARGED':    ['kWh', '1cx', float, 2],
     'BAT_TOTAL_ENERGY_DISCHARGED': ['kWh', '1cy', float, 2],
+    'BAT_DAILY_ENERGY_CHARGED':    ['kWh', '1cz', float, 2],
+    'BAT_DAILY_ENERGY_DISCHARGED': ['kWh', '1da', float, 2],
+    'GRID_DAILY_ON_GRID_ENERGY':   ['kWh', '1bw', float, 2],
+    'GRID_DAILY_ENERGY_PURCHASED': ['kWh', '1bx', float, 2],
+    'GRID_DAILY_ENERGY_USED':      ['kWh', '1co', float, 2],
+    'GRID_TOTAL_POWER':            ['W', '1bq', float, 2],
+    'GRID_TOTAL_CONSUMPTION_POWER':['W', '1cj', float, 2],
 }
 
 class PortalConfig:
@@ -167,6 +174,7 @@ class InverterData(object):
     if (self.interface_portal.is_online()):
       portaldata = self.interface_portal.get_portal_data()
       if (portaldata is not None):
+        #_LOGGER.debug("Data received: %s", portaldata)
         data = portaldata['result']['deviceWapper']['dataJSON']
         # We're online and we have data, so update last_updated
         # Energy_today is not reset at midnight, but in the morning at sunrise when the inverter switches back on
@@ -333,6 +341,34 @@ class InverterData(object):
   def battotalenergydischarged(self):
     return self._sensor_data['BAT_TOTAL_ENERGY_DISCHARGED']
 
+  @property
+  def batdailyenergycharged(self):
+    return self._sensor_data['BAT_DAILY_ENERGY_CHARGED']
+
+  @property
+  def batdailyenergydischarged(self):
+    return self._sensor_data['BAT_DAILY_ENERGY_DISCHARGED']
+
+  @property
+  def griddailyongridenergy(self):
+    return self._sensor_data['GRID_DAILY_ON_GRID_ENERGY']
+
+  @property
+  def griddailyenergypurchased(self):
+    return self._sensor_data['GRID_DAILY_ENERGY_PURCHASED']
+
+  @property
+  def griddailyenergyused(self):
+    return self._sensor_data['GRID_DAILY_ENERGY_USED']
+    
+  @property
+  def gridpowergridtotalpower(self):
+    return self._sensor_data['GRID_TOTAL_POWER']
+    
+  @property
+  def gridtotalconsumptionpower(self):
+    return self._sensor_data['GRID_TOTAL_CONSUMPTION_POWER']
+    
 class PortalAPI():
   """ Class with functions for reading data from the Platform 2.0 portal. """
 
