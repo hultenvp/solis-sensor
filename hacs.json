@@ -1,7 +1,7 @@
 {
   "name": "Solis PV portal integration",
   "content_in_root": false,
-  "render_readme": true,
+  "render_readme": false,
   "homeassistant": "2021.9",
   "domains": ["sensor"]
 }
