@@ -1,7 +1,8 @@
 # Solis sensor integration
 HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com) backend. It logs in to the platform and exposes the data retrieved as sensors.
 Also confirmed to work with:
-* Solarman (home.solarman.ch)
+* Solarman (home.solarman.cn)
+* Sofar solar (home.solarman.cn)
 
 > Platform V2 backend is used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 > :warning: This integration does not work with SolisCloud. See [Issue #18](https://github.com/hultenvp/solis-sensor/issues/18) for more details how to move to m.ginlong.com.
@@ -75,20 +76,24 @@ Configuration variables:
   * *energytoday*: Total energy produced today.
   * *status*: Represents portal status. Online if portal is reachable, offline if portal is unreachable
   * *temperature*: Temperature of the inverter
-  * *dcinputvoltagepv1*: String 1 DC voltage (0 if not present)
-  * *dcinputvoltagepv2*: String 2 DC voltage (0 if not present)
-  * *dcinputvoltagepv3*: String 3 DC voltage (0 if not present)
-  * *dcinputvoltagepv4*: String 4 DC voltage (0 if not present)
-  * *dcinputcurrentpv1*: String 1 DC current (0 if not present)
-  * *dcinputcurrentpv2*: String 2 DC current (0 if not present)
-  * *dcinputcurrentpv3*: String 3 DC current (0 if not present)
-  * *dcinputcurrentpv4*: String 4 DC current (0 if not present)
-  * *acoutputvoltage1* : Phase 1 AC voltage (0 if not present)
-  * *acoutputvoltage2* : Phase 2 AC voltage (0 if not present)
-  * *acoutputvoltage3* : Phase 3 AC voltage (0 if not present)
-  * *acoutputcurrent1*: Phase 1 AC current (0 if not present)
-  * *acoutputcurrent2*: Phase 2 AC current (0 if not present)
-  * *acoutputcurrent3*: Phase 3 AC current (0 if not present)
+  * *dcinputvoltagepv1*: String 1 DC voltage (*)
+  * *dcinputvoltagepv2*: String 2 DC voltage (*)
+  * *dcinputvoltagepv3*: String 3 DC voltage (*)
+  * *dcinputvoltagepv4*: String 4 DC voltage (*)
+  * *dcinputcurrentpv1*: String 1 DC current (*)
+  * *dcinputcurrentpv2*: String 2 DC current (*)
+  * *dcinputcurrentpv3*: String 3 DC current (*)
+  * *dcinputcurrentpv4*: String 4 DC current (*)
+  * *dcinputpowerpv1*: String 1 DC current (*)
+  * *dcinputpowerpv2*: String 2 DC current (*)
+  * *dcinputpowerpv3*: String 3 DC current (*)
+  * *dcinputpowerpv4*: String 4 DC current (*)
+  * *acoutputvoltage1* : Phase 1 AC voltage (*)
+  * *acoutputvoltage2* : Phase 2 AC voltage (*)
+  * *acoutputvoltage3* : Phase 3 AC voltage (*)
+  * *acoutputcurrent1*: Phase 1 AC current (*)
+  * *acoutputcurrent2*: Phase 2 AC current (*)
+  * *acoutputcurrent3*: Phase 3 AC current (*)
   * *energylastmonth*: Total energy produced last month 
   * *energythismonth*: Total energy produced in current month
   * *energythisyear*: Total energy produced this year
@@ -104,6 +109,8 @@ Configuration variables:
   * *griddailyenergyused*: Daily energy used
   * *gridpowergridtotalpower*: Power Grid total power
   * *gridtotalconsumptionpower*: Total Consumption power
+ 
+(*) portal returns '0' if not present
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 

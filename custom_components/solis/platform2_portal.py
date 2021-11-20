@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -64,6 +64,10 @@ PORTAL_INVERTER_CONST = {
     'LINE_2_ADC':                  ['A', '1k', float, 2],
     'LINE_3_ADC':                  ['A', '1l', float, 2],
     'LINE_4_ADC':                  ['A', '1m', float, 2],
+    'LINE_1_PDC':                  ['W', '1s', float, 2],
+    'LINE_2_PDC':                  ['W', '1t', float, 2],
+    'LINE_3_PDC':                  ['W', '1u', float, 2],
+    'LINE_4_PDC':                  ['W', '1v', float, 2],
     'PHASE_1_VAC':                 ['V', '1af', float, 2],
     'PHASE_2_VAC':                 ['V', '1ag', float, 2],
     'PHASE_3_VAC':                 ['V', '1ah', float, 2],
@@ -266,6 +270,22 @@ class InverterData(object):
     return self._sensor_data['LINE_4_ADC']
 
   @property
+  def dcinputpowerpv1(self):
+    return self._sensor_data['LINE_1_PDC']
+
+  @property
+  def dcinputpowerpv2(self):
+    return self._sensor_data['LINE_2_PDC']
+
+  @property
+  def dcinputpowerpv3(self):
+    return self._sensor_data['LINE_3_PDC']
+
+  @property
+  def dcinputpowerpv4(self):
+    return self._sensor_data['LINE_4_PDC']
+
+  @property
   def acoutputvoltage1(self):
     return self._sensor_data['PHASE_1_VAC']
 
@@ -322,7 +342,7 @@ class InverterData(object):
     return self._sensor_data['INV_ENERGY_TOTAL_LIFE']
 
   @property
-  def devide_id(self):
+  def device_id(self):
     return self._sensor_data['INV_DEVICE_ID']
 
   @property
