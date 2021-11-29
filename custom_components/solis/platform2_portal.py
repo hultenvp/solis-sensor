@@ -75,6 +75,7 @@ PORTAL_INVERTER_CONST = {
     'PHASE_2_AAC':                 ['A', '1aj', float, 2],
     'PHASE_3_AAC':                 ['A', '1ak', float, 2],
     'INV_POWER_AC':                ['W', '1ao', float, 2],
+    'INV_FREQ_AC':                 ['Hz', '1ar', float, 2],
     'INV_ENERGY_LAST_MONTH':       ['kWh', '1ru', float, 2],
     'INV_ENERGY_TODAY':            ['kWh', '1bd', float, 2],
     'INV_ENERGY_THIS_MONTH':       ['kWh', '1be', float, 2],
@@ -88,8 +89,15 @@ PORTAL_INVERTER_CONST = {
     'GRID_DAILY_ON_GRID_ENERGY':   ['kWh', '1bw', float, 2],
     'GRID_DAILY_ENERGY_PURCHASED': ['kWh', '1bx', float, 2],
     'GRID_DAILY_ENERGY_USED':      ['kWh', '1co', float, 2],
+    'GRID_MONTHLY_ENERGY_PURCHASED':['kWh', '1bz', float, 2],
+    'GRID_MONTHLY_ENERGY_USED':    ['kWh', '1cp', float, 2],
+    'GRID_YEARLY_ENERGY_PURCHASED': ['kWh', '1cb', float, 2],
+    'GRID_YEARLY_ENERGY_USED':     ['kWh', '1cq', float, 2],
+    'GRID_TOTAL_ON_GRID_ENERGY':   ['kWh', '1bu', float, 2],
+    'GRID_TOTAL_CONSUMPTION_ENERGY':['kWh', '1cn', float, 2],
     'GRID_TOTAL_POWER':            ['W', '1bq', float, 2],
     'GRID_TOTAL_CONSUMPTION_POWER':['W', '1cj', float, 2],
+    'GRID_TOTAL_ENERGY_USED':      ['kWh', '1bv', float, 2],
 }
 
 class PortalConfig:
@@ -314,6 +322,10 @@ class InverterData(object):
     return self._sensor_data['INV_POWER_AC']
 
   @property
+  def acfrequency(self):
+    return self._sensor_data['INV_FREQ_AC']
+  
+  @property
   def energylastmonth(self):
     return self._sensor_data['INV_ENERGY_LAST_MONTH']
 
@@ -380,7 +392,31 @@ class InverterData(object):
   @property
   def griddailyenergyused(self):
     return self._sensor_data['GRID_DAILY_ENERGY_USED']
-    
+  
+  @property
+  def gridmonthlyenergypurchased(self):
+    return self._sensor_data['GRID_MONTHLY_ENERGY_PURCHASED']
+  
+  @property
+  def gridmonthlyenergyused(self):
+    return self._sensor_data['GRID_MONTHLY_ENERGY_USED']
+  
+  @property
+  def gridyearlyenergypurchased(self):
+    return self._sensor_data['GRID_YEARLY_ENERGY_PURCHASED']
+  
+  @property
+  def gridyearlyenergyused(self):
+    return self._sensor_data['GRID_YEARLY_ENERGY_USED']
+  
+  @property
+  def gridtotalongridenergy(self):
+    return self._sensor_data['GRID_TOTAL_ON_GRID_ENERGY']
+  
+  @property
+  def gridtotalconsumptionenergy(self):
+    return self._sensor_data['GRID_TOTAL_CONSUMPTION_ENERGY']
+  
   @property
   def gridpowergridtotalpower(self):
     return self._sensor_data['GRID_TOTAL_POWER']
@@ -389,6 +425,10 @@ class InverterData(object):
   def gridtotalconsumptionpower(self):
     return self._sensor_data['GRID_TOTAL_CONSUMPTION_POWER']
     
+  @property
+  def gridtotalenergyused(self):
+    return self._sensor_data['GRID_TOTAL_ENERGY_USED']
+ 
 class PortalAPI():
   """ Class with functions for reading data from the Platform 2.0 portal. """
 
