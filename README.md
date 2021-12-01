@@ -94,6 +94,7 @@ Configuration variables:
   * *acoutputcurrent1*: Phase 1 AC current (*)
   * *acoutputcurrent2*: Phase 2 AC current (*)
   * *acoutputcurrent3*: Phase 3 AC current (*)
+  * *acfrequency*: AC frequency (*)
   * *energylastmonth*: Total energy produced last month 
   * *energythismonth*: Total energy produced in current month
   * *energythisyear*: Total energy produced this year
@@ -104,11 +105,18 @@ Configuration variables:
   * *battotalenergydischarged*: Total battery energy discharged (not recommended for energy dashboard: precision = 1kWh)
   * *batdailyenergycharged*: Daily battery energy charged (recommended for energy dashboard: precision = 0.1 kWh)
   * *batdailyenergydischarged*: Daily battery energy discharged (recommended for energy dashboard: precision = 0.1 kWh)
-  * *griddailyongridenergy*: Daily energy oreturned to grid
+  * *griddailyongridenergy*: Daily energy returned to grid
   * *griddailyenergypurchased*: Daily energy purchased from grid
   * *griddailyenergyused*: Daily energy used
+  * *gridmonthlyenergypurchased*: Monthly energy purchased from grid
+  * *gridmonthlyenergyused*: Monthly energy used
+  * *gridyearlyenergypurchased*: Yearly energy purchased from grid
+  * *gridyearlyenergyused*: Yearly energy used
   * *gridpowergridtotalpower*: Power Grid total power
   * *gridtotalconsumptionpower*: Total Consumption power
+  * *gridtotalenergyused*: Total energy purchased from grid
+  * *gridtotalconsumptionenergy*: Total energy used
+  * *gridtotalongridenergy*: Total energy returned to grid
  
 (*) portal returns '0' if not present
 
