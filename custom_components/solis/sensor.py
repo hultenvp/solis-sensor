@@ -47,7 +47,7 @@ from .platform2_portal import PortalConfig as inverter_config
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.5'
+VERSION = '0.4.0'
 
 LAST_UPDATED = 'Last updated'
 
