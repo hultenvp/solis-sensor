@@ -7,6 +7,7 @@
 
 import binascii
 import hashlib
+from http import HTTPStatus
 import logging
 import struct
 import sys
@@ -18,7 +19,6 @@ import logging
 import aiohttp
 import async_timeout
 
-from homeassistant.const import HTTP_OK
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -558,7 +558,7 @@ class PortalAPI():
 
         result[STATUS_CODE] = resp.status
         result[CONTENT] = await resp.json()
-        if resp.status == HTTP_OK:
+        if resp.status == HTTPStatus.OK:
           result[SUCCESS] = True
           result[MESSAGE] = "OK"
         else:
@@ -588,7 +588,7 @@ class PortalAPI():
 
         result[STATUS_CODE] = resp.status
         result[CONTENT] = await resp.json()
-        if resp.status == HTTP_OK:
+        if resp.status == HTTPStatus.OK:
           result[SUCCESS] = True
           result[MESSAGE] = "OK"
         else:
