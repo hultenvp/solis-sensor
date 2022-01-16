@@ -48,7 +48,7 @@ sensor:
     portal_domain: "m.ginlong.com"
     portal_username: "my_portal_username"
     portal_password: "my_portal_password"
-    portal_plant_id: "plantId goes here"
+    portal_plant_id: plantId as integer goes here
 ```
 
 Configuration variables:
