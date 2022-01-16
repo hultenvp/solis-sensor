@@ -22,7 +22,7 @@ Install this component by copying the files in [`/custom_components/solis/`]
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/sensor.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/service.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/ginlong_api.py"
-"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/ginlong_consr.py"
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/ginlong_const.py"
 
 This is how your custom_components directory should be:
 ```bash
