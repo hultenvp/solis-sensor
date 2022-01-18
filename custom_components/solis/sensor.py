@@ -43,9 +43,6 @@ _LOGGER = logging.getLogger(__name__)
 VERSION = '1.0.0'
 
 LAST_UPDATED = 'Last updated'
-LAT = 'Lat'
-LON = 'Lon'
-PLANT_ID = 'PlantID'
 SERIAL = 'Inverter serial'
 
 EMPTY_ATTR: dict[str, Any] = {
