@@ -416,7 +416,7 @@ SENSOR_TYPES = {
         'Total Energy Used',
         ENERGY_KILO_WATT_HOUR,
         'mdi:transmission-tower',
-        DEVICE_CLASS_POWER,
+        DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         GRID_TOTAL_ENERGY_USED
     ],
