@@ -20,7 +20,9 @@ Install this component by copying the files in [`/custom_components/solis/`]
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/manifest.json"
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/const.py",
 "https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/sensor.py",
-"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/platform2_portal.py"
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/service.py",
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/ginlong_api.py"
+"https://raw.githubusercontent.com/hultenvp/solis-sensor/master/custom_components/solis/ginlong_const.py"
 
 This is how your custom_components directory should be:
 ```bash
@@ -28,7 +30,9 @@ custom_components
 ├── solis
 │   ├── __init__.py
 │   ├── manifest.json
-│   ├── platform2_portal.py
+│   ├── ginlong_api.py
+│   ├── ginlong_const.py
+│   ├── service.py
 │   ├── const.py
 │   └── sensor.py
 ```
@@ -44,21 +48,7 @@ sensor:
     portal_domain: "m.ginlong.com"
     portal_username: "my_portal_username"
     portal_password: "my_portal_password"
-    portal_plant_id: "plantId goes here"
-    inverter_serial: "Serial goes here"
-    sensors:
-      actualpower:
-      energytoday:
-      status:
-      temperature:
-      dcinputvoltagepv1:
-      dcinputcurrentpv1:
-      acoutputvoltage1:
-      acoutputcurrent1:
-      energylastmonth:
-      energythismonth:
-      energythisyear:
-      energytotal:
+    portal_plant_id: plantId as integer goes here
 ```
 
 Configuration variables:
@@ -70,55 +60,8 @@ Configuration variables:
 > Note: The integration uses https to communicate with the portal, but the username and password are sent over in plain text!
 * **portal_plant_id** (Required): PlantId on the platform the inverter belongs to, log into the portal to find the pland ID under tab "plants". The plantID must be a decimal value. 
 > Dutch: Tab installatie: Installatie ID. 
-* **inverter_serial** (Required): Serial # of the inverter itself, not the logger! Can be found under tab "devices" 
-* **sensors** (Required): List of values which will be presented as sensors:
-  * *actualpower*: Actual power being produced
-  * *energytoday*: Total energy produced today.
-  * *status*: Represents portal status. Online if portal is reachable, offline if portal is unreachable
-  * *temperature*: Temperature of the inverter
-  * *dcinputvoltagepv1*: String 1 DC voltage (*)
-  * *dcinputvoltagepv2*: String 2 DC voltage (*)
-  * *dcinputvoltagepv3*: String 3 DC voltage (*)
-  * *dcinputvoltagepv4*: String 4 DC voltage (*)
-  * *dcinputcurrentpv1*: String 1 DC current (*)
-  * *dcinputcurrentpv2*: String 2 DC current (*)
-  * *dcinputcurrentpv3*: String 3 DC current (*)
-  * *dcinputcurrentpv4*: String 4 DC current (*)
-  * *dcinputpowerpv1*: String 1 DC current (*)
-  * *dcinputpowerpv2*: String 2 DC current (*)
-  * *dcinputpowerpv3*: String 3 DC current (*)
-  * *dcinputpowerpv4*: String 4 DC current (*)
-  * *acoutputvoltage1* : Phase 1 AC voltage (*)
-  * *acoutputvoltage2* : Phase 2 AC voltage (*)
-  * *acoutputvoltage3* : Phase 3 AC voltage (*)
-  * *acoutputcurrent1*: Phase 1 AC current (*)
-  * *acoutputcurrent2*: Phase 2 AC current (*)
-  * *acoutputcurrent3*: Phase 3 AC current (*)
-  * *acfrequency*: AC frequency (*)
-  * *energylastmonth*: Total energy produced last month 
-  * *energythismonth*: Total energy produced in current month
-  * *energythisyear*: Total energy produced this year
-  * *energytotal*: Total energy produced in the lifetime of the inverter
-  > :warning: All the following sensors only work if you have a hybrid inverter with battery:
-  * *batcapacityremaining*: Remaining battery capacity 
-  * *battotalenergycharged*: Total battery energy charged (not recommended for energy dashboard: precision = 1kWh)
-  * *battotalenergydischarged*: Total battery energy discharged (not recommended for energy dashboard: precision = 1kWh)
-  * *batdailyenergycharged*: Daily battery energy charged (recommended for energy dashboard: precision = 0.1 kWh)
-  * *batdailyenergydischarged*: Daily battery energy discharged (recommended for energy dashboard: precision = 0.1 kWh)
-  * *griddailyongridenergy*: Daily energy returned to grid
-  * *griddailyenergypurchased*: Daily energy purchased from grid
-  * *griddailyenergyused*: Daily energy used
-  * *gridmonthlyenergypurchased*: Monthly energy purchased from grid
-  * *gridmonthlyenergyused*: Monthly energy used
-  * *gridyearlyenergypurchased*: Yearly energy purchased from grid
-  * *gridyearlyenergyused*: Yearly energy used
-  * *gridpowergridtotalpower*: Power Grid total power
-  * *gridtotalconsumptionpower*: Total Consumption power
-  * *gridtotalenergyused*: Total energy purchased from grid
-  * *gridtotalconsumptionenergy*: Total energy used
-  * *gridtotalongridenergy*: Total energy returned to grid
- 
-(*) portal returns '0' if not present
+
+The integration will detect automatically which data is available at the backend and create the relevant sensors. Names are backward compatible with old manual configuaration.
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 

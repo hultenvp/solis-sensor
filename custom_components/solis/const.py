@@ -1,21 +1,27 @@
-"""
-  Constants
-
-  For more information: https://github.com/hultenvp/solis-sensor/
+"""Constants
+For more information: https://github.com/hultenvp/solis-sensor/
 """
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
 )
 
-from homeassistant.const import ( 
+from homeassistant.const import (
     TEMP_CELSIUS,
+    PERCENTAGE,
+    FREQUENCY_HERTZ,
+    ELECTRIC_POTENTIAL_VOLT,
+    ENERGY_KILO_WATT_HOUR,
+    POWER_WATT,
+    ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
     DEVICE_CLASS_VOLTAGE,
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_BATTERY)
+
+from .ginlong_const import *
 
 CONF_PORTAL_DOMAIN = 'portal_domain'
 CONF_USERNAME = 'portal_username'
@@ -28,50 +34,390 @@ SENSOR_PREFIX = 'Solis'
 DEFAULT_DOMAIN = 'm.ginlong.com'
 
 # Supported sensor types:
-# Key: ['label', unit, icon, device class, state class]
+# Key: ['label', unit, icon, device class, state class, api_attribute_name]
 SENSOR_TYPES = {
-    'status':                   ['Status', None, 'mdi:solar-power', None, None],
-    'temperature':              ['Temperature', TEMP_CELSIUS, 'mdi:thermometer', DEVICE_CLASS_TEMPERATURE, STATE_CLASS_MEASUREMENT],
-    'dcinputvoltagepv1':        ['DC Voltage PV1', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'dcinputvoltagepv2':        ['DC Voltage PV2', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'dcinputvoltagepv3':        ['DC Voltage PV3', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'dcinputvoltagepv4':        ['DC Voltage PV4', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'dcinputcurrentpv1':        ['DC Current PV1', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'dcinputcurrentpv2':        ['DC Current PV2', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'dcinputcurrentpv3':        ['DC Current PV3', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'dcinputcurrentpv4':        ['DC Current PV4', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'dcinputpowerpv1':          ['DC Power PV1', 'W', 'mdi:solar-power', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'dcinputpowerpv2':          ['DC Power PV2', 'W', 'mdi:solar-power', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'dcinputpowerpv3':          ['DC Power PV3', 'W', 'mdi:solar-power', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'dcinputpowerpv4':          ['DC Power PV4', 'W', 'mdi:solar-power', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'acoutputvoltage1':         ['AC Voltage R', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'acoutputvoltage2':         ['AC Voltage S', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'acoutputvoltage3':         ['AC Voltage T', 'V', 'mdi:flash-outline', DEVICE_CLASS_VOLTAGE, STATE_CLASS_MEASUREMENT],
-    'acoutputcurrent1':         ['AC Current R', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'acoutputcurrent2':         ['AC Current S', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'acoutputcurrent3':         ['AC Current T', 'A', 'mdi:flash-outline', DEVICE_CLASS_CURRENT, STATE_CLASS_MEASUREMENT],
-    'actualpower':              ['AC Output Total Power', 'W', 'mdi:solar-power', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'acfrequency':              ['AC Frequency', 'Hz', 'mdi:sine-wave', None, STATE_CLASS_MEASUREMENT],
-    'energylastmonth':          ['Energy Last Month', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'energytoday':              ['Energy Today', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'energythismonth':          ['Energy This Month', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'energythisyear':           ['energy This Year', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'energytotal':              ['Energy Total', 'kWh', 'mdi:flash-outline', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'batcapacityremaining':     ['Remaining battery capacity', '%', 'mdi:battery', DEVICE_CLASS_BATTERY, STATE_CLASS_MEASUREMENT],
-    'battotalenergycharged':    ['Total Energy Charged', 'kWh', 'mdi:battery-plus', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'battotalenergydischarged': ['Total Energy Discharged', 'kWh', 'mdi:battery-minus', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'batdailyenergycharged':    ['Daily Energy Charged', 'kWh', 'mdi:battery-plus', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'batdailyenergydischarged': ['Daily Energy Discharged', 'kWh', 'mdi:battery-minus', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'griddailyongridenergy':    ['Daily On-grid Energy', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'griddailyenergypurchased': ['Daily Grid Energy Purchased', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'griddailyenergyused':      ['Daily Grid Energy Used', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridmonthlyenergypurchased':['Monthly Grid Energy Purchased', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridmonthlyenergyused':    ['Monthly Grid Energy Used', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridyearlyenergypurchased':['Yearly Grid Energy Purchased', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridyearlyenergyused':     ['Yearly Grid Energy Used', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridtotalongridenergy':    ['Total On-grid Energy', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridtotalconsumptionenergy':['Total Consumption Energy', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_ENERGY, STATE_CLASS_TOTAL_INCREASING],
-    'gridpowergridtotalpower':  ['Power Grid total power', 'W', 'mdi:home-export-outline', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'gridtotalconsumptionpower':['Total Consumption power', 'W', 'mdi:home-import-outline', DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT],
-    'gridtotalenergyused':      ['Total Energy Used', 'kWh', 'mdi:transmission-tower', DEVICE_CLASS_POWER, STATE_CLASS_TOTAL_INCREASING],
+    'inverterpowerstate': [
+        'Power state',
+        None,
+        'mdi:power',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_POWER_STATE
+    ],
+    'inverterstate': [
+        'State',
+        None,
+        'mdi:state-machine',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_STATE
+    ],
+    'timestamponline': [
+        'Timestamp inverter online',
+        None,
+        'mdi:calendar-clock',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_TIMESTAMP_ONLINE
+    ],
+    'timestampmeasurement': [
+        'Timestamp measurements received',
+        None,
+        'mdi:calendar-clock',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_TIMESTAMP_UPDATE
+    ],
+    'status': [
+        'Status',
+        None,
+        'mdi:solar-power',
+        None,
+        None,
+        'status'
+    ],
+    'temperature': [
+        'Temperature',
+        TEMP_CELSIUS,
+        'mdi:thermometer',
+        DEVICE_CLASS_TEMPERATURE,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_TEMPERATURE
+    ],
+    'dcinputvoltagepv1': [
+        'DC Voltage PV1',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        STRING1_VOLTAGE
+    ],
+    'dcinputvoltagepv2': [
+        'DC Voltage PV2',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        STRING2_VOLTAGE
+    ],
+    'dcinputvoltagepv3': [
+        'DC Voltage PV3',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        STRING3_VOLTAGE
+    ],
+    'dcinputvoltagepv4': [
+        'DC Voltage PV4',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        STRING4_VOLTAGE
+    ],
+    'dcinputcurrentpv1': [
+        'DC Current PV1',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        STRING1_CURRENT
+    ],
+    'dcinputcurrentpv2': [
+        'DC Current PV2',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        STRING2_CURRENT
+    ],
+    'dcinputcurrentpv3': [
+        'DC Current PV3',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        STRING3_CURRENT
+    ],
+    'dcinputcurrentpv4': [
+        'DC Current PV4',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        STRING4_CURRENT
+    ],
+    'dcinputpowerpv1': [
+        'DC Power PV1',
+        POWER_WATT,
+        'mdi:solar-power',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        STRING1_POWER
+    ],
+    'dcinputpowerpv2': [
+        'DC Power PV2',
+        POWER_WATT,
+        'mdi:solar-power',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        STRING2_POWER
+    ],
+    'dcinputpowerpv3': [
+        'DC Power PV3',
+        POWER_WATT,
+        'mdi:solar-power',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        STRING3_POWER
+    ],
+    'dcinputpowerpv4': [
+        'DC Power PV4',
+        POWER_WATT,
+        'mdi:solar-power',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        STRING4_POWER
+    ],
+    'acoutputvoltage1': [
+        'AC Voltage R',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        PHASE1_VOLTAGE
+    ],
+    'acoutputvoltage2': [
+        'AC Voltage S',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        PHASE2_VOLTAGE
+    ],
+    'acoutputvoltage3': [
+        'AC Voltage T',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:flash-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        PHASE3_VOLTAGE
+    ],
+    'acoutputcurrent1': [
+        'AC Current R',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        PHASE1_CURRENT
+    ],
+    'acoutputcurrent2': [
+        'AC Current S',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        PHASE2_CURRENT
+    ],
+    'acoutputcurrent3': [
+        'AC Current T',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:flash-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        PHASE3_CURRENT
+    ],
+    'actualpower': [
+        'AC Output Total Power',
+        POWER_WATT,
+        'mdi:solar-power',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_ACPOWER
+    ],
+    'acfrequency': [
+        'AC Frequency',
+        FREQUENCY_HERTZ,
+        'mdi:sine-wave',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        INVERTER_ACFREQUENCY
+    ],
+    'energylastmonth': [
+        'Energy Last Month',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:flash-outline',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        INVERTER_ENERGY_LAST_MONTH
+    ],
+    'energytoday': [
+        'Energy Today',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:flash-outline',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        INVERTER_ENERGY_TODAY
+    ],
+    'energythismonth': [
+        'Energy This Month',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:flash-outline',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        INVERTER_ENERGY_THIS_MONTH
+    ],
+    'energythisyear': [
+        'energy This Year',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:flash-outline',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        INVERTER_ENERGY_THIS_YEAR
+    ],
+    'energytotal': [
+        'Energy Total',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:flash-outline',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        INVERTER_ENERGY_TOTAL_LIFE
+    ],
+    'batcapacityremaining': [
+        'Remaining battery capacity',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        BAT_REMAINING_CAPACITY
+    ],
+    'battotalenergycharged': [
+        'Total Energy Charged',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:battery-plus',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        BAT_TOTAL_ENERGY_CHARGED
+    ],
+    'battotalenergydischarged': [
+        'Total Energy Discharged',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:battery-minus',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        BAT_TOTAL_ENERGY_DISCHARGED
+    ],
+    'batdailyenergycharged': [
+        'Daily Energy Charged',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:battery-plus',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        BAT_DAILY_ENERGY_CHARGED
+    ],
+    'batdailyenergydischarged': [
+        'Daily Energy Discharged',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:battery-minus',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        BAT_DAILY_ENERGY_DISCHARGED
+    ],
+    'griddailyongridenergy': [
+        'Daily On-grid Energy',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_DAILY_ON_GRID_ENERGY
+    ],
+    'griddailyenergypurchased': [
+        'Daily Grid Energy Purchased',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_DAILY_ENERGY_PURCHASED
+    ],
+    'griddailyenergyused': [
+        'Daily Grid Energy Used',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_DAILY_ENERGY_USED
+    ],
+    'gridmonthlyenergypurchased': [
+        'Monthly Grid Energy Purchased',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_MONTHLY_ENERGY_PURCHASED
+    ],
+    'gridmonthlyenergyused': [
+        'Monthly Grid Energy Used',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_MONTHLY_ENERGY_USED
+    ],
+    'gridyearlyenergypurchased': [
+        'Yearly Grid Energy Purchased',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_YEARLY_ENERGY_PURCHASED
+    ],
+    'gridyearlyenergyused': [
+        'Yearly Grid Energy Used',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_YEARLY_ENERGY_USED
+    ],
+    'gridtotalongridenergy': [
+        'Total On-grid Energy',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_TOTAL_ON_GRID_ENERGY
+    ],
+    'gridtotalconsumptionenergy':[
+        'Total Consumption Energy',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_TOTAL_CONSUMPTION_ENERGY
+    ],
+    'gridpowergridtotalpower': [
+        'Power Grid total power',
+        POWER_WATT,
+        'mdi:home-export-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_TOTAL_POWER
+    ],
+    'gridtotalconsumptionpower': [
+        'Total Consumption power',
+        POWER_WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_TOTAL_CONSUMPTION_POWER
+    ],
+    'gridtotalenergyused': [
+        'Total Energy Used',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_TOTAL_ENERGY_USED
+    ],
 }
