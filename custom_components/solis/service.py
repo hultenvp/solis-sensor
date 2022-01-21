@@ -15,7 +15,9 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
 
-from .ginlong_api import PortalConfig, GinlongAPI, GinlongData
+from .ginlong_base import PortalConfig, BaseAPI, GinlongData
+from .ginlong_api import GinlongAPI, GinlongConfig
+from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
@@ -62,7 +64,12 @@ class InverterService():
         self._logintime: datetime | None = None
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
         self._hass: HomeAssistant = hass
-        self._api: GinlongAPI = GinlongAPI(portal_config)
+        if isinstance(portal_config, GinlongConfig):
+            self._api: BaseAPI = GinlongAPI(portal_config)
+        elif isinstance(portal_config, SoliscloudConfig):
+            self._api = SoliscloudAPI(portal_config)
+        else:
+            _LOGGER.error("Failed to initialize service, incompatible config")
 
     async def _login(self) -> bool:
         if not self._api.is_online:
