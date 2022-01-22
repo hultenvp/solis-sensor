@@ -238,9 +238,7 @@ class GinlongAPI():
         return self._online
 
     async def logout(self) -> None:
-        """ Logout from portal and close session."""
-        if self._session is not None:
-            await self._session.close()
+        """ Logout from portal."""
         self._session = None
         self._online = False
         self._inverter_list = None
