@@ -8,6 +8,7 @@ from __future__ import annotations
 import logging
 
 from abc import ABC, abstractmethod
+import asyncio
 from datetime import datetime, timedelta
 from typing import Any, final
 from homeassistant.core import HomeAssistant
@@ -36,6 +37,7 @@ HRS_BETWEEN_LOGIN = timedelta(hours=2)
 
 #Autodiscover retries
 MAX_RETRIES = 3
+RETRY_DELAY = 10
 
 # Status constants
 ONLINE = 'Online'
@@ -91,6 +93,8 @@ class InverterService():
             if not capabilities:
                 _LOGGER.info("Discovery failed, retry #%s", retries)
                 retries += 1
+                # Don't rush the retries
+                await asyncio.sleep(RETRY_DELAY)
         if not capabilities:
             _LOGGER.warning("Failed to discover.")
         return capabilities
