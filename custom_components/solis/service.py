@@ -29,10 +29,13 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
+
+#Autodiscover retries
+MAX_RETRIES = 3
 
 # Status constants
 ONLINE = 'Online'
@@ -49,6 +52,11 @@ class ServiceSubscriber(ABC):
         if self._measured != last_updated:
             if self.do_update(value, last_updated):
                 self._measured = last_updated
+
+    @property
+    def measured(self) -> datetime | None:
+        """Return timestamp last measurement."""
+        return self._measured
 
     @abstractmethod
     def do_update(self, value: Any, last_updated: datetime) -> bool:
@@ -75,6 +83,19 @@ class InverterService():
         self._logintime = None
 
     async def discover(self) -> dict[str, list[str]]:
+        """ Try to discover and retry if needed."""
+        retries = 0
+        capabilities: dict[str, list[str]] = {}
+        while not capabilities and retries <= MAX_RETRIES:
+            capabilities = await self._do_discover()
+            if not capabilities:
+                _LOGGER.info("Discovery failed, retry #%s", retries)
+                retries += 1
+        if not capabilities:
+            _LOGGER.warning("Failed to discover.")
+        return capabilities
+
+    async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
         capabilities: dict[str, list[str]] = {}
         if await self._login():
@@ -111,7 +132,13 @@ class InverterService():
                     # energy dashboard. Return 0 while inverter is still off.
                     is_am = datetime.now().hour < 12
                     if getattr(data, INVERTER_STATE) != 1 and is_am:
-                        value =  0
+                        # Avoid race conditions when between state change in the morning and
+                        # energy today being reset by adding 10 min grace period
+                        last_updated_state = \
+                            self._subscriptions[serial][INVERTER_STATE].measured
+                        if last_updated_state is not None \
+                        and last_updated_state + timedelta(minutes=10) < datetime.now():
+                            value = 0
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
     async def async_update(self, *_) -> int:
