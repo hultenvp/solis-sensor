@@ -91,7 +91,7 @@ class InverterService():
         while not capabilities and retries <= MAX_RETRIES:
             capabilities = await self._do_discover()
             if not capabilities:
-                _LOGGER.info("Discovery failed, retry #%s", retries)
+                _LOGGER.info("Discovery failed, retry attempt #%s", retries + 1)
                 retries += 1
                 # Don't rush the retries
                 await asyncio.sleep(RETRY_DELAY)
