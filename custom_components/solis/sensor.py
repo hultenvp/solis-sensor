@@ -40,7 +40,7 @@ from .ginlong_api import PortalConfig
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 
 LAST_UPDATED = 'Last updated'
 SERIAL = 'Inverter serial'
