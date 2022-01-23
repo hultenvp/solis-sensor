@@ -44,7 +44,7 @@ from .soliscloud_api import SoliscloudConfig
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.1.0'
+VERSION = '2.0.0'
 
 LAST_UPDATED = 'Last updated'
 SERIAL = 'Inverter serial'
@@ -78,7 +78,7 @@ PLATFORM_SCHEMA = vol.All(PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_PORTAL_DOMAIN, default=DEFAULT_DOMAIN): cv.string,
     vol.Required(CONF_USERNAME , default=None): cv.string,
     vol.Optional(CONF_PASSWORD , default=''): cv.string,
-    vol.Optional(CONF_SECRET , default=''): cv.string,
+    vol.Optional(CONF_SECRET , default='00'): cv.string,
     vol.Optional(CONF_KEY_ID , default=''): cv.string,
     vol.Required(CONF_PLANT_ID, default=None): cv.positive_int,
     vol.Optional(CONF_INVERTER_SERIAL, default=''): cv.string,
@@ -139,7 +139,7 @@ async def async_setup_platform(
     portal_username = config.get(CONF_USERNAME)
     portal_password = config.get(CONF_PASSWORD)
     portal_key_id = config.get(CONF_KEY_ID)
-    portal_secret = config.get(CONF_SECRET)
+    portal_secret: bytes = bytes.fromhex(config.get(CONF_SECRET))
     portal_plantid = config.get(CONF_PLANT_ID)
     inverter_sn = config.get(CONF_INVERTER_SERIAL)
 
@@ -154,13 +154,13 @@ async def async_setup_platform(
     if portal_password != '':
         portal_config = GinlongConfig(
             portal_domain, portal_username, portal_password, portal_plantid)
-    elif portal_key_id != '' and portal_secret != '':
+    elif portal_key_id != '' and portal_secret != b'\x00':
         portal_config = SoliscloudConfig(
-            portal_domain, portal_username, portal_secret, portal_key_id, portal_plantid)
+            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
     else:
-        raise vol.Invalid('please specify either[portal_password] or [portal_key_id] & [portal_secret]')
+        raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & [portal_secret]')
     if portal_plantid is None:
-        raise vol.Invalid('configuration parameter [portal_plantid] does not have a value')
+        raise vol.Invalid('Configuration parameter [portal_plantid] does not have a value')
 
     # Initialize the Ginlong data service.
     service: InverterService = InverterService(portal_config, hass)
