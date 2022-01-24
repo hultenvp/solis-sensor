@@ -88,7 +88,6 @@ PLATFORM_SCHEMA = vol.All(PLATFORM_SCHEMA.extend({
 async def async_autodetect(inverter_service: InverterService) -> dict[str, list[str]]:
     """ Autodetect capabilities per inverter."""
     capabilities = await inverter_service.discover()
-    _LOGGER.debug("%s", capabilities)
     # Build list of sensors for each inverter
     discovered_sensors: dict[str, list]= {}
     for inverter_sn in capabilities:
@@ -97,7 +96,8 @@ async def async_autodetect(inverter_service: InverterService) -> dict[str, list[
                 if inverter_sn not in discovered_sensors:
                     discovered_sensors[inverter_sn] = list()
                 discovered_sensors[inverter_sn].append(sensor)
-
+    if not discovered_sensors:
+        _LOGGER.warning("No sensors detected, nothing to register")
     return discovered_sensors
 
 def create_sensors(sensors: dict[str, list[str]],
