@@ -376,7 +376,7 @@ class SoliscloudAPI(BaseAPI):
         date = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
         content_md5 = base64.b64encode(
-            hashlib.md5(json.dumps(body).encode('utf-8')).digest()
+            hashlib.md5(json.dumps(body,separators=(",", ":")).encode('utf-8')).digest()
         ).decode('utf-8')
         content_type = "application/json"
 
@@ -415,7 +415,7 @@ class SoliscloudAPI(BaseAPI):
         try:
             with async_timeout.timeout(10):
                 url = f"https://{self.config.domain}{canonicalized_resource}"
-                resp = await self._session.post(url, json=params, header=header)
+                resp = await self._session.post(url, data=json.dumps(params,separators=(",", ":")), headers=header)
 
                 result[STATUS_CODE] = resp.status
                 result[CONTENT] = await resp.json()
