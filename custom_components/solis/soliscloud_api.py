@@ -200,9 +200,7 @@ class SoliscloudAPI(BaseAPI):
         return self.is_online
 
     async def logout(self) -> None:
-        """ Close session."""
-        if self._session is not None:
-            await self._session.close()
+        """Hand back session """
         self._session = None
         self._user_id = None
         self._inverter_list = None
