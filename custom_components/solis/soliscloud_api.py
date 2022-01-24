@@ -186,7 +186,7 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             result_json = result[CONTENT]
             try:
-                self._user_id = result_json['data']['userId']
+                self._user_id = result_json['data']
                 _LOGGER.info('Login Successful!')
                 # Request inverter list
                 self._inverter_list = await self.fetch_inverter_list(self.config.plantid)
@@ -222,7 +222,7 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             device_ids = {}
             result_json: dict = result[CONTENT]
-            for record in result_json['data']['records']:
+            for record in result_json['data']['page']['records']:
                 serial = record.get('sn')
                 device_id = record.get('id')
                 device_ids[serial] = device_id
@@ -415,7 +415,7 @@ class SoliscloudAPI(BaseAPI):
         try:
             with async_timeout.timeout(10):
                 url = f"https://{self.config.domain}{canonicalized_resource}"
-                resp = await self._session.post(url, data=json.dumps(params,separators=(",", ":")), headers=header)
+                resp = await self._session.post(url, json=params, headers=header)
 
                 result[STATUS_CODE] = resp.status
                 result[CONTENT] = await resp.json()
@@ -428,7 +428,7 @@ class SoliscloudAPI(BaseAPI):
                 return result
         except (asyncio.TimeoutError, ClientError) as err:
             result[MESSAGE] = "%s" % err
-            _LOGGER.debug("Error: %s", result[MESSAGE])
+            _LOGGER.debug("Error from URI (%s) : %s", canonicalized_resource, result[MESSAGE])
             return result
         finally:
             if resp is not None:
