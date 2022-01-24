@@ -1,0 +1,106 @@
+"""Ginlong base classes
+For more information: https://github.com/hultenvp/solis-sensor/
+"""
+from __future__ import annotations
+
+import logging
+
+from abc import ABC, abstractmethod
+#from typing import final
+from aiohttp import ClientSession
+
+_LOGGER = logging.getLogger(__name__)
+
+# VERSION
+VERSION = '0.1.0'
+
+class PortalConfig(ABC):
+    """ Portal configuration data """
+
+    def __init__(self,
+        portal_domain: str,
+        portal_username: str,
+        portal_plantid: str
+    ) -> None:
+        self._domain: str = portal_domain
+        self._username: str = portal_username
+        self._plantid: str = portal_plantid
+
+    @property
+    def domain(self) -> str:
+        """ Configured portal domain name."""
+        return self._domain
+
+    @property
+    def username(self) -> str:
+        """ Username."""
+        return self._username
+
+    @property
+    def plantid(self) -> str:
+        """ Configured plant ID."""
+        return self._plantid
+
+class GinlongData():
+    """ Representing data measurement for one inverter from Ginlong API """
+
+    def __init__(self, data: dict[str, str | int | float]) -> None:
+        """ Initialize the data object """
+        self._data = data
+
+
+    def get_inverter_data(self) -> dict[str, str | int | float]:
+        """Return all available measurements in a dict."""
+        return self._data
+
+    def __dir__(self):
+        return list(self._data.keys())
+
+    def __getattr__(self, name):
+        """Each measurement is represented as property."""
+        try:
+            return self._data[name]
+        except KeyError as key_error:
+            _LOGGER.debug("AttributeError, %s does not exist", name)
+            raise AttributeError(name) from key_error
+
+class BaseAPI(ABC):
+    """ API Base class."""
+    def __init__(self, config: PortalConfig) -> None:
+        self._config: PortalConfig = config
+        self._session: ClientSession | None = None
+        self._inverter_list: dict[str, str] | None = None
+
+    @property
+    def config(self) -> PortalConfig:
+        """ Config this for this API instance."""
+        return self._config
+
+    @property
+    def inverters(self) -> dict[str, str] | None:
+        """ Return the list of inverters for plant ID when logged in."""
+        return self._inverter_list
+
+    @property
+    @abstractmethod
+    def is_online(self) -> bool:
+        """ Returns if we are logged in."""
+
+    @abstractmethod
+    async def login(self, session: ClientSession) -> bool:
+        """ Login to service."""
+
+    @abstractmethod
+    async def logout(self) -> None:
+        """ Close session."""
+
+    @abstractmethod
+    async def fetch_inverter_list(self, plant_id: str) -> dict[str, str]:
+        """ Retrieve inverter list from service."""
+
+    @abstractmethod
+    async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
+        """
+        Fetch data for given inverter. Collect available data from payload and store
+        as GinlongData object.
+        """
