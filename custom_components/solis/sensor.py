@@ -139,7 +139,7 @@ async def async_setup_platform(
     portal_username = config.get(CONF_USERNAME)
     portal_password = config.get(CONF_PASSWORD)
     portal_key_id = config.get(CONF_KEY_ID)
-    portal_secret: bytes = bytes(config.get(CONF_SECRET),, 'utf-8')
+    portal_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8')
     portal_plantid = config.get(CONF_PLANT_ID)
     inverter_sn = config.get(CONF_INVERTER_SERIAL)
 
