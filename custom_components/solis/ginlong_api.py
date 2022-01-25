@@ -20,7 +20,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 # Response constants
 SUCCESS = 'Success'
@@ -335,9 +335,9 @@ class GinlongAPI():
         """ Cleanup received data. """
         if self._data:
             # Fix timestamps
-            if self._data.has_key(INVERTER_TIMESTAMP_ONLINE):
+            if self._data.__contains__(INVERTER_TIMESTAMP_ONLINE):
                 self._data[INVERTER_TIMESTAMP_ONLINE] = float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
-            if self._data.has_key(INVERTER_TIMESTAMP_UPDATE):
+            if self._data.__contains__(INVERTER_TIMESTAMP_UPDATE):
                 self._data[INVERTER_TIMESTAMP_UPDATE] = float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
             # Unused phases are still in JSON payload as 0.0, remove them
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
