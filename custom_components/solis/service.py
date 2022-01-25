@@ -30,7 +30,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.1'
+VERSION = '0.2.2'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -135,7 +135,9 @@ class InverterService():
                     # sunrise when the inverter switches back on. This messes up the
                     # energy dashboard. Return 0 while inverter is still off.
                     is_am = datetime.now().hour < 12
-                    if getattr(data, INVERTER_STATE) != 1 and is_am:
+                    if getattr(data, INVERTER_STATE) == 2 and is_am:
+                        value = 0
+                    elif getattr(data, INVERTER_STATE) == 1 and is_am:
                         # Avoid race conditions when between state change in the morning and
                         # energy today being reset by adding 10 min grace period
                         last_updated_state = \
