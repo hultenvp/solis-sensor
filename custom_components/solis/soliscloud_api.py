@@ -23,6 +23,7 @@ import async_timeout
 
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
+from .soliscloud_const import *
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,6 +66,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ENERGY_THIS_MONTH: ['eMonth', float, 2],
         INVERTER_ENERGY_THIS_YEAR:  ['eYear', float, 2],
         INVERTER_ENERGY_TOTAL_LIFE: ['eTotal', float, 2],
+        STRING_COUNT:    ['dcInputtype', int, None],
         STRING1_VOLTAGE: ['uPv1', float, 2],
         STRING2_VOLTAGE: ['uPv2', float, 2],
         STRING3_VOLTAGE: ['uPv3', float, 2],
@@ -95,8 +97,10 @@ INVERTER_DATA: InverterDataType = {
         GRID_YEARLY_ENERGY_PURCHASED: ['gridPurchasedYearEnergy', float, 2],
         GRID_TOTAL_ON_GRID_ENERGY:    ['gridSellTotalEnergy', float, 2],
         #GRID_TOTAL_CONSUMPTION_ENERGY:['1cn', float, 2],
-        GRID_TOTAL_POWER:             ['psumCal', float, 3],
+        GRID_TOTAL_POWER:             ['psum', float, 3],
+        GRID_TOTAL_POWER_STR:         ['psumStr', str, None],
         GRID_TOTAL_CONSUMPTION_POWER: ['familyLoadPower', float, 3],
+        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         GRID_TOTAL_ENERGY_USED:       ['homeLoadTotalEnergy', float, 2],
     },
     PLANT_DETAIL: {
@@ -294,23 +298,27 @@ class SoliscloudAPI(BaseAPI):
             # Fix timestamps
             self._data[INVERTER_TIMESTAMP_UPDATE] = \
                 float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
-            # Convert kW into W.
-            self._data[GRID_TOTAL_POWER] = \
-                float(self._data[GRID_TOTAL_POWER])*1000
-            self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
-                float(self._data[GRID_TOTAL_CONSUMPTION_POWER])*1000
+
+            # Convert kW into W depending on unit returned from API.
+            if self._data[GRID_TOTAL_POWER_STR] == "kW":
+                self._data[GRID_TOTAL_POWER] = \
+                    float(self._data[GRID_TOTAL_POWER])*1000
+            if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
+                self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
+                    float(self._data[GRID_TOTAL_CONSUMPTION_POWER])*1000
+
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
             self._purge_if_unused(0.0, PHASE2_CURRENT, PHASE2_VOLTAGE)
             self._purge_if_unused(0.0, PHASE3_CURRENT, PHASE3_VOLTAGE)
+
             # Unused PV chains are still in JSON payload as 0, remove them
             # FIXME: use dcInputtype (NB num + 1) Unfortunately so are chains that are
             # just making 0 voltage.  So this is too simplistic.
-            #self._purge_if_unused(0, STRING1_CURRENT, STRING1_VOLTAGE, STRING1_POWER)
-            #self._purge_if_unused(0, STRING2_CURRENT, STRING2_VOLTAGE, STRING2_POWER)
-            #self._purge_if_unused(0, STRING3_CURRENT, STRING3_VOLTAGE, STRING3_POWER)
-            #self._purge_if_unused(0, STRING4_CURRENT, STRING4_VOLTAGE, STRING4_POWER)
+            for i,stringlist in enumerate(STRING_LISTS):
+                if i > self._data[STRING_COUNT]:
+                    self._purge_if_unused(0, *stringlist)
 
     def _purge_if_unused(self, value: Any, *elements: str) -> None:
         for element in elements:
