@@ -27,7 +27,7 @@ logger:
   logs:
     custom_components.solis: debug
 ```
-And attach the resulting log to the issue. If yo do not know where to find logs you missed an important step in the install of HACS.
+And attach the resulting log to the issue. If yo do not know where to find logs you missed an important step in the install of HACS. ;-)
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
