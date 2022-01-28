@@ -20,7 +20,10 @@ from .ginlong_api import PortalConfig, GinlongAPI, GinlongData
 from .ginlong_const import (
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
-    INVERTER_STATE
+    INVERTER_STATE,
+    #Autodiscover retries
+    MAX_RETRIES,
+    RETRY_DELAY,
 )
 
 # REFRESH CONSTANTS
@@ -35,9 +38,7 @@ VERSION = '0.2.2'
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
 
-#Autodiscover retries
-MAX_RETRIES = 3
-RETRY_DELAY = 10
+
 
 # Status constants
 ONLINE = 'Online'
