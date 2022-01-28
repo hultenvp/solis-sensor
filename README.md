@@ -12,6 +12,8 @@ Also confirmed to work with:
 > Platform V2 backend is used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 
 ## SolisCloud
+❗This feature is in beta. The server still has some issues. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
+
 [SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. It's unknown to me if the other brands are also supported.
 The new portal requires a key-id, secret and username to function.
 Key and secret can be obtained via support: Look at https://www.ginlong.com/global/aftersales.html for the initial contact email address in your region.
@@ -75,6 +77,8 @@ Configuration variables:
 * **portal_username** (Required): Username of your portal account.
 * **portal_password** (Optional): Password of the portal account. 
 > Note: The integration uses https to communicate with the portal, but the username and password are sent over in plain text!
+* **portal_key_id** (Optional): Key ID needed for communication with SolisCloud (obtain via Ginlong support)
+* **portal_secret** (Optional): Secret needed for communication with SolisCloud (obtain via Ginlong support)
 * **portal_plant_id** (Required): PlantId (Ginlong v2 portal) or StationId (SolisCloud) on the platform the inverter belongs to. Can be found on the portal.
 > Dutch: Tab installatie: Installatie ID. 
 
