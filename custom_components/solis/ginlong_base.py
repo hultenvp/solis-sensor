@@ -53,8 +53,14 @@ class GinlongData():
         """Return all available measurements in a dict."""
         return self._data
 
-    def __dir__(self):
-        return list(self._data.keys())
+    def keys(self) -> list[str]:
+        """Return keys of all measurements in a list, ensure state is first."""
+        available_measurements: list[str] = list(self._data.keys())
+        # Move state to beginning of list to avoid race conditions for the
+        # energy today fix.
+        available_measurements.remove(INVERTER_STATE)
+        available_measurements.insert(0, INVERTER_STATE)
+        return available_measurements
 
     def __getattr__(self, name):
         """Each measurement is represented as property."""
