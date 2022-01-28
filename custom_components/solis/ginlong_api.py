@@ -20,7 +20,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 
 # Response constants
 SUCCESS = 'Success'
@@ -166,8 +166,14 @@ class GinlongData():
         """Return all available measurements in a dict."""
         return self._data
 
-    def __dir__(self):
-        return list(self._data.keys())
+    def keys(self) -> list[str]:
+        """Return keys of all measurements in a list, ensure state is first."""
+        available_measurements: list[str] = list(self._data.keys())
+        # Move state to beginning of list to avoid race conditions for the
+        # energy today fix.
+        available_measurements.remove(INVERTER_STATE)
+        available_measurements.insert(0, INVERTER_STATE)
+        return available_measurements
 
     def __getattr__(self, name):
         """Each measurement is represented as property."""
@@ -287,7 +293,7 @@ class GinlongAPI():
                 device_id = self._inverter_list[inverter_serial]
                 payload = await self._get_inverter_details(device_id)
                 if payload is not None:
-                    #_LOGGER.debug("%s", payload)
+                    #_LOGGER.debug("Payload = %s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
                     return GinlongData(self._data)
