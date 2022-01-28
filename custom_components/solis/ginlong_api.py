@@ -133,48 +133,10 @@ class GinlongConfig(PortalConfig):
         super().__init__(portal_domain, portal_username, portal_plantid)
         self._password: str = portal_password
 
-    # @property
-    # def domain(self) -> str:
-    #     """ Configured portal domain name."""
-    #     return self._domain
-
-    # @property
-    # def username(self) -> str:
-    #     """ Configured username."""
-    #     return self._username
-
     @property
     def password(self) -> str:
         """ Configured password."""
         return self._password
-
-    # @property
-    # def plantid(self) -> int:
-    #     """ Configured plant ID."""
-    #     return self._plantid
-
-# class GinlongData():
-#     """ Representing data measurement for one inverter from Ginlong API """
-
-#     def __init__(self, data: dict[str, str | int | float]) -> None:
-#         """ Initialize the data object """
-#         self._data = data
-
-
-#     def get_inverter_data(self) -> dict[str, str | int | float]:
-#         """Return all available measurements in a dict."""
-#         return self._data
-
-#     def __dir__(self):
-#         return list(self._data.keys())
-
-#     def __getattr__(self, name):
-#         """Each measurement is represented as property."""
-#         try:
-#             return self._data[name]
-#         except KeyError as key_error:
-#             _LOGGER.debug("AttributeError, %s does not exist", name)
-#             raise AttributeError(name) from key_error
 
 class GinlongAPI(BaseAPI):
     """Class with functions for reading data from the Ginlong Portal 2.0."""
