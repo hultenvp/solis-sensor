@@ -55,6 +55,8 @@ Configuration variables:
 
 * **name** (Optional): Let you overwrite the name of the device in the frontend. *Default value: Solis*
 * **portal_domain** (Optional): Portal domain name *Default value: m.ginlong.com*.
+* **max_retries** (Optional): Tunable setting for auto-discovery retries. *Default value: 3*
+* **retry_delay** (Optional): Tunable setting for auto-discovery backoff. *Default value: 10*
 * **portal_username** (Required): Username of your portal account.
 * **portal_password** (Required): Password of the portal account. 
 > Note: The integration uses https to communicate with the portal, but the username and password are sent over in plain text!
