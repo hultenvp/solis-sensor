@@ -110,7 +110,7 @@ class InverterService():
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
-                    capabilities[inverter_serial] = dir(data)
+                    capabilities[inverter_serial] = data.keys()
         return capabilities
 
     def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str
@@ -127,7 +127,7 @@ class InverterService():
         serial = getattr(data, INVERTER_SERIAL)
         if serial not in self._subscriptions:
             return
-        for attribute in dir(data):
+        for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
                 if attribute == INVERTER_ENERGY_TODAY:
