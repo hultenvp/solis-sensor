@@ -124,16 +124,6 @@ class SoliscloudConfig(PortalConfig):
         self._key_id: str = portal_key_id
         self._secret: bytes = portal_secret
 
-    # @property
-    # def domain(self) -> str:
-    #     """ Configured portal domain name."""
-    #     return self._domain
-
-    # @property
-    # def username(self) -> str:
-    #     """ Username."""
-    #     return self._username
-
     @property
     def key_id(self) -> str:
         """ Key ID."""
@@ -143,11 +133,6 @@ class SoliscloudConfig(PortalConfig):
     def secret(self) -> bytes:
         """ API Key."""
         return self._secret
-
-    # @property
-    # def plantid(self) -> str:
-    #     """ Configured plant ID."""
-    #     return self._plantid
 
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
@@ -168,11 +153,6 @@ class SoliscloudAPI(BaseAPI):
     def is_online(self) -> bool:
         """ Returns if we are logged in."""
         return self._user_id is not None
-
-    # @property
-    # def inverters(self) -> dict[str, str] | None:
-    #     """ Return the list of inverters for plant ID when logged in."""
-    #     return self._inverter_list
 
     async def login(self, session: ClientSession) -> bool:
         """See if we can fetch userId and build a list of inverters"""
@@ -262,15 +242,12 @@ class SoliscloudAPI(BaseAPI):
         """
 
         # Get inverter details
-        #url = 'http://'+self.config.domain+'/cpro/device/inverter/goDetailAjax.json'
         params = {
             'id': device_id,
             'sn': device_serial
         }
 
         result = await self._post_data_json(INVERTER_DETAIL, params)
-
-        #result = await self._get_data(url, params)
 
         jsondata = None
         if result[SUCCESS] is True:
@@ -315,8 +292,10 @@ class SoliscloudAPI(BaseAPI):
 
             # Unused PV chains are still in JSON payload as 0, remove them
             # FIXME: use dcInputtype (NB num + 1) Unfortunately so are chains that are
-            # just making 0 voltage.  So this is too simplistic.
-            for i,stringlist in enumerate(STRING_LISTS):
+            # just making 0 voltage. So this is too simplistic.
+            # mypy trips over self_data[STRING_COUNT] as it could be of type str, int or float
+            # needs to be fixed at some point in time, but this works.
+            for i, stringlist in enumerate(STRING_LISTS):
                 if i > self._data[STRING_COUNT]:
                     self._purge_if_unused(0, *stringlist)
 
@@ -329,21 +308,6 @@ class SoliscloudAPI(BaseAPI):
                 return
         for element in elements:
             self._data.pop(element)
-
-    # def _get_value_from_record(self,
-    #     data: list[dict[str, str]], key: str, type_: type, precision: int = 2
-    # ) -> str | int | float | None:
-    #     result = None
-    #     for record in data:
-    #         key_value = record.get('key')
-    #         if key_value == key:
-    #             data_raw = record.get('value')
-    #             if data_raw is not None:
-    #                 result = type_(data_raw)
-    #                 # Round to specified precision
-    #                 if type_ is float:
-    #                     result = round(result, precision)
-    #     return result
 
     def _get_value(self,
         data: dict[str, Any], key: str, type_: type, precision: int = 2
@@ -451,31 +415,3 @@ class SoliscloudAPI(BaseAPI):
         finally:
             if resp is not None:
                 await resp.release()
-
-    # async def _post_data(self, url: str, params: dict[str, Any]) -> dict[str, Any]:
-    #     """ Http-post data to specified url. """
-
-    #     result: dict[str, Any] = {SUCCESS: False, MESSAGE: None}
-    #     resp = None
-    #     if self._session is None:
-    #         return result
-    #     try:
-    #         with async_timeout.timeout(10):
-    #             resp = await self._session.post(url, params=params)
-
-    #             result[STATUS_CODE] = resp.status
-    #             result[CONTENT] = await resp.json()
-    #             if resp.status == HTTPStatus.OK:
-    #                 result[SUCCESS] = True
-    #                 result[MESSAGE] = "OK"
-    #             else:
-    #                 result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
-
-    #             return result
-    #     except (asyncio.TimeoutError, ClientError) as err:
-    #         result[MESSAGE] = "%s" % err
-    #         _LOGGER.debug("Error: %s", result[MESSAGE])
-    #         return result
-    #     finally:
-    #         if resp is not None:
-    #             await resp.release()
