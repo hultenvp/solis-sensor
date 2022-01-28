@@ -21,7 +21,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.1'
+VERSION = '0.1.4'
 
 # Response constants
 SUCCESS = 'Success'
@@ -248,7 +248,7 @@ class GinlongAPI(BaseAPI):
                 device_id = self._inverter_list[inverter_serial]
                 payload = await self._get_inverter_details(device_id)
                 if payload is not None:
-                    #_LOGGER.debug("%s", payload)
+                    #_LOGGER.debug("Payload = %s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
                     return GinlongData(self._data)

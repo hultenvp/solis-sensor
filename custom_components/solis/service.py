@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.1'
+VERSION = '0.2.3'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -117,7 +117,7 @@ class InverterService():
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
-                    capabilities[inverter_serial] = dir(data)
+                    capabilities[inverter_serial] = data.keys()
         return capabilities
 
     def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str
@@ -134,7 +134,7 @@ class InverterService():
         serial = getattr(data, INVERTER_SERIAL)
         if serial not in self._subscriptions:
             return
-        for attribute in dir(data):
+        for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
                 if attribute == INVERTER_ENERGY_TODAY:
@@ -142,7 +142,9 @@ class InverterService():
                     # sunrise when the inverter switches back on. This messes up the
                     # energy dashboard. Return 0 while inverter is still off.
                     is_am = datetime.now().hour < 12
-                    if getattr(data, INVERTER_STATE) != 1 and is_am:
+                    if getattr(data, INVERTER_STATE) == 2 and is_am:
+                        value = 0
+                    elif getattr(data, INVERTER_STATE) == 1 and is_am:
                         # Avoid race conditions when between state change in the morning and
                         # energy today being reset by adding 10 min grace period
                         last_updated_state = \
