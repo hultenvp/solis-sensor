@@ -15,12 +15,13 @@ from aiohttp import ClientError, ClientSession
 import async_timeout
 
 
+from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
 
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 
 # Response constants
 SUCCESS = 'Success'
@@ -120,68 +121,28 @@ INVERTER_DATA: InverterDataType = {
     ]
 }
 
-class PortalConfig:
+class GinlongConfig(PortalConfig):
     """ Portal configuration data """
 
     def __init__(self,
         portal_domain: str,
         portal_username: str,
         portal_password: str,
-        portal_plantid: int
+        portal_plantid: str
     ) -> None:
-        self._domain: str = portal_domain
-        self._username: str = portal_username
+        super().__init__(portal_domain, portal_username, portal_plantid)
         self._password: str = portal_password
-        self._plantid: int = portal_plantid
-
-    @property
-    def domain(self) -> str:
-        """ Configured portal domain name."""
-        return self._domain
-
-    @property
-    def username(self) -> str:
-        """ Configured username."""
-        return self._username
 
     @property
     def password(self) -> str:
         """ Configured password."""
         return self._password
 
-    @property
-    def plantid(self) -> int:
-        """ Configured plant ID."""
-        return self._plantid
-
-class GinlongData():
-    """ Representing data measurement for one inverter from Ginlong API """
-
-    def __init__(self, data: dict[str, str | int | float]) -> None:
-        """ Initialize the data object """
-        self._data = data
-
-
-    def get_inverter_data(self) -> dict[str, str | int | float]:
-        """Return all available measurements in a dict."""
-        return self._data
-
-    def __dir__(self):
-        return list(self._data.keys())
-
-    def __getattr__(self, name):
-        """Each measurement is represented as property."""
-        try:
-            return self._data[name]
-        except KeyError as key_error:
-            _LOGGER.debug("AttributeError, %s does not exist", name)
-            raise AttributeError(name) from key_error
-
-class GinlongAPI():
+class GinlongAPI(BaseAPI):
     """Class with functions for reading data from the Ginlong Portal 2.0."""
 
-    def __init__(self, config: PortalConfig) -> None:
-        self._config: PortalConfig = config
+    def __init__(self, config: GinlongConfig) -> None:
+        self._config: GinlongConfig = config
         self._session: ClientSession | None = None
         self._data: dict[str, str | int | float] = {}
         self._online: bool = False
@@ -190,7 +151,7 @@ class GinlongAPI():
         self._language = 2
 
     @property
-    def config(self) -> PortalConfig:
+    def config(self) -> GinlongConfig:
         """ Config this for this API instance."""
         return self._config
 
@@ -243,7 +204,7 @@ class GinlongAPI():
         self._online = False
         self._inverter_list = None
 
-    async def fetch_inverter_list(self, plant_id: int) -> dict[str, str]:
+    async def fetch_inverter_list(self, plant_id: str) -> dict[str, str]:
         """
         Fetch return list of inverters { inverter serial : device_id }
         """
@@ -287,7 +248,7 @@ class GinlongAPI():
                 device_id = self._inverter_list[inverter_serial]
                 payload = await self._get_inverter_details(device_id)
                 if payload is not None:
-                    #_LOGGER.debug("%s", payload)
+                    #_LOGGER.debug("Payload = %s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
                     return GinlongData(self._data)
@@ -335,10 +296,10 @@ class GinlongAPI():
         """ Cleanup received data. """
         if self._data:
             # Fix timestamps
-            if self._data.__contains__(INVERTER_TIMESTAMP_ONLINE):
-                self._data[INVERTER_TIMESTAMP_ONLINE] = float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
-            if self._data.__contains__(INVERTER_TIMESTAMP_UPDATE):
-                self._data[INVERTER_TIMESTAMP_UPDATE] = float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
+            self._data[INVERTER_TIMESTAMP_ONLINE] = \
+                float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
+            self._data[INVERTER_TIMESTAMP_UPDATE] = \
+                float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
             # Unused phases are still in JSON payload as 0.0, remove them
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
             self._purge_if_unused(0.0, PHASE2_CURRENT, PHASE2_VOLTAGE)

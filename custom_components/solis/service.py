@@ -16,7 +16,9 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
 
-from .ginlong_api import PortalConfig, GinlongAPI, GinlongData
+from .ginlong_base import PortalConfig, BaseAPI, GinlongData
+from .ginlong_api import GinlongAPI, GinlongConfig
+from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
@@ -33,7 +35,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.2'
+VERSION = '0.2.3'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -73,7 +75,12 @@ class InverterService():
         self._logintime: datetime | None = None
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
         self._hass: HomeAssistant = hass
-        self._api: GinlongAPI = GinlongAPI(portal_config)
+        if isinstance(portal_config, GinlongConfig):
+            self._api: BaseAPI = GinlongAPI(portal_config)
+        elif isinstance(portal_config, SoliscloudConfig):
+            self._api = SoliscloudAPI(portal_config)
+        else:
+            _LOGGER.error("Failed to initialize service, incompatible config")
 
     async def _login(self) -> bool:
         if not self._api.is_online:
@@ -111,7 +118,7 @@ class InverterService():
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
-                    capabilities[inverter_serial] = dir(data)
+                    capabilities[inverter_serial] = data.keys()
         return capabilities
 
     def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str
@@ -128,7 +135,7 @@ class InverterService():
         serial = getattr(data, INVERTER_SERIAL)
         if serial not in self._subscriptions:
             return
-        for attribute in dir(data):
+        for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
                 if attribute == INVERTER_ENERGY_TODAY:

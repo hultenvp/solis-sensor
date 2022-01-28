@@ -26,6 +26,8 @@ from .ginlong_const import *
 CONF_PORTAL_DOMAIN = 'portal_domain'
 CONF_USERNAME = 'portal_username'
 CONF_PASSWORD = 'portal_password'
+CONF_SECRET = 'portal_secret'
+CONF_KEY_ID = 'portal_key_id'
 CONF_PLANT_ID = 'portal_plant_id'
 CONF_INVERTER_SERIAL = 'inverter_serial'
 CONF_SENSORS = 'sensors'
