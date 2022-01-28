@@ -32,8 +32,8 @@ CONF_SENSORS = 'sensors'
 
 SENSOR_PREFIX = 'Solis'
 DEFAULT_DOMAIN = 'm.ginlong.com'
-DEFAULT_RETRY = 3
-DEFAULT_TIMEOUT = 10
+MAX_RETRIES = 3
+RETRY_DELAY = 10
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
