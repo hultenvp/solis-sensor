@@ -123,7 +123,6 @@ INVERTER_DATA: InverterDataType = {
 
 CHECK = set((
     INVERTER_STATE,
-    INVERTER_TIMESTAMP_ONLINE,
     INVERTER_TIMESTAMP_UPDATE,
     INVERTER_SERIAL,
     INVERTER_ENERGY_TODAY
@@ -308,10 +307,12 @@ class GinlongAPI(BaseAPI):
         """ Cleanup received data. """
         if self._data:
             # Fix timestamps
-            self._data[INVERTER_TIMESTAMP_ONLINE] = \
-                float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
-            self._data[INVERTER_TIMESTAMP_UPDATE] = \
-                float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
+            if INVERTER_TIMESTAMP_ONLINE in self._data:
+                self._data[INVERTER_TIMESTAMP_ONLINE] = \
+                    float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
+            if INVERTER_TIMESTAMP_UPDATE in self._data:
+                self._data[INVERTER_TIMESTAMP_UPDATE] = \
+                    float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
             # Unused phases are still in JSON payload as 0.0, remove them
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
             self._purge_if_unused(0.0, PHASE2_CURRENT, PHASE2_VOLTAGE)
