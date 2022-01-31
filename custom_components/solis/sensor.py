@@ -11,7 +11,7 @@ import logging
 from typing import Any
 import voluptuous as vol
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.sensor import (
     PLATFORM_SCHEMA,
     SensorEntity,
@@ -85,21 +85,6 @@ PLATFORM_SCHEMA = vol.All(PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_SENSORS): vol.Schema({cv.slug: cv.ensure_list}),
 }, extra=vol.PREVENT_EXTRA), _check_config_schema)
 
-async def async_autodetect(inverter_service: InverterService) -> dict[str, list[str]]:
-    """ Autodetect capabilities per inverter."""
-    capabilities = await inverter_service.discover()
-    # Build list of sensors for each inverter
-    discovered_sensors: dict[str, list]= {}
-    for inverter_sn in capabilities:
-        for sensor in SENSOR_TYPES.keys():
-            if SENSOR_TYPES[sensor][5] in capabilities[inverter_sn]:
-                if inverter_sn not in discovered_sensors:
-                    discovered_sensors[inverter_sn] = list()
-                discovered_sensors[inverter_sn].append(sensor)
-    if not discovered_sensors:
-        _LOGGER.warning("No sensors detected, nothing to register")
-    return discovered_sensors
-
 def create_sensors(sensors: dict[str, list[str]],
         inverter_service: InverterService,
         inverter_name: str
@@ -171,14 +156,38 @@ async def async_setup_platform(
     if CONF_SENSORS in config.keys():
         # Old config schema
         hass_sensors = create_sensors_legacy(config, service, inverter_name, inverter_sn)
-    else:
-        sensors = await async_autodetect(service)
-        # Create the sensors
-        hass_sensors = create_sensors(sensors, service, inverter_name)
-    async_add_entities(hass_sensors)
+        async_add_entities(hass_sensors)
 
+        # schedule the first update in 1 minute from now:
+        service.schedule_update(1)
+    else:
+        cookie: dict[str, Any] = {
+            'name': inverter_name,
+            'service': service,
+            'async_add_entities' : async_add_entities
+        }
+        # Will retry endlessly to discover
+        _LOGGER.info("Scheduling discovery")
+        service.schedule_discovery(on_discovered, cookie, 1)
+
+@callback
+def on_discovered(capabilities, cookie):
+    """ Callback when discovery was successful."""
+    discovered_sensors: dict[str, list]= {}
+    for inverter_sn in capabilities:
+        for sensor in SENSOR_TYPES.keys():
+            if SENSOR_TYPES[sensor][5] in capabilities[inverter_sn]:
+                if inverter_sn not in discovered_sensors:
+                    discovered_sensors[inverter_sn] = list()
+                discovered_sensors[inverter_sn].append(sensor)
+    if not discovered_sensors:
+        _LOGGER.warning("No sensors detected, nothing to register")
+
+    # Create the sensors
+    hass_sensors = create_sensors(discovered_sensors, cookie['service'], cookie['name'])
+    cookie['async_add_entities'](hass_sensors)
     # schedule the first update in 1 minute from now:
-    await service.schedule_update(1)
+    cookie['service'].schedule_update(1)
 
 class SolisSensor(ServiceSubscriber, SensorEntity):
     """ Representation of a Solis sensor. """
