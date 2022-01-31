@@ -37,9 +37,8 @@ VERSION = '0.2.3'
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
 
-#Autodiscover retries
-MAX_RETRIES = 3
-RETRY_DELAY = 10
+#Autodiscover
+RETRY_DELAY_SECONDS = 60
 
 # Status constants
 ONLINE = 'Online'
@@ -74,6 +73,8 @@ class InverterService():
         self._logintime: datetime | None = None
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
         self._hass: HomeAssistant = hass
+        self._discovery_callback = None
+        self._discovery_cookie = None
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
         elif isinstance(portal_config, SoliscloudConfig):
@@ -91,20 +92,16 @@ class InverterService():
         await self._api.logout()
         self._logintime = None
 
-    async def discover(self) -> dict[str, list[str]]:
+    async def async_discover(self, *_) -> dict[str, list[str]]:
         """ Try to discover and retry if needed."""
-        retries = 0
         capabilities: dict[str, list[str]] = {}
-        while not capabilities and retries <= MAX_RETRIES:
-            capabilities = await self._do_discover()
-            if not capabilities:
-                _LOGGER.info("Discovery failed, retry attempt #%s", retries + 1)
-                retries += 1
-                # Don't rush the retries
-                await asyncio.sleep(RETRY_DELAY)
-        if not capabilities:
-            _LOGGER.warning("Failed to discover.")
-        return capabilities
+        capabilities = await self._do_discover()
+        if capabilities:
+            if self._discovery_callback and self._discovery_cookie:
+                self._discovery_callback(capabilities, self._discovery_cookie)
+        else:
+            _LOGGER.warning("Failed to discover, scheduling retry.")
+            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, RETRY_DELAY_SECONDS)
 
     async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
@@ -183,11 +180,19 @@ class InverterService():
 
         return update
 
-    async def schedule_update(self, minute: int = 1):
+    def schedule_update(self, minute: int = 1):
         """ Schedule an update after minute minutes. """
         _LOGGER.debug("Scheduling next update in %s minutes.", minute)
         nxt = dt_util.utcnow() + timedelta(minutes=minute)
         async_track_point_in_utc_time(self._hass, self.async_update, nxt)
+
+    def schedule_discovery(self, callback, cookie: dict[str, Any], seconds: int = 1):
+        """ Schedule a discovery after seconds seconds. """
+        _LOGGER.debug("Scheduling discovery in %s seconds.", seconds)
+        self._discovery_callback = callback
+        self._discovery_cookie = cookie
+        nxt = dt_util.utcnow() + timedelta(seconds=seconds)
+        async_track_point_in_utc_time(self._hass, self.async_discover, nxt)
 
     @property
     def status(self):
