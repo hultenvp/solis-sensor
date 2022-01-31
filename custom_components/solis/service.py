@@ -150,7 +150,7 @@ class InverterService():
                         last_updated_state = \
                             self._subscriptions[serial][INVERTER_STATE].measured
                         if last_updated_state is not None \
-                        and last_updated_state + timedelta(minutes=10) < datetime.now():
+                        and last_updated_state + timedelta(minutes=10) > datetime.now():
                             value = 0
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
