@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.3'
+VERSION = '0.2.4'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
