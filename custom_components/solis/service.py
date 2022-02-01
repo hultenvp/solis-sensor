@@ -171,7 +171,7 @@ class InverterService():
                     # Reset session and try to login again next time
                     await self._logout()
 
-        await self.schedule_update(update)
+        self.schedule_update(update)
 
         if self._logintime is not None:
             if (self._logintime + HRS_BETWEEN_LOGIN) < (datetime.now()):
