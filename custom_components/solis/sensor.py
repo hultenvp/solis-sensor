@@ -44,7 +44,7 @@ from .soliscloud_api import SoliscloudConfig
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '2.0.4'
+VERSION = '2.0.5'
 
 LAST_UPDATED = 'Last updated'
 SERIAL = 'Inverter serial'
