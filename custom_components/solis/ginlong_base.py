@@ -14,7 +14,7 @@ from .ginlong_const import INVERTER_STATE
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 class PortalConfig(ABC):
     """ Portal configuration data """
@@ -48,7 +48,7 @@ class GinlongData():
 
     def __init__(self, data: dict[str, str | int | float]) -> None:
         """ Initialize the data object """
-        self._data = data
+        self._data = dict(data)
 
 
     def get_inverter_data(self) -> dict[str, str | int | float]:
