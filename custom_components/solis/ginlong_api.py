@@ -121,6 +121,13 @@ INVERTER_DATA: InverterDataType = {
     ]
 }
 
+CHECK = set((
+    INVERTER_STATE,
+    INVERTER_TIMESTAMP_UPDATE,
+    INVERTER_SERIAL,
+    INVERTER_ENERGY_TODAY
+))
+
 class GinlongConfig(PortalConfig):
     """ Portal configuration data """
 
@@ -249,9 +256,9 @@ class GinlongAPI(BaseAPI):
                 payload = await self._get_inverter_details(device_id)
                 if payload is not None:
                     #_LOGGER.debug("Payload = %s", payload)
-                    self._collect_inverter_data(payload)
-                    self._post_process()
-                    return GinlongData(self._data)
+                    if self._collect_inverter_data(payload):
+                        self._post_process()
+                        return GinlongData(self._data)
         return None
 
 
@@ -275,7 +282,7 @@ class GinlongAPI(BaseAPI):
             _LOGGER.info('Unable to fetch details for device with ID: %s', device_id)
         return jsondata
 
-    def _collect_inverter_data(self, payload: dict[str, Any]) -> None:
+    def _collect_inverter_data(self, payload: dict[str, Any]) -> bool:
         """ Fetch dynamic properties """
         for subkey in INVERTER_DATA:
             jsondata = payload['result']['deviceWapper']
@@ -293,15 +300,21 @@ class GinlongAPI(BaseAPI):
                         if unit == 'kW':
                             value *= 1000
                         self._data[dictkey] = value
+        # Ensure a minimal dataset has been collected
+        if CHECK.issubset(self._data.keys()):
+            return True
+        return False
 
     def _post_process(self) -> None:
         """ Cleanup received data. """
         if self._data:
             # Fix timestamps
-            self._data[INVERTER_TIMESTAMP_ONLINE] = \
-                float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
-            self._data[INVERTER_TIMESTAMP_UPDATE] = \
-                float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
+            if INVERTER_TIMESTAMP_ONLINE in self._data:
+                self._data[INVERTER_TIMESTAMP_ONLINE] = \
+                    float(self._data[INVERTER_TIMESTAMP_ONLINE])/1000
+            if INVERTER_TIMESTAMP_UPDATE in self._data:
+                self._data[INVERTER_TIMESTAMP_UPDATE] = \
+                    float(self._data[INVERTER_TIMESTAMP_UPDATE])/1000
             # Unused phases are still in JSON payload as 0.0, remove them
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
             self._purge_if_unused(0.0, PHASE2_CURRENT, PHASE2_VOLTAGE)
