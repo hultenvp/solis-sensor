@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.4'
+VERSION = '0.2.5'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -144,8 +144,11 @@ class InverterService():
                     elif getattr(data, INVERTER_STATE) == 1 and is_am:
                         # Avoid race conditions when between state change in the morning and
                         # energy today being reset by adding 10 min grace period
-                        last_updated_state = \
+                        last_updated_state = None
+                        try:
                             self._subscriptions[serial][INVERTER_STATE].measured
+                        except KeyError:
+                            pass
                         if last_updated_state is not None \
                         and last_updated_state + timedelta(minutes=10) > datetime.now():
                             value = 0
