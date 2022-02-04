@@ -219,7 +219,7 @@ class SoliscloudAPI(BaseAPI):
         Collect available data from payload and store as GinlongData object
         """
 
-        _LOGGER.info("Fetching data for serial: %s", inverter_serial)
+        _LOGGER.debug("Fetching data for serial: %s", inverter_serial)
         self._data = {}
         if self.is_online:
             if self._inverter_list is not None and inverter_serial in self._inverter_list:
