@@ -295,8 +295,10 @@ class GinlongAPI(BaseAPI):
                 precision = attributes[dictkey][2]
                 methodname = '_get_value' + INVERTER_DATA[subkey][0]
                 if key is not None:
-                    value = getattr(self, methodname)(jsondata, key, type_, precision)
+                    value, unit = getattr(self, methodname)(jsondata, key, type_, precision)
                     if value is not None:
+                        if unit == 'kW':
+                            value *= 1000
                         self._data[dictkey] = value
         # Ensure a minimal dataset has been collected
         if CHECK.issubset(self._data.keys()):
@@ -330,8 +332,9 @@ class GinlongAPI(BaseAPI):
 
     def _get_value_from_record(self,
         data: list[dict[str, str]], key: str, type_: type, precision: int = 2
-    ) -> str | int | float | None:
-        result = None
+    ) -> tuple[str | int | float | None, str | None]:
+        result: str | int | float = None
+        unit: str | None = None
         for record in data:
             key_value = record.get('key')
             if key_value == key:
@@ -341,11 +344,12 @@ class GinlongAPI(BaseAPI):
                     # Round to specified precision
                     if type_ is float:
                         result = round(result, precision)
-        return result
+                unit = record.get('unit')
+        return result, unit
 
     def _get_value(self,
         data: dict[str, Any], key: str, type_: type, precision: int = 2
-    ) -> str | int | float | None:
+    ) -> tuple[str | int | float | None, str | None]:
         """ Retrieve 'key' from 'data' as type 'type_' with precision 'precision' """
         result = None
 
@@ -355,7 +359,7 @@ class GinlongAPI(BaseAPI):
             # Round to specified precision
             if type_ is float:
                 result = round(result, precision)
-        return result
+        return result, None
 
     async def _get_data(self,
             url: str,
