@@ -1,6 +1,6 @@
 {
   "domain": "solis",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "name": "Solis Inverter",
   "iot_class": "cloud_polling",
   "documentation": "https://github.com/hultenvp/solis-sensor/",
