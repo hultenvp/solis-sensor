@@ -142,16 +142,20 @@ class InverterService():
                     if getattr(data, INVERTER_STATE) == 2 and is_am:
                         value = 0
                     elif getattr(data, INVERTER_STATE) == 1 and is_am:
-                        # Avoid race conditions when between state change in the morning and
-                        # energy today being reset by adding 10 min grace period
                         last_updated_state = None
                         try:
-                            self._subscriptions[serial][INVERTER_STATE].measured
+                            last_updated_state = \
+                                self._subscriptions[serial][INVERTER_STATE].measured
                         except KeyError:
                             pass
-                        if last_updated_state is not None \
-                        and last_updated_state + timedelta(minutes=10) > datetime.now():
-                            value = 0
+                        if last_updated_state is not None:
+                            # Hybrid systems do not reset in the morning, but just after midnight.
+                            if last_updated_state.hour == 0 and last_updated_state.minute < 15:
+                                value = 0
+                            # Avoid race conditions when between state change in the morning and
+                            # energy today being reset by adding 10 min grace period
+                            elif last_updated_state + timedelta(minutes=10) > datetime.now():
+                                value = 0
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
     async def async_update(self, *_) -> int:
