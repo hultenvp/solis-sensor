@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 # Response constants
 SUCCESS = 'Success'
@@ -49,64 +49,65 @@ InverterDataType = dict[str, dict[str, list]]
 """{endpoint: [payload type, {key type, decimal precision}]}"""
 INVERTER_DATA: InverterDataType = {
     INVERTER_DETAIL: {
-        INVERTER_SERIAL:             ['sn', str, None],
-        INVERTER_PLANT_ID:           ['stationId', str, None],
-        INVERTER_DEVICE_ID:          ['id', str, None],
-        INVERTER_DATALOGGER_SERIAL:  ['collectorId', str, None],
+        INVERTER_SERIAL:                  ['sn', str, None],
+        INVERTER_PLANT_ID:                ['stationId', str, None],
+        INVERTER_DEVICE_ID:               ['id', str, None],
+        INVERTER_DATALOGGER_SERIAL:       ['collectorId', str, None],
         # Timestamp of measurement
-        INVERTER_TIMESTAMP_UPDATE:   ['dataTimestamp', int, None],
-        INVERTER_STATE:              ['state', int, None],
-        INVERTER_TEMPERATURE:       ['inverterTemperature', float, 1],
-        #INVERTER_POWER_LIMIT:       ['pacPec', float, 2], # correct? - Nope
-        INVERTER_POWER_STATE:       ['currentState', int, None],
-        INVERTER_ACPOWER:           ['pac', float, 2],
-        INVERTER_ACFREQUENCY:       ['fac', float, 2],
-        #xxxINVERTER_ENERGY_LAST_MONTH: ['1ru', float, 2],
-        INVERTER_ENERGY_TODAY:      ['eToday', float, 2],
-        INVERTER_ENERGY_THIS_MONTH: ['eMonth', float, 2],
-        INVERTER_ENERGY_THIS_YEAR:  ['eYear', float, 2],
-        INVERTER_ENERGY_TOTAL_LIFE: ['eTotal', float, 2],
-        STRING_COUNT:    ['dcInputtype', int, None],
-        STRING1_VOLTAGE: ['uPv1', float, 2],
-        STRING2_VOLTAGE: ['uPv2', float, 2],
-        STRING3_VOLTAGE: ['uPv3', float, 2],
-        STRING4_VOLTAGE: ['uPv4', float, 2],
-        STRING1_CURRENT: ['iPv1', float, 2],
-        STRING2_CURRENT: ['iPv2', float, 2],
-        STRING3_CURRENT: ['iPv3', float, 2],
-        STRING4_CURRENT: ['iPv4', float, 2],
-        STRING1_POWER: ['pow1', float, 2], # Undocumented
-        STRING2_POWER: ['pow2', float, 2], # Undocumented
-        STRING3_POWER: ['pow3', float, 2], # Undocumented
-        STRING4_POWER: ['pow4', float, 2], # Undocumented
-        PHASE1_VOLTAGE: ['uAc1', float, 2],
-        PHASE2_VOLTAGE: ['uAc2', float, 2],
-        PHASE3_VOLTAGE: ['uAc3', float, 2],
-        PHASE1_CURRENT: ['iAc1', float, 2],
-        PHASE2_CURRENT: ['iAc2', float, 2],
-        PHASE3_CURRENT: ['iAc3', float, 2],
-        BAT_REMAINING_CAPACITY:      ['batteryCapacitySoc', float, 2],
-        BAT_TOTAL_ENERGY_CHARGED:    ['batteryTotalChargeEnergy', float, 2],
-        BAT_TOTAL_ENERGY_DISCHARGED: ['batteryTotalDischargeEnergy', float, 2],
-        BAT_DAILY_ENERGY_CHARGED:    ['batteryTodayChargeEnergy', float, 2],
-        BAT_DAILY_ENERGY_DISCHARGED: ['batteryTodayDischargeEnergy', float, 2],
-        GRID_DAILY_ON_GRID_ENERGY:    ['gridSellTodayEnergy', float, 2],
-        GRID_DAILY_ENERGY_PURCHASED:  ['gridPurchasedTodayEnergy', float, 2],
-        GRID_DAILY_ENERGY_USED:       ['homeLoadTodayEnergy', float, 2],
-        GRID_MONTHLY_ENERGY_PURCHASED:['gridPurchasedMonthEnergy', float, 2],
-        GRID_YEARLY_ENERGY_PURCHASED: ['gridPurchasedYearEnergy', float, 2],
-        GRID_TOTAL_ON_GRID_ENERGY:    ['gridSellTotalEnergy', float, 2],
-        #GRID_TOTAL_CONSUMPTION_ENERGY:['1cn', float, 2],
-        GRID_TOTAL_POWER:             ['psum', float, 3],
-        GRID_TOTAL_POWER_STR:         ['psumStr', str, None],
-        GRID_TOTAL_CONSUMPTION_POWER: ['familyLoadPower', float, 3],
+        INVERTER_TIMESTAMP_UPDATE:        ['dataTimestamp', int, None],
+        INVERTER_STATE:                   ['state', int, None],
+        INVERTER_TEMPERATURE:             ['inverterTemperature', float, 1],
+        INVERTER_POWER_STATE:             ['currentState', int, None],
+        INVERTER_ACPOWER:                 ['pac', float, 3],
+        INVERTER_ACPOWER_STR:             ['pacStr', str, None],
+        INVERTER_ACFREQUENCY:             ['fac', float, 2],
+        INVERTER_ENERGY_TODAY:            ['eToday', float, 2],
+        INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
+        INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
+        INVERTER_ENERGY_THIS_YEAR_STR:    ['eYearStr', str, None],
+        INVERTER_ENERGY_TOTAL_LIFE:       ['eTotal', float, 2],
+        INVERTER_ENERGY_TOTAL_LIFE_STR:   ['eTotalStr', str, None],
+        STRING_COUNT:                     ['dcInputtype', int, None],
+        STRING1_VOLTAGE:                  ['uPv1', float, 2],
+        STRING2_VOLTAGE:                  ['uPv2', float, 2],
+        STRING3_VOLTAGE:                  ['uPv3', float, 2],
+        STRING4_VOLTAGE:                  ['uPv4', float, 2],
+        STRING1_CURRENT:                  ['iPv1', float, 2],
+        STRING2_CURRENT:                  ['iPv2', float, 2],
+        STRING3_CURRENT:                  ['iPv3', float, 2],
+        STRING4_CURRENT:                  ['iPv4', float, 2],
+        STRING1_POWER:                    ['pow1', float, 2], # Undocumented
+        STRING2_POWER:                    ['pow2', float, 2], # Undocumented
+        STRING3_POWER:                    ['pow3', float, 2], # Undocumented
+        STRING4_POWER:                    ['pow4', float, 2], # Undocumented
+        PHASE1_VOLTAGE:                   ['uAc1', float, 2],
+        PHASE2_VOLTAGE:                   ['uAc2', float, 2],
+        PHASE3_VOLTAGE:                   ['uAc3', float, 2],
+        PHASE1_CURRENT:                   ['iAc1', float, 2],
+        PHASE2_CURRENT:                   ['iAc2', float, 2],
+        PHASE3_CURRENT:                   ['iAc3', float, 2],
+        BAT_REMAINING_CAPACITY:           ['batteryCapacitySoc', float, 2],
+        BAT_TOTAL_ENERGY_CHARGED:         ['batteryTotalChargeEnergy', float, 2],
+        BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 2],
+        BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
+        BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
+        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2],
+        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2],
+        GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2],
+        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
+        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
+        GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 2],
+        GRID_TOTAL_POWER:                 ['psum', float, 3],
+        GRID_TOTAL_POWER_STR:             ['psumStr', str, None],
+        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
         GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
-        GRID_TOTAL_ENERGY_USED:       ['homeLoadTotalEnergy', float, 2],
+        GRID_TOTAL_ENERGY_USED:           ['homeLoadTotalEnergy', float, 3],
+        GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
     },
     PLANT_DETAIL: {
-        INVERTER_LAT:                ['latitude', float, 7],
-        INVERTER_LON:                ['longitude', float, 7],
-        INVERTER_ADDRESS:            ['cityStr', str, None],
+        INVERTER_LAT:                     ['latitude', float, 7],
+        INVERTER_LON:                     ['longitude', float, 7],
+        INVERTER_ADDRESS:                 ['cityStr', str, None],
     },
 }
 
@@ -280,9 +281,32 @@ class SoliscloudAPI(BaseAPI):
             if self._data[GRID_TOTAL_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_POWER] = \
                     float(self._data[GRID_TOTAL_POWER])*1000
+
             if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
                     float(self._data[GRID_TOTAL_CONSUMPTION_POWER])*1000
+
+            if self._data[GRID_TOTAL_ENERGY_USED_STR] == "MWh":
+                self._data[GRID_TOTAL_ENERGY_USED] = \
+                    float(self._data[GRID_TOTAL_ENERGY_USED])*1000
+            elif self._data[GRID_TOTAL_ENERGY_USED_STR] == "GWh":
+                self._data[GRID_TOTAL_ENERGY_USED] = \
+                    float(self._data[GRID_TOTAL_ENERGY_USED])*1000*1000
+
+            if self._data[INVERTER_ACPOWER_STR] == "kW":
+                self._data[INVERTER_ACPOWER] = \
+                    float(self._data[INVERTER_ACPOWER])*1000
+
+            if self._data[INVERTER_ENERGY_THIS_YEAR_STR] == "MWh":
+                self._data[INVERTER_ENERGY_THIS_YEAR] = \
+                    float(self._data[INVERTER_ENERGY_THIS_YEAR])*1000
+
+            if self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "MWh":
+                self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
+                    float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000
+            elif self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "GWh":
+                self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
+                    float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
 
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
@@ -296,7 +320,7 @@ class SoliscloudAPI(BaseAPI):
             # mypy trips over self_data[STRING_COUNT] as it could be of type str, int or float
             # needs to be fixed at some point in time, but this works.
             for i, stringlist in enumerate(STRING_LISTS):
-                if i > self._data[STRING_COUNT]:
+                if i > int(self._data[STRING_COUNT]):
                     self._purge_if_unused(0, *stringlist)
 
     def _purge_if_unused(self, value: Any, *elements: str) -> None:
