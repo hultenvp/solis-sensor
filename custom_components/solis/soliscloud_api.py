@@ -281,32 +281,40 @@ class SoliscloudAPI(BaseAPI):
             if self._data[GRID_TOTAL_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_POWER] = \
                     float(self._data[GRID_TOTAL_POWER])*1000
+                self._data[GRID_TOTAL_POWER_STR] = "W"    
 
             if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
                     float(self._data[GRID_TOTAL_CONSUMPTION_POWER])*1000
+                self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] = "W"
 
             if self._data[GRID_TOTAL_ENERGY_USED_STR] == "MWh":
                 self._data[GRID_TOTAL_ENERGY_USED] = \
                     float(self._data[GRID_TOTAL_ENERGY_USED])*1000
+                self._data[GRID_TOTAL_ENERGY_USED_STR] = "kWh"
             elif self._data[GRID_TOTAL_ENERGY_USED_STR] == "GWh":
                 self._data[GRID_TOTAL_ENERGY_USED] = \
                     float(self._data[GRID_TOTAL_ENERGY_USED])*1000*1000
-
+                self._data[GRID_TOTAL_ENERGY_USED_STR] = "kWh"
+                
             if self._data[INVERTER_ACPOWER_STR] == "kW":
                 self._data[INVERTER_ACPOWER] = \
                     float(self._data[INVERTER_ACPOWER])*1000
+                self._data[INVERTER_ACPOWER_STR] = "W"
 
             if self._data[INVERTER_ENERGY_THIS_YEAR_STR] == "MWh":
                 self._data[INVERTER_ENERGY_THIS_YEAR] = \
                     float(self._data[INVERTER_ENERGY_THIS_YEAR])*1000
+                self._data[INVERTER_ENERGY_THIS_YEAR_STR] = "kWh"
 
             if self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "MWh":
                 self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
                     float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000
+                self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
             elif self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "GWh":
                 self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
                     float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
+                self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
 
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType

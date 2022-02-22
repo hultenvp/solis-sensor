@@ -18,7 +18,7 @@ STRING_LISTS = [
 ]
 GRID_TOTAL_POWER_STR = 'gridTotalPowerUnit'
 GRID_TOTAL_CONSUMPTION_POWER_STR = 'gridTotalConsumptionPowerUnit'
-INVERTER_ACPOWER_STR = 'pacUint'
+INVERTER_ACPOWER_STR = 'pacUnit'
 GRID_TOTAL_ENERGY_USED_STR = 'homeLoadTotalEnergyUnit'
 INVERTER_ENERGY_THIS_YEAR_STR = 'energyThisYearUnit'
 INVERTER_ENERGY_TOTAL_LIFE_STR = 'energyTotalLifeUnit'
