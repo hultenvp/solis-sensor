@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 
 # Response constants
 SUCCESS = 'Success'
@@ -86,6 +86,8 @@ INVERTER_DATA: InverterDataType = {
         PHASE1_CURRENT:                   ['iAc1', float, 2],
         PHASE2_CURRENT:                   ['iAc2', float, 2],
         PHASE3_CURRENT:                   ['iAc3', float, 2],
+        BAT_POWER:                        ['batteryPower', float, 3],
+        BAT_POWER_STR:                    ['batteryPowerStr', str, None],
         BAT_REMAINING_CAPACITY:           ['batteryCapacitySoc', float, 2],
         BAT_TOTAL_ENERGY_CHARGED:         ['batteryTotalChargeEnergy', float, 2],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 2],
@@ -281,7 +283,12 @@ class SoliscloudAPI(BaseAPI):
             if self._data[GRID_TOTAL_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_POWER] = \
                     float(self._data[GRID_TOTAL_POWER])*1000
-                self._data[GRID_TOTAL_POWER_STR] = "W"    
+                self._data[GRID_TOTAL_POWER_STR] = "W"
+
+            if self._data[BAT_POWER_STR] == "kW":
+                self._data[BAT_POWER] = \
+                    float(self._data[BAT_POWER])*1000
+                self._data[BAT_POWER_STR] = "W"    
 
             if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
@@ -315,6 +322,10 @@ class SoliscloudAPI(BaseAPI):
                 self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
                     float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
                 self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
+
+            # Just temporary till SolisCloud is fixed
+            self._data[GRID_DAILY_ON_GRID_ENERGY] = \
+                float(self._data[GRID_DAILY_ON_GRID_ENERGY])*10
 
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType

@@ -7,7 +7,7 @@
 """
 
 # VERSION
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 
 INVERTER_SERIAL = 'serial'
 INVERTER_PLANT_ID = 'plantID'
@@ -47,6 +47,7 @@ PHASE3_VOLTAGE = 'acVoltage3'
 PHASE1_CURRENT = 'acCurrent1'
 PHASE2_CURRENT = 'acCurrent2'
 PHASE3_CURRENT = 'acCurrent3'
+BAT_POWER = 'batteryPower'
 BAT_REMAINING_CAPACITY = 'remainingCapacity'
 BAT_TOTAL_ENERGY_CHARGED = 'totalEnergyCharged'
 BAT_TOTAL_ENERGY_DISCHARGED = 'totalEnergyDischarged'
