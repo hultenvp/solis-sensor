@@ -86,6 +86,14 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         INVERTER_TEMPERATURE
     ],
+    'radiatortemperature1': [
+        'Radiator temperature 1', # Solarman only
+        TEMP_CELSIUS,
+        'mdi:thermometer',
+        DEVICE_CLASS_TEMPERATURE,
+        STATE_CLASS_MEASUREMENT,
+        RADIATOR1_TEMP
+    ],
     'dcinputvoltagepv1': [
         'DC Voltage PV1',
         ELECTRIC_POTENTIAL_VOLT,
@@ -285,6 +293,14 @@ SENSOR_TYPES = {
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         INVERTER_ENERGY_TOTAL_LIFE
+    ],
+    'batpack1capacityremaining': [
+        'Battery pack 1 remaining battery capacity',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        BAT1_REMAINING_CAPACITY
     ],
     'batcapacityremaining': [
         'Remaining battery capacity',
