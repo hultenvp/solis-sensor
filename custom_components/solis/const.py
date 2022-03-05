@@ -39,7 +39,7 @@ DEFAULT_DOMAIN = 'm.ginlong.com'
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
 SENSOR_TYPES = {
     'inverterpowerstate': [
-        'Power state',
+        'Power State',
         None,
         'mdi:power',
         None,
@@ -55,7 +55,7 @@ SENSOR_TYPES = {
         INVERTER_STATE
     ],
     'timestamponline': [
-        'Timestamp inverter online',
+        'Timestamp Inverter Online',
         None,
         'mdi:calendar-clock',
         None,
@@ -63,7 +63,7 @@ SENSOR_TYPES = {
         INVERTER_TIMESTAMP_ONLINE
     ],
     'timestampmeasurement': [
-        'Timestamp measurements received',
+        'Timestamp Measurements Received',
         None,
         'mdi:calendar-clock',
         None,
@@ -279,7 +279,7 @@ SENSOR_TYPES = {
         INVERTER_ENERGY_THIS_MONTH
     ],
     'energythisyear': [
-        'energy This Year',
+        'Energy This Year',
         ENERGY_KILO_WATT_HOUR,
         'mdi:flash-outline',
         DEVICE_CLASS_ENERGY,
@@ -302,8 +302,16 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         BAT1_REMAINING_CAPACITY
     ],
+    'batteryPower': [
+        'Battery Power',
+        POWER_WATT,
+        'mdi:battery',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        BAT_POWER
+    ],
     'batcapacityremaining': [
-        'Remaining battery capacity',
+        'Remaining Battery Capacity',
         PERCENTAGE,
         'mdi:battery',
         DEVICE_CLASS_BATTERY,
