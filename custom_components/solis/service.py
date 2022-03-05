@@ -32,7 +32,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.5'
+VERSION = '0.2.6'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -153,9 +153,9 @@ class InverterService():
                             if last_updated_state.hour == 0 and last_updated_state.minute < 15:
                                 value = 0
                             # Avoid race conditions when between state change in the morning and
-                            # energy today being reset by adding 10 min grace period
-                            elif last_updated_state + timedelta(minutes=10) > datetime.now():
-                                value = 0
+                            # energy today being reset by adding 5 min grace period and skipping update
+                            elif last_updated_state + timedelta(minutes=5) > datetime.now():
+                                continue
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
     async def async_update(self, *_) -> int:
