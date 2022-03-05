@@ -21,7 +21,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.5'
+VERSION = '0.2.0'
 
 # Response constants
 SUCCESS = 'Success'
@@ -66,6 +66,16 @@ INVERTER_DATA: InverterDataType = {
     'realTimeDataState': [
         VALUE_RECORD, {
             INVERTER_POWER_STATE:       ['1fd', int, None],
+        }
+    ],
+    'realTimeDataTemp': [
+        VALUE_RECORD, {
+            RADIATOR1_TEMP:       ['1to', int, None],
+        }
+    ],
+    'realTimeDataBattery': [
+        VALUE_RECORD, {
+            BAT1_REMAINING_CAPACITY:       ['3je', int, None],
         }
     ],
     'realTimeDataPower': [
