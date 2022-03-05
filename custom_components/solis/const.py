@@ -295,7 +295,7 @@ SENSOR_TYPES = {
         INVERTER_ENERGY_TOTAL_LIFE
     ],
     'batpack1capacityremaining': [
-        'Battery pack 1 remaining battery capacity',
+        'Battery pack 1 remaining battery capacity', # Solarman only
         PERCENTAGE,
         'mdi:battery',
         DEVICE_CLASS_BATTERY,
