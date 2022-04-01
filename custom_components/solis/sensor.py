@@ -29,8 +29,6 @@ from .const import (
     CONF_SECRET,
     CONF_KEY_ID,
     CONF_PLANT_ID,
-    CONF_INVERTER_SERIAL,
-    CONF_SENSORS,
     SENSOR_PREFIX,
     DEFAULT_DOMAIN,
     SENSOR_TYPES,
@@ -44,7 +42,7 @@ from .soliscloud_api import SoliscloudConfig
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '2.1.0'
+VERSION = '2.2.0'
 
 LAST_UPDATED = 'Last updated'
 SERIAL = 'Inverter serial'
@@ -54,24 +52,24 @@ EMPTY_ATTR: dict[str, Any] = {
     SERIAL: None,
 }
 
-def _check_config_schema(conf: ConfigType):
-    """Check if the sensors and attributes are valid."""
-    if CONF_SENSORS in conf.keys():
-        _LOGGER.warning("Deprecated platform configuration, please move to the new configuration")
-        if conf[CONF_INVERTER_SERIAL] == '':
-            raise vol.Invalid('inverter_serial required in config when sensors are specified')
+def _check_config_schema(config: ConfigType):
+    # Check input configuration.
+    portal_domain = config.get(CONF_PORTAL_DOMAIN)
+    if portal_domain is None:
+        raise vol.Invalid('configuration parameter [portal_domain] does not have a value')
+    elif portal_domain[:4] == 'http':
+        raise vol.Invalid('leave http(s):// out of configuration parameter [portal_domain]')
+    if config.get(CONF_USERNAME) is None:
+        raise vol.Invalid('configuration parameter [portal_username] does not have a value')
+    if config.get(CONF_PLANT_ID) is None:
+        raise vol.Invalid('Configuration parameter [portal_plantid] does not have a value')
+    has_password = config.get(CONF_PASSWORD) != ''
+    has_key_id = config.get(CONF_KEY_ID) != ''
+    has_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8') != b'\x00'
+    if not (has_password ^ (has_key_id and has_secret)):
+        raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & [portal_secret]')
 
-        for sensor, attrs in conf[CONF_SENSORS].items():
-            if sensor not in SENSOR_TYPES:
-                raise vol.Invalid('sensor {} does not exist'.format(sensor))
-            for attr in attrs:
-                if attr not in SENSOR_TYPES:
-                    raise vol.Invalid('attribute sensor {} does not \
-                        exist [{}]'.format(attr, sensor))
-    else:
-        if conf[CONF_INVERTER_SERIAL] != '':
-            _LOGGER.warning("Using new config schema, ignoring inverter_serial")
-    return conf
+    return config
 
 PLATFORM_SCHEMA = vol.All(PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_NAME, default=SENSOR_PREFIX): cv.string,
@@ -81,8 +79,6 @@ PLATFORM_SCHEMA = vol.All(PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_SECRET , default='00'): cv.string,
     vol.Optional(CONF_KEY_ID , default=''): cv.string,
     vol.Required(CONF_PLANT_ID, default=None): cv.positive_int,
-    vol.Optional(CONF_INVERTER_SERIAL, default=''): cv.string,
-    vol.Optional(CONF_SENSORS): vol.Schema({cv.slug: cv.ensure_list}),
 }, extra=vol.PREVENT_EXTRA), _check_config_schema)
 
 def create_sensors(sensors: dict[str, list[str]],
@@ -96,20 +92,6 @@ def create_sensors(sensors: dict[str, list[str]],
             _LOGGER.debug("Creating %s (%s)", sensor_type, inverter_sn)
             hass_sensors.append(SolisSensor(inverter_service, inverter_name,
                 inverter_sn, sensor_type))
-    return hass_sensors
-
-def create_sensors_legacy(
-        config: ConfigType,
-        inverter_service: InverterService,
-        inverter_name: str,
-        inverter_sn: str
-    ) -> list[SolisSensor]:
-    """Legacy for old config schema."""
-    hass_sensors = []
-    for sensor_type, subtypes in config[CONF_SENSORS].items():
-        _LOGGER.debug("Creating %s sensor: %s", inverter_name, sensor_type)
-        hass_sensors.append(SolisSensor(inverter_service, inverter_name,
-            inverter_sn, sensor_type))
     return hass_sensors
 
 async def async_setup_platform(
@@ -126,15 +108,7 @@ async def async_setup_platform(
     portal_key_id = config.get(CONF_KEY_ID)
     portal_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8')
     portal_plantid = config.get(CONF_PLANT_ID)
-    inverter_sn = config.get(CONF_INVERTER_SERIAL)
 
-    # Check input configuration.
-    if portal_domain is None:
-        raise vol.Invalid('configuration parameter [portal_domain] does not have a value')
-    if portal_domain[:4] == 'http':
-        raise vol.Invalid('leave http(s):// out of configuration parameter [portal_domain]')
-    if portal_username is None:
-        raise vol.Invalid('configuration parameter [portal_username] does not have a value')
     portal_config: PortalConfig | None = None
     if portal_password != '':
         portal_config = GinlongConfig(
@@ -144,8 +118,6 @@ async def async_setup_platform(
             portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
     else:
         raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & [portal_secret]')
-    if portal_plantid is None:
-        raise vol.Invalid('Configuration parameter [portal_plantid] does not have a value')
 
     # Initialize the Ginlong data service.
     service: InverterService = InverterService(portal_config, hass)
@@ -153,22 +125,14 @@ async def async_setup_platform(
     # Prepare the sensor entities.
     hass_sensors: list[SolisSensor] = []
 
-    if CONF_SENSORS in config.keys():
-        # Old config schema
-        hass_sensors = create_sensors_legacy(config, service, inverter_name, inverter_sn)
-        async_add_entities(hass_sensors)
-
-        # schedule the first update in 1 minute from now:
-        service.schedule_update(1)
-    else:
-        cookie: dict[str, Any] = {
-            'name': inverter_name,
-            'service': service,
-            'async_add_entities' : async_add_entities
-        }
-        # Will retry endlessly to discover
-        _LOGGER.info("Scheduling discovery")
-        service.schedule_discovery(on_discovered, cookie, 1)
+    cookie: dict[str, Any] = {
+        'name': inverter_name,
+        'service': service,
+        'async_add_entities' : async_add_entities
+    }
+    # Will retry endlessly to discover
+    _LOGGER.info("Scheduling discovery")
+    service.schedule_discovery(on_discovered, cookie, 1)
 
 @callback
 def on_discovered(capabilities, cookie):
