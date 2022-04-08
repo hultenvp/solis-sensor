@@ -12,17 +12,25 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Any, final
 from homeassistant.core import HomeAssistant
+from homeassistant.const import (
+    CONF_NAME,
+)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
+from homeassistant.helpers import device_registry as dr
 from homeassistant.util import dt as dt_util
 
 from .ginlong_base import PortalConfig, BaseAPI, GinlongData
 from .ginlong_api import GinlongAPI, GinlongConfig
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
+    INVERTER_PLANT_ID,
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
     INVERTER_STATE
+)
+from .const import (
+        DOMAIN,
 )
 
 # REFRESH CONSTANTS
@@ -118,7 +126,23 @@ class InverterService():
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
                     capabilities[inverter_serial] = data.keys()
+                    device_registry = dr.async_get(self._hass)
+                    config = self._hass.data[DOMAIN][data.getattr(INVERTER_PLANT_ID)]
+                    if config is not None:
+                        device_registry.async_get_or_create(
+                            config_entry_id=config,
+    #                        connections={(dr.CONNECTION_NETWORK_MAC, config.mac)},
+                            identifiers={(DOMAIN, data.getattr(INVERTER_SERIAL))},
+                            manufacturer="Solis",
+                            name=config[CONF_NAME],
+#                            model=config.modelid,
+#                            sw_version=config.swversion,
+#                            hw_version=config.hwversion,
+                        )
+
         return capabilities
+
+
 
     def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str
     ) -> None:
@@ -156,7 +180,7 @@ class InverterService():
                             if last_updated_state.hour == 0 and last_updated_state.minute < 15:
                                 value = 0
                             # Avoid race conditions when between state change in the morning and
-                            # energy today being reset by adding 5 min grace period and 
+                            # energy today being reset by adding 5 min grace period and
                             # skipping update
                             elif last_updated_state + timedelta(minutes=5) > datetime.now():
                                 continue
