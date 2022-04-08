@@ -19,10 +19,12 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     CONF_NAME,
 )
+from homeassistant.config_entries import ConfigEntry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .const import (
+    DOMAIN,
     CONF_PORTAL_DOMAIN,
     CONF_USERNAME,
     CONF_PASSWORD,
@@ -32,6 +34,7 @@ from .const import (
     SENSOR_PREFIX,
     DEFAULT_DOMAIN,
     SENSOR_TYPES,
+    SERVICE,
 )
 
 from .service import (ServiceSubscriber, InverterService)
@@ -57,16 +60,16 @@ def _check_config_schema(config: ConfigType):
     portal_domain = config.get(CONF_PORTAL_DOMAIN)
     if portal_domain is None:
         raise vol.Invalid('configuration parameter [portal_domain] does not have a value')
-    elif portal_domain[:4] == 'http':
-        raise vol.Invalid('leave http(s):// out of configuration parameter [portal_domain]')
+    elif portal_domain[:4] != 'http':
+        raise vol.Invalid('Ensure [portal_domain] starts with http(s)://')
     if config.get(CONF_USERNAME) is None:
         raise vol.Invalid('configuration parameter [portal_username] does not have a value')
     if config.get(CONF_PLANT_ID) is None:
         raise vol.Invalid('Configuration parameter [portal_plantid] does not have a value')
-    has_password = config.get(CONF_PASSWORD) != ''
-    has_key_id = config.get(CONF_KEY_ID) != ''
-    has_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8') != b'\x00'
-    if not (has_password ^ (has_key_id and has_secret)):
+    has_password: bool = config.get(CONF_PASSWORD) != ''
+    has_key_id: bool = config.get(CONF_KEY_ID) != ''
+    has_secret: bool = bytes(config.get(CONF_SECRET), 'utf-8') != b'\x00'
+    if not has_password ^ (has_key_id and has_secret):
         raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & [portal_secret]')
 
     return config
@@ -123,8 +126,28 @@ async def async_setup_platform(
     service: InverterService = InverterService(portal_config, hass)
 
     # Prepare the sensor entities.
-    hass_sensors: list[SolisSensor] = []
+    #hass_sensors: list[SolisSensor] = []
 
+    cookie: dict[str, Any] = {
+        'name': inverter_name,
+        'service': service,
+        'async_add_entities' : async_add_entities
+    }
+    # Will retry endlessly to discover
+    _LOGGER.info("Scheduling discovery")
+    service.schedule_discovery(on_discovered, cookie, 1)
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities):
+
+    """Setup sensors from a config entry created in the integrations UI."""
+
+    # Prepare the sensor entities.
+    #hass_sensors: list[SolisSensor] = []
+    inverter_name = config_entry.data[CONF_NAME]
+    service = hass.data[DOMAIN][config_entry.entry_id][SERVICE]
     cookie: dict[str, Any] = {
         'name': inverter_name,
         'service': service,
