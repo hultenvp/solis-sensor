@@ -187,7 +187,7 @@ class GinlongAPI(BaseAPI):
         self._session = session
         self._inverter_list = None
         # Building url & params
-        url = 'https://'+self._config.domain+'/cpro/login/validateLogin.json'
+        url = self._config.domain+'/cpro/login/validateLogin.json'
         params = {
             "userName": self._config.username,
             "password": self._config.password,
@@ -309,6 +309,12 @@ class GinlongAPI(BaseAPI):
                     if value is not None:
                         if unit == 'kW':
                             value *= 1000
+                        #if dictkey == INVERTER_ENERGY_TOTAL_LIFE:
+                        #    _LOGGER.info('Unit = %s', unit)
+                        #    if unit == "kWh":
+                        #        value = float(value/1000)
+                        #    elif unit == "GWh":
+                        #        value = float(value * 1000)
                         self._data[dictkey] = value
         # Ensure a minimal dataset has been collected
         if CHECK.issubset(self._data.keys()):
@@ -350,7 +356,17 @@ class GinlongAPI(BaseAPI):
             if key_value == key:
                 data_raw = record.get('value')
                 if data_raw is not None:
-                    result = type_(data_raw)
+                    try:
+                        result = type_(data_raw)
+                    except ValueError:
+                        _LOGGER.debug("Failed to convert %s(%s) to type %s, raw value = %s", record.get('name'), key, type_, data_raw)
+                        if type_ is float:
+                            _LOGGER.debug("Trying to convert to int as fallback")
+                            try:
+                                result = int(data_raw)
+                                type_ = int
+                            except ValueError:
+                                _LOGGER.debug("Convert to int failed, giving up")
                     # Round to specified precision
                     if type_ is float:
                         result = round(result, precision)
