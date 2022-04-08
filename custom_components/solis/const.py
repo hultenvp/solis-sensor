@@ -12,6 +12,7 @@ from homeassistant.const import (
     FREQUENCY_HERTZ,
     ELECTRIC_POTENTIAL_VOLT,
     ENERGY_KILO_WATT_HOUR,
+    ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
     ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
@@ -24,14 +25,17 @@ from homeassistant.const import (
 from .ginlong_const import *
 
 CONF_PORTAL_DOMAIN = 'portal_domain'
+CONF_PORTAL_VERSION = 'portal_version'
 CONF_USERNAME = 'portal_username'
 CONF_PASSWORD = 'portal_password'
 CONF_SECRET = 'portal_secret'
 CONF_KEY_ID = 'portal_key_id'
 CONF_PLANT_ID = 'portal_plant_id'
 
+DOMAIN = "Solis"
 SENSOR_PREFIX = 'Solis'
-DEFAULT_DOMAIN = 'm.ginlong.com'
+DEFAULT_DOMAIN = 'https://m.ginlong.com'
+SERVICE = "service"
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
