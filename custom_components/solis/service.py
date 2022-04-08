@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 
 from abc import ABC, abstractmethod
-import asyncio
+#import asyncio
 from datetime import datetime, timedelta
 from typing import Any, final
 from homeassistant.core import HomeAssistant
@@ -74,7 +74,7 @@ class InverterService():
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
         self._hass: HomeAssistant = hass
         self._discovery_callback = None
-        self._discovery_cookie = None
+        self._discovery_cookie: dict[str, Any] | None = None
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
         elif isinstance(portal_config, SoliscloudConfig):
@@ -92,16 +92,19 @@ class InverterService():
         await self._api.logout()
         self._logintime = None
 
-    async def async_discover(self, *_) -> dict[str, list[str]]:
+    async def async_discover(self, *_) -> None:
         """ Try to discover and retry if needed."""
-        capabilities: dict[str, list[str]] = {}
-        capabilities = await self._do_discover()
-        if capabilities:
-            if self._discovery_callback and self._discovery_cookie:
+        if self._discovery_callback and self._discovery_cookie:
+            capabilities: dict[str, list[str]] = {}
+            capabilities = await self._do_discover()
+            if capabilities:
                 self._discovery_callback(capabilities, self._discovery_cookie)
-        else:
-            _LOGGER.warning("Failed to discover, scheduling retry.")
-            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, RETRY_DELAY_SECONDS)
+            else:
+                _LOGGER.warning("Failed to discover, scheduling retry.")
+                self.schedule_discovery(
+                    self._discovery_callback,
+                    self._discovery_cookie,
+                    RETRY_DELAY_SECONDS)
 
     async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
@@ -153,7 +156,8 @@ class InverterService():
                             if last_updated_state.hour == 0 and last_updated_state.minute < 15:
                                 value = 0
                             # Avoid race conditions when between state change in the morning and
-                            # energy today being reset by adding 5 min grace period and skipping update
+                            # energy today being reset by adding 5 min grace period and 
+                            # skipping update
                             elif last_updated_state + timedelta(minutes=5) > datetime.now():
                                 continue
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
