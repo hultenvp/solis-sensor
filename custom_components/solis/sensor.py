@@ -227,14 +227,3 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
     def extra_state_attributes(self):
         """Return entity specific state attributes."""
         return self._attributes
-    
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self._attributes[SERIAL])
-            },
-            "name": self._name,
-            "manufacturer": "Solis",
-        }
