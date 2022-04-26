@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 
 # Response constants
 SUCCESS = 'Success'
@@ -61,7 +61,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ACPOWER:                 ['pac', float, 3],
         INVERTER_ACPOWER_STR:             ['pacStr', str, None],
         INVERTER_ACFREQUENCY:             ['fac', float, 2],
-        INVERTER_ENERGY_TODAY:            ['eToday', float, 2],
+        #INVERTER_ENERGY_TODAY:            ['eToday', float, 2], # Moved to PLANT_DETAIL
         INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
         INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
         INVERTER_ENERGY_THIS_YEAR_STR:    ['eYearStr', str, None],
@@ -110,6 +110,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]
     },
 }
 
@@ -228,10 +229,14 @@ class SoliscloudAPI(BaseAPI):
             if self._inverter_list is not None and inverter_serial in self._inverter_list:
                 device_id = self._inverter_list[inverter_serial]
                 payload = await self._get_inverter_details(device_id, inverter_serial)
+                payload2 = await self._get_station_details(self.config.plantid)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
+                if payload2 is not None:
+                    self._collect_station_data(payload2)
+                if self._data is not None:
                     return GinlongData(self._data)
         return None
 
@@ -271,6 +276,37 @@ class SoliscloudAPI(BaseAPI):
                 value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
+
+    async def _get_station_details(self, plant_id: str) -> dict[str, str]:
+        """
+        Fetch Station Details
+        """
+
+        params = {
+            'id': plant_id
+        }
+        result = await self._post_data_json(PLANT_DETAIL, params)
+
+        jsondata = None
+        if result[SUCCESS] is True:
+            jsondata = result[CONTENT]
+        else:
+            _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
+        return jsondata
+
+    def _collect_station_data(self, payload: dict[str, Any]) -> None:
+        """ Fetch dynamic properties """
+        jsondata = payload['data']
+        attributes = INVERTER_DATA[PLANT_DETAIL]
+        for dictkey in attributes:
+            key = attributes[dictkey][0]
+            type_ = attributes[dictkey][1]
+            precision = attributes[dictkey][2]
+            if key is not None:
+                value = self._get_value(jsondata, key, type_, precision)
+                if value is not None:
+                    self._data[dictkey] = value
+
 
     def _post_process(self) -> None:
         """ Cleanup received data. """
