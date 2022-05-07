@@ -21,7 +21,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 # Response constants
 SUCCESS = 'Success'
@@ -243,10 +243,15 @@ class GinlongAPI(BaseAPI):
         if result[SUCCESS] is True:
             device_ids = {}
             result_json: dict = result[CONTENT]
-            for record in result_json['result']['paginationAjax']['data']:
-                serial = record.get('sn')
-                device_id = record.get('deviceId')
-                device_ids[serial] = device_id
+            try:
+                for record in result_json['result']['paginationAjax']['data']:
+                    serial = record.get('sn')
+                    device_id = record.get('deviceId')
+                    device_ids[serial] = device_id
+            except TypeError:
+                _LOGGER.warning("Unknown payload received")
+                _LOGGER.debug("%s", result_json)
+                slef._online = False
         else:
             self._online = False
 
