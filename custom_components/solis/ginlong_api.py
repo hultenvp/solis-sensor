@@ -251,7 +251,7 @@ class GinlongAPI(BaseAPI):
             except TypeError:
                 _LOGGER.warning("Unknown payload received")
                 _LOGGER.debug("%s", result_json)
-                slef._online = False
+                self._online = False
         else:
             self._online = False
 
