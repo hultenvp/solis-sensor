@@ -439,7 +439,7 @@ class SoliscloudAPI(BaseAPI):
             return result
         try:
             with async_timeout.timeout(10):
-                url = f"https://{self.config.domain}{canonicalized_resource}"
+                url = f"{self.config.domain}{canonicalized_resource}"
                 resp = await self._session.post(url, json=params, headers=header)
 
                 result[STATUS_CODE] = resp.status
