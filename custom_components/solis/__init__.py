@@ -53,9 +53,10 @@ async def async_setup_entry(
 ) -> bool:
     """Set up platform from a ConfigEntry."""
     hass.data.setdefault(DOMAIN, {})
-    #hass.data[DOMAIN][entry.entry_id] = entry.data
+    hass.data[DOMAIN][entry.entry_id] = entry.data
 
-    config = entry.data #hass.data[DOMAIN][config_entry.entry_id]
+    config = entry.data 
+    #hass.data[DOMAIN][config_entry.entry_id]
     #session = async_get_clientsession(hass)
 
     portal_domain = config[CONF_PORTAL_DOMAIN]
