@@ -110,6 +110,7 @@ INVERTER_DATA: InverterDataType = {
     'dataJSON': [
         VALUE_ELEMENT, {
             BAT_REMAINING_CAPACITY:      ['1cv', float, 2],
+            BAT_POWER:                   ['1ct', float, 2],
             BAT_TOTAL_ENERGY_CHARGED:    ['1cx', float, 2],
             BAT_TOTAL_ENERGY_DISCHARGED: ['1cy', float, 2],
             BAT_DAILY_ENERGY_CHARGED:    ['1cz', float, 2],
