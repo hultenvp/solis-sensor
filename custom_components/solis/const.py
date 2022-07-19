@@ -300,13 +300,37 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         BAT1_REMAINING_CAPACITY
     ],
-    'batteryPower': [
+    'batpower': [
         'Battery Power',
         POWER_WATT,
         'mdi:battery',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
         BAT_POWER
+    ],
+    'batvoltage': [
+        'Battery Voltage',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:battery',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        BAT_VOLTAGE        
+    ],
+    'batstatus': [ # Key: ['label', unit, icon, device class, state class, api_attribute_name]
+        'Battery Status',
+        None,
+        'mdi:battery',
+        None,
+        None,
+        BAT_STATUS
+    ],
+    'batcurrent': [
+        'Battery Current',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:battery',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        BAT_CURRENT
     ],
     'batcapacityremaining': [
         'Remaining Battery Capacity',
