@@ -110,6 +110,10 @@ INVERTER_DATA: InverterDataType = {
     'dataJSON': [
         VALUE_ELEMENT, {
             BAT_REMAINING_CAPACITY:      ['1cv', float, 2],
+            BAT_POWER:                   ['1ct', float, 2],
+            BAT_STATUS:                  ['1ff', str, None],
+            BAT_VOLTAGE:                 ['1cr', float, 2],
+            BAT_CURRENT:                 ['1cs', float, 2],
             BAT_TOTAL_ENERGY_CHARGED:    ['1cx', float, 2],
             BAT_TOTAL_ENERGY_DISCHARGED: ['1cy', float, 2],
             BAT_DAILY_ENERGY_CHARGED:    ['1cz', float, 2],
@@ -334,6 +338,9 @@ class GinlongAPI(BaseAPI):
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
             self._purge_if_unused(0.0, PHASE2_CURRENT, PHASE2_VOLTAGE)
             self._purge_if_unused(0.0, PHASE3_CURRENT, PHASE3_VOLTAGE)
+
+            # Battery power from battery state (discharge/charge)
+            # Charge / Discharge
 
     def _purge_if_unused(self, value: Any, *elements: str) -> None:
         for element in elements:
