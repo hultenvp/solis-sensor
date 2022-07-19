@@ -21,7 +21,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.1'
+VERSION = '0.3.0'
 
 # Response constants
 SUCCESS = 'Success'
