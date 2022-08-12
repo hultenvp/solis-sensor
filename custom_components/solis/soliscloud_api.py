@@ -361,7 +361,7 @@ class SoliscloudAPI(BaseAPI):
 
             # Just temporary till SolisCloud is fixed
             self._data[GRID_DAILY_ON_GRID_ENERGY] = \
-                float(self._data[GRID_DAILY_ON_GRID_ENERGY])*10
+                float(self._data[GRID_DAILY_ON_GRID_ENERGY])
 
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
