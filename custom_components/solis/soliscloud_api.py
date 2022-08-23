@@ -202,7 +202,7 @@ class SoliscloudAPI(BaseAPI):
         Fetch return list of inverters { inverter serial : device_id }
         """
 
-        device_ids = None
+        device_ids = {}
 
         params = {
             'stationId': plant_id
@@ -210,7 +210,6 @@ class SoliscloudAPI(BaseAPI):
         result = await self._post_data_json('/v1/api/inveterList', params)
 
         if result[SUCCESS] is True:
-            device_ids = {}
             result_json: dict = result[CONTENT]
             for record in result_json['data']['page']['records']:
                 serial = record.get('sn')
@@ -407,7 +406,7 @@ class SoliscloudAPI(BaseAPI):
                 if type_ is float:
                     result = round(result, precision)
             except ValueError:
-                pass
+                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
         return result
 
     async def _get_data(self,
