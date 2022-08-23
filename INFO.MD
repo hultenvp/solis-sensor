@@ -7,4 +7,4 @@ This integration provides data from m.ginlong.com and home.solarman.cn portal ba
 ## Example
 ![dashboard integration](https://github.com/hultenvp/solis-sensor/blob/master/image/energy_dashboard_integration.GIF)
 ## Documentation
-Read more [here](./README.md) for detailed documentation
+Read more [here](https://github.com/hultenvp/solis-sensor/blob/master/README.md) for detailed documentation
