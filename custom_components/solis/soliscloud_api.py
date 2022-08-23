@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.6'
+VERSION = '0.1.7'
 
 # Response constants
 SUCCESS = 'Success'
@@ -399,7 +399,10 @@ class SoliscloudAPI(BaseAPI):
         data_raw = data.get(key)
         if data_raw is not None:
             try:
-                result = type_(data_raw)
+                if type_ is int:
+                    result = int(float(data_raw))
+                else:
+                    result = type_(data_raw)
                 # Round to specified precision
                 if type_ is float:
                     result = round(result, precision)
