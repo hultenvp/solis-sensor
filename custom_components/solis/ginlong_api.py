@@ -372,7 +372,7 @@ class GinlongAPI(BaseAPI):
                             result = round(result, precision)
                         unit = record.get('unit')
                     except ValueError:
-                        pass
+                        _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
         return result, unit
 
     def _get_value(self,
@@ -392,7 +392,7 @@ class GinlongAPI(BaseAPI):
                 if type_ is float:
                     result = round(result, precision)
             except ValueError:
-                pass
+                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
         return result, None
 
     async def _get_data(self,
@@ -446,7 +446,7 @@ class GinlongAPI(BaseAPI):
 
                 return result
         except (asyncio.TimeoutError, ClientError) as err:
-            result[MESSAGE] = "%s" % err
+            result[MESSAGE] = "Exception: %s" % err.__class__
             _LOGGER.debug("Error: %s", result[MESSAGE])
             return result
         finally:
