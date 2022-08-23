@@ -21,7 +21,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.0'
+VERSION = '0.3.1'
 
 # Response constants
 SUCCESS = 'Success'
@@ -248,7 +248,7 @@ class GinlongAPI(BaseAPI):
             device_ids = {}
             result_json: dict = result[CONTENT]
             try:
-                for record in result_json['result']['paginationAjax']['data']:
+                for record in reversed(result_json['result']['paginationAjax']['data']):
                     serial = record.get('sn')
                     device_id = record.get('deviceId')
                     device_ids[serial] = device_id
@@ -355,18 +355,21 @@ class GinlongAPI(BaseAPI):
     def _get_value_from_record(self,
         data: list[dict[str, str]], key: str, type_: type, precision: int = 2
     ) -> tuple[str | int | float | None, str | None]:
-        result: str | int | float = None
+        result: str | int | float | None = None
         unit: str | None = None
         for record in data:
             key_value = record.get('key')
             if key_value == key:
                 data_raw = record.get('value')
                 if data_raw is not None:
-                    result = type_(data_raw)
-                    # Round to specified precision
-                    if type_ is float:
-                        result = round(result, precision)
-                unit = record.get('unit')
+                    try:
+                        result = type_(data_raw)
+                        # Round to specified precision
+                        if type_ is float:
+                            result = round(result, precision)
+                        unit = record.get('unit')
+                    except ValueError:
+                        pass
         return result, unit
 
     def _get_value(self,
@@ -377,10 +380,13 @@ class GinlongAPI(BaseAPI):
 
         data_raw = data.get(key)
         if data_raw is not None:
-            result = type_(data_raw)
-            # Round to specified precision
-            if type_ is float:
-                result = round(result, precision)
+            try:
+                result = type_(data_raw)
+                # Round to specified precision
+                if type_ is float:
+                    result = round(result, precision)
+            except ValueError:
+                pass
         return result, None
 
     async def _get_data(self,

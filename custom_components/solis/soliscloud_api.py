@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.5'
+VERSION = '0.1.6'
 
 # Response constants
 SUCCESS = 'Success'
@@ -178,6 +178,10 @@ class SoliscloudAPI(BaseAPI):
                 _LOGGER.info('Login Successful!')
                 # Request inverter list
                 self._inverter_list = await self.fetch_inverter_list(self.config.plantid)
+                if len(self._inverter_list)==0:
+                    _LOGGER.warning("No inverters found")
+                else:
+                    _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
             except KeyError:
                 _LOGGER.error(
                     'Unable to communicate with %s, please verify configuration.',
@@ -219,7 +223,7 @@ class SoliscloudAPI(BaseAPI):
 
     async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
         """
-        Fetch data for given inverter. Backend data is optimized for frontend.
+        Fetch data for given inverter. 
         Collect available data from payload and store as GinlongData object
         """
 
@@ -236,8 +240,10 @@ class SoliscloudAPI(BaseAPI):
                     self._post_process()
                 if payload2 is not None:
                     self._collect_station_data(payload2)
-                if self._data is not None:
+                if self._data is not None and INVERTER_SERIAL in self._data:
                     return GinlongData(self._data)
+                else:
+                    _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
 
 
@@ -359,10 +365,6 @@ class SoliscloudAPI(BaseAPI):
                     float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
                 self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
 
-            # Just temporary till SolisCloud is fixed
-            self._data[GRID_DAILY_ON_GRID_ENERGY] = \
-                float(self._data[GRID_DAILY_ON_GRID_ENERGY])
-
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
@@ -396,10 +398,13 @@ class SoliscloudAPI(BaseAPI):
 
         data_raw = data.get(key)
         if data_raw is not None:
-            result = type_(data_raw)
-            # Round to specified precision
-            if type_ is float:
-                result = round(result, precision)
+            try:
+                result = type_(data_raw)
+                # Round to specified precision
+                if type_ is float:
+                    result = round(result, precision)
+            except ValueError:
+                pass
         return result
 
     async def _get_data(self,

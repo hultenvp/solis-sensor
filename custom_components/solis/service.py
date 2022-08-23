@@ -32,13 +32,14 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.6'
+VERSION = '0.2.7'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
 
 #Autodiscover
 RETRY_DELAY_SECONDS = 60
+MAX_RETRY_DELAY_SECONDS = 900
 
 # Status constants
 ONLINE = 'Online'
@@ -75,6 +76,7 @@ class InverterService():
         self._hass: HomeAssistant = hass
         self._discovery_callback = None
         self._discovery_cookie = None
+        self._retry_delay_seconds = 0
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
         elif isinstance(portal_config, SoliscloudConfig):
@@ -99,9 +101,12 @@ class InverterService():
         if capabilities:
             if self._discovery_callback and self._discovery_cookie:
                 self._discovery_callback(capabilities, self._discovery_cookie)
+            self._retry_delay_seconds = 0
         else:
-            _LOGGER.warning("Failed to discover, scheduling retry.")
-            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, RETRY_DELAY_SECONDS)
+            self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, self._retry_delay_seconds + RETRY_DELAY_SECONDS)
+            _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", self._retry_delay_seconds)
+            await self._logout()
+            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, self._retry_delay_seconds)
 
     async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
@@ -128,7 +133,10 @@ class InverterService():
 
     async def update_devices(self, data: GinlongData) -> None:
         """ Update all registered sensors. """
-        serial = getattr(data, INVERTER_SERIAL)
+        try:
+            serial = getattr(data, INVERTER_SERIAL)
+        except AttributeError:
+            return
         if serial not in self._subscriptions:
             return
         for attribute in data.keys():
