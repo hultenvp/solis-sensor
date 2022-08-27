@@ -19,7 +19,7 @@ import logging
 from typing import Any
 from aiohttp import ClientError, ClientSession
 import async_timeout
-
+import yaml
 
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
@@ -127,6 +127,10 @@ class SoliscloudConfig(PortalConfig):
         super().__init__(portal_domain, portal_username, portal_plantid)
         self._key_id: str = portal_key_id
         self._secret: bytes = portal_secret
+        self._workarounds = {} 
+        with open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
+            self._workarounds = yaml.safe_load(file)
+            _LOGGER.debug("workarounds: %s", self._workarounds)
 
     @property
     def key_id(self) -> str:
@@ -137,6 +141,11 @@ class SoliscloudConfig(PortalConfig):
     def secret(self) -> bytes:
         """ API Key."""
         return self._secret
+    
+    @property
+    def workarounds(self) -> dict[str, Any]:
+        """ Return all workaround settings """
+        return self._workarounds
 
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
@@ -364,6 +373,14 @@ class SoliscloudAPI(BaseAPI):
                     float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
                 self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
 
+            # Just temporary till SolisCloud is fixed
+            try:
+                if self.config.workarounds['correct_daily_on_grid_energy_enabled']:
+                    self._data[GRID_DAILY_ON_GRID_ENERGY] = \
+                        float(self._data[GRID_DAILY_ON_GRID_ENERGY])*10
+            except KeyError:
+                pass
+            
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
