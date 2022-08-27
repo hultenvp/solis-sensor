@@ -8,6 +8,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timedelta
 from http import HTTPStatus
 import logging
 from typing import Any
@@ -247,11 +248,17 @@ class GinlongAPI(BaseAPI):
         if result[SUCCESS] is True:
             device_ids = {}
             result_json: dict = result[CONTENT]
+            #_LOGGER.debug("%s",result_json['result']['paginationAjax']['data'])
             try:
                 for record in reversed(result_json['result']['paginationAjax']['data']):
                     serial = record.get('sn')
+                    updateDate = datetime.fromtimestamp(record.get('updateDate')/1000)
+                    twoDaysAgo = datetime.now() - timedelta(days = 2)
+                    active = record.get('dataloggerState')== '1'
                     device_id = record.get('deviceId')
-                    device_ids[serial] = device_id
+                    # Ignore all device_id's inactive for more than 2 days
+                    if active or updateDate>twoDaysAgo:
+                        device_ids[serial] = device_id
             except TypeError:
                 _LOGGER.warning("Unknown payload received")
                 _LOGGER.debug("%s", result_json)
