@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.7'
+VERSION = '0.1.8'
 
 # Response constants
 SUCCESS = 'Success'
@@ -90,7 +90,9 @@ INVERTER_DATA: InverterDataType = {
         BAT_POWER_STR:                    ['batteryPowerStr', str, None],
         BAT_REMAINING_CAPACITY:           ['batteryCapacitySoc', float, 2],
         BAT_TOTAL_ENERGY_CHARGED:         ['batteryTotalChargeEnergy', float, 2],
+        BAT_TOTAL_ENERGY_CHARGED_STR:     ['batteryTotalChargeEnergyStr', str, None],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 2],
+        BAT_TOTAL_ENERGY_DISCHARGED_STR:  ['batteryTotalDischargeEnergyStr', str, None],
         BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
         BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
         GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2],
@@ -339,6 +341,16 @@ class SoliscloudAPI(BaseAPI):
                 self._data[BAT_POWER] = \
                     float(self._data[BAT_POWER])*1000
                 self._data[BAT_POWER_STR] = "W"    
+
+            if self._data[BAT_TOTAL_ENERGY_CHARGED_STR] == "MWh":
+                self._data[BAT_TOTAL_ENERGY_CHARGED] = \
+                    float(self._data[BAT_TOTAL_ENERGY_CHARGED])*1000
+                self._data[BAT_TOTAL_ENERGY_CHARGED_STR] = "kWh"    
+
+            if self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] == "MWh":
+                self._data[BAT_TOTAL_ENERGY_DISCHARGED] = \
+                    float(self._data[BAT_TOTAL_ENERGY_DISCHARGED])*1000
+                self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] = "kWh"    
 
             if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
                 self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
