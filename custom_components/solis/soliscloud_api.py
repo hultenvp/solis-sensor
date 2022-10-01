@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.8'
+VERSION = '0.1.9'
 
 # Response constants
 SUCCESS = 'Success'
@@ -155,7 +155,7 @@ class SoliscloudAPI(BaseAPI):
     def __init__(self, config: SoliscloudConfig) -> None:
         self._config: SoliscloudConfig = config
         self._session: ClientSession | None = None
-        self._user_id: int | None = None
+        self._is_online: bool = False
         self._data: dict[str, str | int | float] = {}
         self._inverter_list: dict[str, str] | None = None
 
@@ -167,45 +167,29 @@ class SoliscloudAPI(BaseAPI):
     @property
     def is_online(self) -> bool:
         """ Returns if we are logged in."""
-        return self._user_id is not None
+        return self._is_online
 
     async def login(self, session: ClientSession) -> bool:
-        """See if we can fetch userId and build a list of inverters"""
+        """See if we can build a list of inverters"""
         self._session = session
         self._inverter_list = None
-        # Building url & params
-        canonicalized_resource = '/v1/api/addUser'
-        params = {
-            "userName": self.config.username,
-            "userType":0
-        }
 
-        # Request user id
-        result = await self._post_data_json(canonicalized_resource, params)
-        if result[SUCCESS] is True:
-            result_json = result[CONTENT]
-            try:
-                self._user_id = result_json['data']
-                _LOGGER.info('Login Successful!')
-                # Request inverter list
-                self._inverter_list = await self.fetch_inverter_list(self.config.plantid)
-                if len(self._inverter_list)==0:
-                    _LOGGER.warning("No inverters found")
-                else:
-                    _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
-            except KeyError:
-                _LOGGER.error(
-                    'Unable to communicate with %s, please verify configuration.',
-                    self.config.domain)
-                self._user_id = None
+        # Request inverter list
+        self._inverter_list = await self.fetch_inverter_list(self.config.plantid)
+        if len(self._inverter_list)==0:
+            _LOGGER.warning("No inverters found")
+            self._is_online = False
         else:
-            self._user_id = None
+            _LOGGER.info("Login successful")
+            _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
+            self._is_online = True
+
         return self.is_online
 
     async def logout(self) -> None:
         """Hand back session """
         self._session = None
-        self._user_id = None
+        self._is_online = False
         self._inverter_list = None
 
     async def fetch_inverter_list(self, plant_id: str) -> dict[str, str]:
