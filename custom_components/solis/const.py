@@ -32,10 +32,9 @@ CONF_SECRET = 'portal_secret'
 CONF_KEY_ID = 'portal_key_id'
 CONF_PLANT_ID = 'portal_plant_id'
 
-DOMAIN = "Solis"
+DOMAIN = "solis"
 SENSOR_PREFIX = 'Solis'
 DEFAULT_DOMAIN = 'https://m.ginlong.com'
-SERVICE = "service"
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
