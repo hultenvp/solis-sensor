@@ -228,7 +228,7 @@ class GinlongAPI(BaseAPI):
 
         device_ids = None
 
-        url = 'http://'+self._config.domain+'/cpro/epc/plantDevice/inverterListAjax.json'
+        url = self._config.domain+'/cpro/epc/plantDevice/inverterListAjax.json'
         params = {
             'orderBy': 'updateDate',
             'orderType': 2,
@@ -278,7 +278,7 @@ class GinlongAPI(BaseAPI):
         """
 
         # Get inverter details
-        url = 'http://'+self._config.domain+'/cpro/device/inverter/goDetailAjax.json'
+        url = self._config.domain+'/cpro/device/inverter/goDetailAjax.json'
         params = {
             'deviceId': device_id
         }
@@ -369,7 +369,7 @@ class GinlongAPI(BaseAPI):
                                 _LOGGER.debug("Convert to int failed, giving up")
                     # Round to specified precision
                     if type_ is float:
-                        result = round(result, precision)
+                        result = round(float(result), precision)
                 unit = record.get('unit')
         return result, unit
 
