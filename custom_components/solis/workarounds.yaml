@@ -1,0 +1,4 @@
+# Switch on/off SolisCloud workarounds 
+
+#SolisCloud returns daily on grid energy a factor 10 off
+correct_daily_on_grid_energy_enabled: true

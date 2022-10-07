@@ -2,6 +2,7 @@
 
 # Solis sensor integration
 HomeAssistant sensor for Solis portal platform V2 (m.ginlong.com) and SolisCloud portal. 
+Still questions after the readme? Read the [wiki](https://github.com/hultenvp/solis-sensor/wiki) or look at the [discussions page](https://github.com/hultenvp/solis-sensor/discussions)
 
 ## Platform v2
 The platform v2 support logs in to the platform and exposes the data retrieved as sensors.
@@ -12,11 +13,18 @@ Also confirmed to work with:
 > Platform V2 backend is used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 
 ## SolisCloud
-❗This feature is in beta. The server still has some issues. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
+>❗This feature is in beta. The server still has some issues. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
 
 [SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. It's unknown to me if the other brands are also supported.
+
 The new portal requires a key-id, secret and username to function.
-Key and secret can be obtained via support: Look at https://www.ginlong.com/global/aftersales.html for the initial contact email address in your region.
+You can obtain key and secret via SolisCloud
+* Go to https://www.soliscloud.com/#/apiManage
+* Ativate API management and agree with the usage conditions.
+* After activation, click on view key tot get a pop-up window asking for the verification code.
+* First click on "Verification code" after which you get an image with 2 puzzle pieces, which you need to overlap each other using the slider below.
+* After that, you will receive an email with the verification code you need to enter (within 60 seconds).
+* Once confirmed, you get the API ID, secret an API URL
 
 ## HACS installation
 

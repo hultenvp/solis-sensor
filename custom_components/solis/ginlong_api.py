@@ -8,6 +8,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timedelta
 from http import HTTPStatus
 import logging
 from typing import Any
@@ -21,7 +22,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.0'
+VERSION = '0.3.2'
 
 # Response constants
 SUCCESS = 'Success'
@@ -110,6 +111,10 @@ INVERTER_DATA: InverterDataType = {
     'dataJSON': [
         VALUE_ELEMENT, {
             BAT_REMAINING_CAPACITY:      ['1cv', float, 2],
+            BAT_POWER:                   ['1ct', float, 2],
+            BAT_STATUS:                  ['1ff', str, None],
+            BAT_VOLTAGE:                 ['1cr', float, 2],
+            BAT_CURRENT:                 ['1cs', float, 2],
             BAT_TOTAL_ENERGY_CHARGED:    ['1cx', float, 2],
             BAT_TOTAL_ENERGY_DISCHARGED: ['1cy', float, 2],
             BAT_DAILY_ENERGY_CHARGED:    ['1cz', float, 2],
@@ -243,10 +248,21 @@ class GinlongAPI(BaseAPI):
         if result[SUCCESS] is True:
             device_ids = {}
             result_json: dict = result[CONTENT]
-            for record in result_json['result']['paginationAjax']['data']:
-                serial = record.get('sn')
-                device_id = record.get('deviceId')
-                device_ids[serial] = device_id
+            #_LOGGER.debug("%s",result_json['result']['paginationAjax']['data'])
+            try:
+                for record in reversed(result_json['result']['paginationAjax']['data']):
+                    serial = record.get('sn')
+                    updateDate = datetime.fromtimestamp(record.get('updateDate')/1000)
+                    twoDaysAgo = datetime.now() - timedelta(days = 2)
+                    active = record.get('dataloggerState')== '1'
+                    device_id = record.get('deviceId')
+                    # Ignore all device_id's inactive for more than 2 days
+                    if active or updateDate>twoDaysAgo:
+                        device_ids[serial] = device_id
+            except TypeError:
+                _LOGGER.warning("Unknown payload received")
+                _LOGGER.debug("%s", result_json)
+                self._online = False
         else:
             self._online = False
 
@@ -336,6 +352,9 @@ class GinlongAPI(BaseAPI):
             self._purge_if_unused(0.0, PHASE2_CURRENT, PHASE2_VOLTAGE)
             self._purge_if_unused(0.0, PHASE3_CURRENT, PHASE3_VOLTAGE)
 
+            # Battery power from battery state (discharge/charge)
+            # Charge / Discharge
+
     def _purge_if_unused(self, value: Any, *elements: str) -> None:
         for element in elements:
             try:
@@ -349,7 +368,7 @@ class GinlongAPI(BaseAPI):
     def _get_value_from_record(self,
         data: list[dict[str, str]], key: str, type_: type, precision: int = 2
     ) -> tuple[str | int | float | None, str | None]:
-        result: str | int | float = None
+        result: str | int | float | None = None
         unit: str | None = None
         for record in data:
             key_value = record.get('key')
@@ -357,7 +376,10 @@ class GinlongAPI(BaseAPI):
                 data_raw = record.get('value')
                 if data_raw is not None:
                     try:
-                        result = type_(data_raw)
+                        if type_ is int:
+                            result = int(float(data_raw))
+                        else:
+                          result = type_(data_raw)
                     except ValueError:
                         _LOGGER.debug("Failed to convert %s(%s) to type %s, raw value = %s", record.get('name'), key, type_, data_raw)
                         if type_ is float:
@@ -381,10 +403,16 @@ class GinlongAPI(BaseAPI):
 
         data_raw = data.get(key)
         if data_raw is not None:
-            result = type_(data_raw)
-            # Round to specified precision
-            if type_ is float:
-                result = round(result, precision)
+            try:
+                if type_ is int:
+                    result = int(float(data_raw))
+                else:
+                    result = type_(data_raw)
+                # Round to specified precision
+                if type_ is float:
+                    result = round(result, precision)
+            except ValueError:
+                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
         return result, None
 
     async def _get_data(self,
@@ -438,7 +466,7 @@ class GinlongAPI(BaseAPI):
 
                 return result
         except (asyncio.TimeoutError, ClientError) as err:
-            result[MESSAGE] = "%s" % err
+            result[MESSAGE] = "Exception: %s" % err.__class__
             _LOGGER.debug("Error: %s", result[MESSAGE])
             return result
         finally:

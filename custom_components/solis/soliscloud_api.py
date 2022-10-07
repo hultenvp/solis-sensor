@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.9'
+VERSION = '0.2.0'
 
 # Response constants
 SUCCESS = 'Success'
