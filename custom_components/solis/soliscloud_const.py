@@ -7,7 +7,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from .ginlong_const import *
 
 # VERSION
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 STRING_COUNT = 'dcStringCount'
 STRING_LISTS = [

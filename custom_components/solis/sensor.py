@@ -19,10 +19,13 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     CONF_NAME,
 )
+from homeassistant.config_entries import ConfigEntry, SOURCE_IMPORT
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .const import (
+    DOMAIN,
     CONF_PORTAL_DOMAIN,
     CONF_USERNAME,
     CONF_PASSWORD,
@@ -32,12 +35,13 @@ from .const import (
     SENSOR_PREFIX,
     DEFAULT_DOMAIN,
     SENSOR_TYPES,
+#    SERVICE,
 )
 
 from .service import (ServiceSubscriber, InverterService)
-from .ginlong_base import PortalConfig
-from .ginlong_api import GinlongConfig
-from .soliscloud_api import SoliscloudConfig
+#from .ginlong_base import PortalConfig
+#from .ginlong_api import GinlongConfig
+#from .soliscloud_api import SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,17 +61,18 @@ def _check_config_schema(config: ConfigType):
     portal_domain = config.get(CONF_PORTAL_DOMAIN)
     if portal_domain is None:
         raise vol.Invalid('configuration parameter [portal_domain] does not have a value')
-    elif portal_domain[:4] == 'http':
-        raise vol.Invalid('leave http(s):// out of configuration parameter [portal_domain]')
+    if portal_domain[:4] != 'http':
+        raise vol.Invalid('Ensure [portal_domain] starts with http(s)://')
     if config.get(CONF_USERNAME) is None:
         raise vol.Invalid('configuration parameter [portal_username] does not have a value')
     if config.get(CONF_PLANT_ID) is None:
         raise vol.Invalid('Configuration parameter [portal_plantid] does not have a value')
-    has_password = config.get(CONF_PASSWORD) != ''
-    has_key_id = config.get(CONF_KEY_ID) != ''
-    has_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8') != b'\x00'
-    if not (has_password ^ (has_key_id and has_secret)):
-        raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & [portal_secret]')
+    has_password: bool = config.get(CONF_PASSWORD) != ''
+    has_key_id: bool = config.get(CONF_KEY_ID) != ''
+    has_secret: bool = bytes(config.get(CONF_SECRET), 'utf-8') != b'\x00'
+    if not has_password ^ (has_key_id and has_secret):
+        raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] \
+            & [portal_secret]')
 
     return config
 
@@ -97,34 +102,63 @@ def create_sensors(sensors: dict[str, list[str]],
 async def async_setup_platform(
         hass: HomeAssistant,
         config: ConfigType,
-        async_add_entities: AddEntitiesCallback,
+        async_add_entities: AddEntitiesCallback | None = None,
         discovery_info: DiscoveryInfoType | None = None) -> None:
     """Set up Solis platform."""
+    _LOGGER.debug("sensor.async_setup_platform")
+    hass.async_create_task(
+        hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_IMPORT},
+            data=config,
+        )
+    )
 
-    inverter_name = config.get(CONF_NAME)
-    portal_domain = config.get(CONF_PORTAL_DOMAIN)
-    portal_username = config.get(CONF_USERNAME)
-    portal_password = config.get(CONF_PASSWORD)
-    portal_key_id = config.get(CONF_KEY_ID)
-    portal_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8')
-    portal_plantid = config.get(CONF_PLANT_ID)
+    # inverter_name = config.get(CONF_NAME)
+    # portal_domain = config.get(CONF_PORTAL_DOMAIN)
+    # portal_username = config.get(CONF_USERNAME)
+    # portal_password = config.get(CONF_PASSWORD)
+    # portal_key_id = config.get(CONF_KEY_ID)
+    # portal_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8')
+    # portal_plantid = config.get(CONF_PLANT_ID)
 
-    portal_config: PortalConfig | None = None
-    if portal_password != '':
-        portal_config = GinlongConfig(
-            portal_domain, portal_username, portal_password, portal_plantid)
-    elif portal_key_id != '' and portal_secret != b'\x00':
-        portal_config = SoliscloudConfig(
-            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
-    else:
-        raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & [portal_secret]')
+    # portal_config: PortalConfig | None = None
+    # if portal_password != '':
+    #     portal_config = GinlongConfig(
+    #         portal_domain, portal_username, portal_password, portal_plantid)
+    # elif portal_key_id != '' and portal_secret != b'\x00':
+    #     portal_config = SoliscloudConfig(
+    #         portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
+    # else:
+    #     raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & \
+    #         [portal_secret]')
 
-    # Initialize the Ginlong data service.
-    service: InverterService = InverterService(portal_config, hass)
+    # # Initialize the Ginlong data service.
+    # service: InverterService = InverterService(portal_config, hass)
 
+    # # Prepare the sensor entities.
+    # #hass_sensors: list[SolisSensor] = []
+
+    # cookie: dict[str, Any] = {
+    #     'name': inverter_name,
+    #     'service': service,
+    #     'async_add_entities' : async_add_entities
+    # }
+    # # Will retry endlessly to discover
+    # _LOGGER.info("Scheduling discovery")
+    # service.schedule_discovery(on_discovered, cookie, 1)
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities):
+
+    """Setup sensors from a config entry created in the integrations UI."""
+    _LOGGER.debug("sensor.async_setup_entry")
     # Prepare the sensor entities.
-    hass_sensors: list[SolisSensor] = []
-
+    #hass_sensors: list[SolisSensor] = []
+    inverter_name = config_entry.data[CONF_NAME]
+    service = hass.data[DOMAIN][config_entry.entry_id]
     cookie: dict[str, Any] = {
         'name': inverter_name,
         'service': service,
@@ -173,7 +207,7 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         self._attr_native_unit_of_measurement = SENSOR_TYPES[sensor_type][1]
         self._attr_device_class = SENSOR_TYPES[sensor_type][3]
         self._attr_state_class = SENSOR_TYPES[sensor_type][4]
-        self._attr_unique_id = f"{inverter_sn}{self._name}".replace(" ", "_")
+        self._attr_unique_id = f"{inverter_sn}_{self._name}".replace(" ", "_")
         ginlong_service.subscribe(self, inverter_sn, SENSOR_TYPES[sensor_type][5])
 
     def do_update(self, value: Any, last_updated: datetime) -> bool:
@@ -204,3 +238,17 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
     def extra_state_attributes(self):
         """Return entity specific state attributes."""
         return self._attributes
+
+    @property
+    def device_info(self) -> DeviceInfo | None:
+        """Return a device description for device registry."""
+        return DeviceInfo(
+#            config_entry_id=config.entry_id,
+    #                        connections={(dr.CONNECTION_NETWORK_MAC, config.mac)},
+            identifiers={(DOMAIN, self._attributes[SERIAL])},
+            manufacturer="Solis",
+            name=f"Solis_Inverter_{self._attributes[SERIAL]}",
+#            model=config.modelid,
+#            sw_version=config.swversion,
+#            hw_version=config.hwversion,
+        )

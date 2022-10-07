@@ -8,22 +8,30 @@ from __future__ import annotations
 import logging
 
 from abc import ABC, abstractmethod
-import asyncio
+#import asyncio
 from datetime import datetime, timedelta
 from typing import Any, final
 from homeassistant.core import HomeAssistant
+#from homeassistant.const import (
+#    CONF_NAME,
+#)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
+#from homeassistant.helpers import device_registry as dr
 from homeassistant.util import dt as dt_util
 
 from .ginlong_base import PortalConfig, BaseAPI, GinlongData
 from .ginlong_api import GinlongAPI, GinlongConfig
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
+#    INVERTER_PLANT_ID,
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
     INVERTER_STATE
 )
+#from .const import (
+#        DOMAIN,
+#)
 
 # REFRESH CONSTANTS
 SCHEDULE_OK = 2
@@ -75,7 +83,7 @@ class InverterService():
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
         self._hass: HomeAssistant = hass
         self._discovery_callback = None
-        self._discovery_cookie = None
+        self._discovery_cookie: dict[str, Any] | None = None
         self._retry_delay_seconds = 0
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
@@ -94,12 +102,12 @@ class InverterService():
         await self._api.logout()
         self._logintime = None
 
-    async def async_discover(self, *_) -> dict[str, list[str]]:
+    async def async_discover(self, *_) -> None:
         """ Try to discover and retry if needed."""
-        capabilities: dict[str, list[str]] = {}
-        capabilities = await self._do_discover()
-        if capabilities:
-            if self._discovery_callback and self._discovery_cookie:
+        if self._discovery_callback and self._discovery_cookie:
+            capabilities: dict[str, list[str]] = {}
+            capabilities = await self._do_discover()
+            if capabilities:
                 self._discovery_callback(capabilities, self._discovery_cookie)
             self._retry_delay_seconds = 0
         else:
@@ -120,7 +128,27 @@ class InverterService():
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
                     capabilities[inverter_serial] = data.keys()
+#                    device_registry = dr.async_get(self._hass)
+#                    try:
+#                        config = self._hass.data[DOMAIN][getattr(data, INVERTER_PLANT_ID)]
+#                    except KeyError:
+#                        config = None
+#                    if config is not None:
+#                        _LOGGER.debug("Registering %s in device registry", config[CONF_NAME])
+#                        device_registry.async_get_or_create(
+#                            config_entry_id=config.entry_id,
+    #                        connections={(dr.CONNECTION_NETWORK_MAC, config.mac)},
+#                            identifiers={(DOMAIN, getattr(data, INVERTER_SERIAL))},
+#                            manufacturer="Solis",
+#                            name=config[CONF_NAME],
+#                            model=config.modelid,
+#                            sw_version=config.swversion,
+#                            hw_version=config.hwversion,
+#                        )
+
         return capabilities
+
+
 
     def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str
     ) -> None:
@@ -161,7 +189,8 @@ class InverterService():
                             if last_updated_state.hour == 0 and last_updated_state.minute < 15:
                                 value = 0
                             # Avoid race conditions when between state change in the morning and
-                            # energy today being reset by adding 5 min grace period and skipping update
+                            # energy today being reset by adding 5 min grace period and
+                            # skipping update
                             elif last_updated_state + timedelta(minutes=5) > datetime.now():
                                 continue
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
@@ -208,6 +237,10 @@ class InverterService():
         self._discovery_cookie = cookie
         nxt = dt_util.utcnow() + timedelta(seconds=seconds)
         async_track_point_in_utc_time(self._hass, self.async_discover, nxt)
+
+    async def shutdown(self):
+        """ Shutdown the service """
+        await self._logout()
 
     @property
     def status(self):

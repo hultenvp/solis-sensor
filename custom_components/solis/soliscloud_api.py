@@ -130,10 +130,13 @@ class SoliscloudConfig(PortalConfig):
         self._key_id: str = portal_key_id
         self._secret: bytes = portal_secret
         self._workarounds = {} 
-        with open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
-            self._workarounds = yaml.safe_load(file)
-            _LOGGER.debug("workarounds: %s", self._workarounds)
-
+        try: 
+            with open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
+                self._workarounds = yaml.safe_load(file)
+                _LOGGER.debug("workarounds: %s", self._workarounds)
+        except FileNotFoundError:
+            pass
+            
     @property
     def key_id(self) -> str:
         """ Key ID."""
@@ -280,7 +283,7 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
-    async def _get_station_details(self, plant_id: str) -> dict[str, str]:
+    async def _get_station_details(self, plant_id: str) -> dict[str, str] | None:
         """
         Fetch Station Details
         """
@@ -290,7 +293,7 @@ class SoliscloudAPI(BaseAPI):
         }
         result = await self._post_data_json(PLANT_DETAIL, params)
 
-        jsondata = None
+        jsondata : dict[str, str] | None = None
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
             if jsondata['code'] != '0':
@@ -442,7 +445,7 @@ class SoliscloudAPI(BaseAPI):
         data: dict[str, Any], key: str, type_: type, precision: int = 2
     ) -> str | int | float | None:
         """ Retrieve 'key' from 'data' as type 'type_' with precision 'precision' """
-        result = None
+        result : str | int | float | None = None
 
         data_raw = data.get(key)
         if data_raw is not None:
@@ -453,7 +456,7 @@ class SoliscloudAPI(BaseAPI):
                     result = type_(data_raw)
                 # Round to specified precision
                 if type_ is float:
-                    result = round(result, precision)
+                    result = round(float(result), precision)
             except ValueError:
                 _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
         return result
@@ -531,7 +534,7 @@ class SoliscloudAPI(BaseAPI):
             return result
         try:
             with async_timeout.timeout(10):
-                url = f"https://{self.config.domain}{canonicalized_resource}"
+                url = f"{self.config.domain}{canonicalized_resource}"
                 resp = await self._session.post(url, json=params, headers=header)
 
                 result[STATUS_CODE] = resp.status
