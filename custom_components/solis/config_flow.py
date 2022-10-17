@@ -28,6 +28,9 @@ from .soliscloud_api import SoliscloudConfig, SoliscloudAPI
 
 _LOGGER = logging.getLogger(__name__)
 
+PLATFORMV2 = "ginlong_v2"
+SOLISCLOUD = "soliscloud"
+
 class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Solis."""
 
@@ -40,10 +43,8 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._data = user_input
-            if user_input.get(CONF_PORTAL_VERSION) == "ginlong_v2":
-                _LOGGER.debug("Ginlong.")
+            if user_input.get(CONF_PORTAL_VERSION) == PLATFORMV2:
                 return await self.async_step_credentials_password(user_input)
-            _LOGGER.debug("Soliscloud.")
             return await self.async_step_credentials_secret(user_input)
 
         data_schema= {
@@ -52,18 +53,19 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         }
         data_schema[CONF_PORTAL_VERSION] = selector({
             "select": {
-                "options": ["ginlong_v2", "soliscloud"],
+                "options": [PLATFORMV2, SOLISCLOUD],
             }
         })
 
-        return self.async_show_form(step_id="user", data_schema=vol.Schema(data_schema), errors=errors)
+        return self.async_show_form(step_id="user", 
+            data_schema=vol.Schema(data_schema), 
+            errors=errors)
 
     async def async_step_credentials_password(self, user_input=None):
         """Handle username/password based credential settings."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            _LOGGER.debug("User_input = %s", user_input)
             url =  self._data.get(CONF_PORTAL_DOMAIN)
             plant_id = user_input.get(CONF_PLANT_ID)
             username = user_input.get(CONF_USERNAME),
@@ -73,13 +75,12 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 if username and password and plant_id:
                     self._data.update(user_input)
-                    _LOGGER.debug("set up ginlong with user_input = %s", self._data)
                     config = GinlongConfig(url, username, password, plant_id)
                     api = GinlongAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
-                        _LOGGER.debug("Unique ID set")
-                        return self.async_create_entry(title=f"Station {plant_id}", data=self._data)
+                        return self.async_create_entry(title=f"Station {api.plant_name}",
+                            data=self._data)
 
                     errors["base"] = "auth"
 
@@ -110,7 +111,8 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     api = SoliscloudAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
-                        return self.async_create_entry(title=f"Station {plant_id}", data=user_input)
+                        return self.async_create_entry(title=f"Station {api.plant_name}", 
+                            data=user_input)
 
                     errors["base"] = "auth"
 
@@ -129,7 +131,9 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             if self._async_entry_exists(user_input.get(CONF_PLANT_ID)):
-                _LOGGER.debug("Already configured, aborting")
+                _str = f"The configuration for plant {user_input.get(CONF_PLANT_ID)} \
+                    has already been imported, please remove from configuration.yaml"
+                _LOGGER.debug(_str)
                 return self.async_abort(reason="already_configured")
             url = user_input.get(CONF_PORTAL_DOMAIN)
             if url[:4] != 'http':
@@ -137,17 +141,16 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 url = f"https://{url}"
                 user_input[CONF_PORTAL_DOMAIN] = url
 
-            user_input[CONF_PORTAL_VERSION] = "ginlong_v2"
+            user_input[CONF_PORTAL_VERSION] = PLATFORMV2
             has_key_id = user_input.get(CONF_KEY_ID) != ''
             has_secret: bytes = bytes(user_input.get(CONF_SECRET), 'utf-8') != b'\x00'
             if has_key_id and has_secret:
-                user_input[CONF_PORTAL_VERSION] = "soliscloud"
+                user_input[CONF_PORTAL_VERSION] = SOLISCLOUD
 
         return await self.async_step_user(user_input)
 
     def _async_entry_exists(self, plant_id) -> bool:
-        existing_entries = [
-            int(entry.title[8:])
-            for entry in self._async_current_entries()
-        ]
+        existing_entries = []
+        for entry in self._async_current_entries():
+                existing_entries.append(entry.data[CONF_PLANT_ID])
         return plant_id in existing_entries
