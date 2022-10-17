@@ -24,6 +24,9 @@ _LOGGER = logging.getLogger(__name__)
 # VERSION
 VERSION = '0.3.2'
 
+# API NAME
+API_NAME = 'Ginlong Platform 2.0'
+
 # Response constants
 SUCCESS = 'Success'
 CONTENT = 'Content'
@@ -42,6 +45,7 @@ INVERTER_DATA: InverterDataType = {
         VALUE_ELEMENT, {
             INVERTER_SERIAL:             ['sn', str, None],
             INVERTER_PLANT_ID:           ['plantId', str, None],
+            INVERTER_PLANT_NAME:         ['plantName', str, None],
             INVERTER_LAT:                ['lat', float, 7],
             INVERTER_LON:                ['lon', float, 7],
             INVERTER_ADDRESS:            ['address', str, None],
@@ -173,6 +177,11 @@ class GinlongAPI(BaseAPI):
         self._language = 2
 
     @property
+    def api_name(self) -> str:
+        """ Return name of the API."""
+        return API_NAME
+
+    @property
     def config(self) -> GinlongConfig:
         """ Config this for this API instance."""
         return self._config
@@ -211,6 +220,9 @@ class GinlongAPI(BaseAPI):
                     _LOGGER.info('Login Successful!')
                     self._inverter_list = await self.fetch_inverter_list(
                         self.config.plantid)
+                    # Fetch plant name
+                    data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
+                    self._plant_name = getattr(data, INVERTER_PLANT_NAME)
             except KeyError:
                 _LOGGER.error(
                     'Unable to login to %s, are username and password correct?',
