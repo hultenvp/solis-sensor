@@ -7,10 +7,11 @@
 """
 
 # VERSION
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 
 INVERTER_SERIAL = 'serial'
 INVERTER_PLANT_ID = 'plantID'
+INVERTER_PLANT_NAME = 'plantName'
 INVERTER_LAT = 'lat'
 INVERTER_LON = 'lon'
 INVERTER_ADDRESS = 'address'
