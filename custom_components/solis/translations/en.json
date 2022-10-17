@@ -1,0 +1,45 @@
+{
+    "config": {
+        "flow_title": "Solis setup flow",
+        "error": {
+            "auth": "Cannot login with provided URL and credentials",
+            "invalid_path": "The url provided is not valid. Should be in the format `http[s]://hostname.com[:port]`."
+        },
+        "step": {
+            "user": {
+                "title": "Portal selection",
+                "description": "Enter the PV portal URL and portal version",
+                "data": {
+                    "name": "Name of the platform",
+                    "portal_domain": "PV Portal URL, e.g. https://www.soliscloud.com:13333",
+                    "portal_version": "PV Portal version"
+                }
+            },
+            "credentials_password": {
+                "data": {
+                    "portal_username": "Portal username or email address",
+                    "portal_password": "Portal password",
+                    "portal_plant_id": "Plant ID as found on portal website"
+                },
+                "description": "Enter credentials and plantID",
+                "title": "Add Ginlong Portal v2 credentials"
+            },
+            "credentials_secret": {
+                "data": {
+                    "portal_username": "Portal username or email address",
+                    "portal_key_id": "API Key ID provided by SolisCloud",
+                    "portal_secret": "API Secret provided by SolisCloud",
+                    "portal_plant_id": "Station ID as found on portal website"
+                },
+                "description": "Enter credentials and stationID",
+                "title": "Add SolisCloud credentials"
+            }
+        }
+    },
+    "issues": {
+        "deprecated_yaml": {
+            "title": "The Solis YAML configuration is being removed",
+            "description": "Configuring Solis using YAML is being removed.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the Solis YAML configuration from your configuration.yaml file and restart Home Assistant to fix this issue."
+        }
+    }
+}
