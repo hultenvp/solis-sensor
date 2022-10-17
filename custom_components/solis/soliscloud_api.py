@@ -28,7 +28,10 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.0'
+VERSION = '0.3.0'
+
+# API NAME
+API_NAME = 'SolisCloud'
 
 # Response constants
 SUCCESS = 'Success'
@@ -109,6 +112,7 @@ INVERTER_DATA: InverterDataType = {
         GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
     },
     PLANT_DETAIL: {
+        INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
@@ -163,6 +167,11 @@ class SoliscloudAPI(BaseAPI):
         self._inverter_list: dict[str, str] | None = None
 
     @property
+    def api_name(self) -> str:
+        """ Return name of the API."""
+        return API_NAME
+
+    @property
     def config(self) -> SoliscloudConfig:
         """ Config this for this API instance."""
         return self._config
@@ -186,7 +195,8 @@ class SoliscloudAPI(BaseAPI):
             _LOGGER.info("Login successful")
             _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
             self._is_online = True
-
+            data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
+            self._plant_name = getattr(data, INVERTER_PLANT_NAME)
         return self.is_online
 
     async def logout(self) -> None:
@@ -213,9 +223,6 @@ class SoliscloudAPI(BaseAPI):
                 serial = record.get('sn')
                 device_id = record.get('id')
                 device_ids[serial] = device_id
-        else:
-            self._user_id = None
-
         return device_ids
 
     async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
