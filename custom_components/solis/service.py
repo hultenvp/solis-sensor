@@ -40,7 +40,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.2.7'
+VERSION = '1.0.0'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -91,6 +91,10 @@ class InverterService():
             self._api = SoliscloudAPI(portal_config)
         else:
             _LOGGER.error("Failed to initialize service, incompatible config")
+    @property
+    def api_name(self) -> str:
+        """Return name of the API."""
+        return self._api.api_name
 
     async def _login(self) -> bool:
         if not self._api.is_online:
@@ -128,24 +132,6 @@ class InverterService():
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
                     capabilities[inverter_serial] = data.keys()
-#                    device_registry = dr.async_get(self._hass)
-#                    try:
-#                        config = self._hass.data[DOMAIN][getattr(data, INVERTER_PLANT_ID)]
-#                    except KeyError:
-#                        config = None
-#                    if config is not None:
-#                        _LOGGER.debug("Registering %s in device registry", config[CONF_NAME])
-#                        device_registry.async_get_or_create(
-#                            config_entry_id=config.entry_id,
-    #                        connections={(dr.CONNECTION_NETWORK_MAC, config.mac)},
-#                            identifiers={(DOMAIN, getattr(data, INVERTER_SERIAL))},
-#                            manufacturer="Solis",
-#                            name=config[CONF_NAME],
-#                            model=config.modelid,
-#                            sw_version=config.swversion,
-#                            hw_version=config.hwversion,
-#                        )
-
         return capabilities
 
 
