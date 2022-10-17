@@ -46,14 +46,17 @@ from .service import (ServiceSubscriber, InverterService)
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '2.3.6'
+VERSION = '3.0.0'
 
+# ATTRIBUTES
 LAST_UPDATED = 'Last updated'
 SERIAL = 'Inverter serial'
+API_NAME = 'API Name'
 
 EMPTY_ATTR: dict[str, Any] = {
     LAST_UPDATED: None,
     SERIAL: None,
+    API_NAME: None,
 }
 
 def _check_config_schema(config: ConfigType):
@@ -105,7 +108,6 @@ async def async_setup_platform(
         async_add_entities: AddEntitiesCallback | None = None,
         discovery_info: DiscoveryInfoType | None = None) -> None:
     """Set up Solis platform."""
-    _LOGGER.debug("sensor.async_setup_platform")
     hass.async_create_task(
         hass.config_entries.flow.async_init(
             DOMAIN,
@@ -200,6 +202,7 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         self._measured: datetime | None = None
         self._attributes = EMPTY_ATTR
         self._attributes[SERIAL] = inverter_sn
+        self._attributes[API_NAME] = ginlong_service.api_name
         # Properties
         self._icon = SENSOR_TYPES[sensor_type][2]
         self._name = inverter_name + ' ' + SENSOR_TYPES[sensor_type][0]
@@ -245,8 +248,10 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         return DeviceInfo(
 #            config_entry_id=config.entry_id,
     #                        connections={(dr.CONNECTION_NETWORK_MAC, config.mac)},
-            identifiers={(DOMAIN, self._attributes[SERIAL])},
-            manufacturer="Solis",
+            identifiers={
+                (DOMAIN, f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}")
+            },
+            manufacturer=f"Solis {self._attributes[API_NAME]}",
             name=f"Solis_Inverter_{self._attributes[SERIAL]}",
 #            model=config.modelid,
 #            sw_version=config.swversion,
