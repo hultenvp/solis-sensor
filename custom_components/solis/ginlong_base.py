@@ -22,11 +22,11 @@ class PortalConfig(ABC):
     def __init__(self,
         portal_domain: str,
         portal_username: str,
-        portal_plantid: str
+        portal_plant_id: str
     ) -> None:
         self._domain: str = portal_domain
         self._username: str = portal_username
-        self._plantid: str = portal_plantid
+        self._plant_id: str = portal_plant_id
 
     @property
     def domain(self) -> str:
@@ -39,9 +39,9 @@ class PortalConfig(ABC):
         return self._username
 
     @property
-    def plantid(self) -> str:
+    def plant_id(self) -> str:
         """ Configured plant ID."""
-        return self._plantid
+        return self._plant_id
 
 class GinlongData():
     """ Representing data measurement for one inverter from Ginlong API """
