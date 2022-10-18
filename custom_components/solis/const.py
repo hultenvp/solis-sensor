@@ -317,7 +317,7 @@ SENSOR_TYPES = {
         'mdi:battery',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
-        BAT_VOLTAGE        
+        BAT_VOLTAGE
     ],
     'batstatus': [ # Key: ['label', unit, icon, device class, state class, api_attribute_name]
         'Battery Status',
