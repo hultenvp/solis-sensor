@@ -133,14 +133,14 @@ class SoliscloudConfig(PortalConfig):
         super().__init__(portal_domain, portal_username, portal_plantid)
         self._key_id: str = portal_key_id
         self._secret: bytes = portal_secret
-        self._workarounds = {} 
-        try: 
+        self._workarounds = {}
+        try:
             with open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
                 self._workarounds = yaml.safe_load(file)
                 _LOGGER.debug("workarounds: %s", self._workarounds)
         except FileNotFoundError:
             pass
-            
+
     @property
     def key_id(self) -> str:
         """ Key ID."""
@@ -150,7 +150,7 @@ class SoliscloudConfig(PortalConfig):
     def secret(self) -> bytes:
         """ API Key."""
         return self._secret
-    
+
     @property
     def workarounds(self) -> dict[str, Any]:
         """ Return all workaround settings """
@@ -187,7 +187,7 @@ class SoliscloudAPI(BaseAPI):
         self._inverter_list = None
 
         # Request inverter list
-        self._inverter_list = await self.fetch_inverter_list(self.config.plantid)
+        self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
         if len(self._inverter_list)==0:
             _LOGGER.warning("No inverters found")
             self._is_online = False
@@ -227,7 +227,7 @@ class SoliscloudAPI(BaseAPI):
 
     async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
         """
-        Fetch data for given inverter. 
+        Fetch data for given inverter.
         Collect available data from payload and store as GinlongData object
         """
 
@@ -237,7 +237,7 @@ class SoliscloudAPI(BaseAPI):
             if self._inverter_list is not None and inverter_serial in self._inverter_list:
                 device_id = self._inverter_list[inverter_serial]
                 payload = await self._get_inverter_details(device_id, inverter_serial)
-                payload2 = await self._get_station_details(self.config.plantid)
+                payload2 = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
@@ -246,8 +246,7 @@ class SoliscloudAPI(BaseAPI):
                     self._collect_station_data(payload2)
                 if self._data is not None and INVERTER_SERIAL in self._data:
                     return GinlongData(self._data)
-                else:
-                    _LOGGER.debug("Unexpected response from server: %s", payload)
+                _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
 
 
@@ -271,7 +270,8 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
             if jsondata['code'] != '0':
-                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL, jsondata['code'], jsondata['msg'])
+                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL, \
+                    jsondata['code'], jsondata['msg'])
                 return None
         else:
             _LOGGER.info('Unable to fetch details for device with ID: %s', device_id)
@@ -300,15 +300,16 @@ class SoliscloudAPI(BaseAPI):
         }
         result = await self._post_data_json(PLANT_DETAIL, params)
 
-        jsondata : dict[str, str] | None = None
         if result[SUCCESS] is True:
-            jsondata = result[CONTENT]
-            if jsondata['code'] != '0':
-                _LOGGER.info("%s responded with error: %s:%s",PLANT_DETAIL, jsondata['code'], jsondata['msg'])
-                return None
+            jsondata : dict[str, str] = result[CONTENT]
+            if jsondata['code'] == '0':
+                return jsondata
+            else:
+                _LOGGER.info("%s responded with error: %s:%s",PLANT_DETAIL, \
+                    jsondata['code'], jsondata['msg'])
         else:
             _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
-        return jsondata
+        return None
 
     def _collect_station_data(self, payload: dict[str, Any]) -> None:
         """ Fetch dynamic properties """
@@ -355,7 +356,7 @@ class SoliscloudAPI(BaseAPI):
                 if self._data[BAT_TOTAL_ENERGY_CHARGED_STR] == "MWh":
                     self._data[BAT_TOTAL_ENERGY_CHARGED] = \
                         float(self._data[BAT_TOTAL_ENERGY_CHARGED])*1000
-                    self._data[BAT_TOTAL_ENERGY_CHARGED_STR] = "kWh"    
+                    self._data[BAT_TOTAL_ENERGY_CHARGED_STR] = "kWh"
             except KeyError:
                 pass
 
@@ -363,7 +364,7 @@ class SoliscloudAPI(BaseAPI):
                 if self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] == "MWh":
                     self._data[BAT_TOTAL_ENERGY_DISCHARGED] = \
                         float(self._data[BAT_TOTAL_ENERGY_DISCHARGED])*1000
-                    self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] = "kWh"    
+                    self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] = "kWh"
             except KeyError:
                 pass
 
@@ -463,9 +464,10 @@ class SoliscloudAPI(BaseAPI):
                     result = type_(data_raw)
                 # Round to specified precision
                 if type_ is float:
-                    result = round(float(result), precision)
+                    result = round(float(result), precision) # type: ignore
             except ValueError:
-                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
+                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", \
+                    key, type_, data_raw)
         return result
 
     async def _get_data(self,
