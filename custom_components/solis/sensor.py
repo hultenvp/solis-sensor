@@ -39,9 +39,6 @@ from .const import (
 )
 
 from .service import (ServiceSubscriber, InverterService)
-#from .ginlong_base import PortalConfig
-#from .ginlong_api import GinlongConfig
-#from .soliscloud_api import SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -115,40 +112,6 @@ async def async_setup_platform(
             data=config,
         )
     )
-
-    # inverter_name = config.get(CONF_NAME)
-    # portal_domain = config.get(CONF_PORTAL_DOMAIN)
-    # portal_username = config.get(CONF_USERNAME)
-    # portal_password = config.get(CONF_PASSWORD)
-    # portal_key_id = config.get(CONF_KEY_ID)
-    # portal_secret: bytes = bytes(config.get(CONF_SECRET), 'utf-8')
-    # portal_plantid = config.get(CONF_PLANT_ID)
-
-    # portal_config: PortalConfig | None = None
-    # if portal_password != '':
-    #     portal_config = GinlongConfig(
-    #         portal_domain, portal_username, portal_password, portal_plantid)
-    # elif portal_key_id != '' and portal_secret != b'\x00':
-    #     portal_config = SoliscloudConfig(
-    #         portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
-    # else:
-    #     raise vol.Invalid('Please specify either[portal_password] or [portal_key_id] & \
-    #         [portal_secret]')
-
-    # # Initialize the Ginlong data service.
-    # service: InverterService = InverterService(portal_config, hass)
-
-    # # Prepare the sensor entities.
-    # #hass_sensors: list[SolisSensor] = []
-
-    # cookie: dict[str, Any] = {
-    #     'name': inverter_name,
-    #     'service': service,
-    #     'async_add_entities' : async_add_entities
-    # }
-    # # Will retry endlessly to discover
-    # _LOGGER.info("Scheduling discovery")
-    # service.schedule_discovery(on_discovered, cookie, 1)
 
 async def async_setup_entry(
     hass: HomeAssistant,
