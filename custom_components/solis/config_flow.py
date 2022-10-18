@@ -1,6 +1,5 @@
 """Config flow for Solis integration."""
 import logging
-import os
 
 import voluptuous as vol
 from homeassistant import config_entries
@@ -21,7 +20,6 @@ from .const import (
     CONF_PLANT_ID,
     SENSOR_PREFIX,
     DEFAULT_DOMAIN,
-#    SENSOR_TYPES,
 )
 from .ginlong_api import GinlongConfig, GinlongAPI
 from .soliscloud_api import SoliscloudConfig, SoliscloudAPI
@@ -57,8 +55,8 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             }
         })
 
-        return self.async_show_form(step_id="user", 
-            data_schema=vol.Schema(data_schema), 
+        return self.async_show_form(step_id="user",
+            data_schema=vol.Schema(data_schema),
             errors=errors)
 
     async def async_step_credentials_password(self, user_input=None):
@@ -68,8 +66,8 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             url =  self._data.get(CONF_PORTAL_DOMAIN)
             plant_id = user_input.get(CONF_PLANT_ID)
-            username = user_input.get(CONF_USERNAME),
-            password = user_input.get(CONF_PASSWORD),
+            username = user_input.get(CONF_USERNAME)
+            password = user_input.get(CONF_PASSWORD)
             if url[:8] != 'https://':
                 errors["base"] = "invalid_path"
             else:
@@ -95,6 +93,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_credentials_secret(self, user_input=None):
         """Handle key_id/secret based credential settings."""
+        errors: dict[str, str] = {}
 
         if user_input is not None:
             url =  self._data.get(CONF_PORTAL_DOMAIN)
@@ -111,7 +110,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     api = SoliscloudAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
-                        return self.async_create_entry(title=f"Station {api.plant_name}", 
+                        return self.async_create_entry(title=f"Station {api.plant_name}",
                             data=user_input)
 
                     errors["base"] = "auth"
@@ -152,5 +151,5 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _async_entry_exists(self, plant_id) -> bool:
         existing_entries = []
         for entry in self._async_current_entries():
-                existing_entries.append(entry.data[CONF_PLANT_ID])
+            existing_entries.append(entry.data[CONF_PLANT_ID])
         return plant_id in existing_entries
