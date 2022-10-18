@@ -36,10 +36,7 @@ PLATFORMS = [Platform.SENSOR]
 
 async def async_setup(hass: HomeAssistantType, config: ConfigType):
     """Set up the Solis component from configuration.yaml."""
-    _LOGGER.debug("async_setup")
-#    hass.data.setdefault(DOMAIN, {})
-#    for entry in config:
-#        _LOGGER.debug("%s", entry)
+
     if "sensor" not in config:
         return True
 
@@ -62,7 +59,7 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry
 ) -> bool:
     """Set up platform from a ConfigEntry."""
-    _LOGGER.debug("async_setup_entry")
+
     hass.data.setdefault(DOMAIN, {})
 
     config = entry.data
@@ -88,18 +85,18 @@ async def async_setup_entry(
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.
+    #hass.async_create_task(
+    #    hass.config_entries.async_forward_entry_setup(entry, component)
+    #    for component in PLATFORMS
+    #)
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, component)
-        for component in PLATFORMS
+        hass.config_entries.async_forward_entry_setup(entry, "sensor")
     )
-    # hass.async_create_task(
-    #     hass.config_entries.async_forward_entry_setup(entry, "sensor")
-    # )
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
-    _LOGGER.debug("async_unload_entry")
+
     unload_ok = all(
         await asyncio.gather(
             *[
