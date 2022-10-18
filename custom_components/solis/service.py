@@ -8,30 +8,21 @@ from __future__ import annotations
 import logging
 
 from abc import ABC, abstractmethod
-#import asyncio
 from datetime import datetime, timedelta
 from typing import Any, final
 from homeassistant.core import HomeAssistant
-#from homeassistant.const import (
-#    CONF_NAME,
-#)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
-#from homeassistant.helpers import device_registry as dr
 from homeassistant.util import dt as dt_util
 
 from .ginlong_base import PortalConfig, BaseAPI, GinlongData
 from .ginlong_api import GinlongAPI, GinlongConfig
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
-#    INVERTER_PLANT_ID,
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
     INVERTER_STATE
 )
-#from .const import (
-#        DOMAIN,
-#)
 
 # REFRESH CONSTANTS
 SCHEDULE_OK = 2
@@ -83,7 +74,7 @@ class InverterService():
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
         self._hass: HomeAssistant = hass
         self._discovery_callback = None
-        self._discovery_cookie: dict[str, Any] | None = None
+        self._discovery_cookie: dict[str, Any] = {}
         self._retry_delay_seconds = 0
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
@@ -115,10 +106,13 @@ class InverterService():
                 self._discovery_callback(capabilities, self._discovery_cookie)
             self._retry_delay_seconds = 0
         else:
-            self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, self._retry_delay_seconds + RETRY_DELAY_SECONDS)
-            _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", self._retry_delay_seconds)
+            self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, \
+                self._retry_delay_seconds + RETRY_DELAY_SECONDS)
+            _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", \
+                self._retry_delay_seconds)
             await self._logout()
-            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, self._retry_delay_seconds)
+            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, \
+                self._retry_delay_seconds)
 
     async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
