@@ -219,7 +219,7 @@ class GinlongAPI(BaseAPI):
                     self._online = True
                     _LOGGER.info('Login Successful!')
                     self._inverter_list = await self.fetch_inverter_list(
-                        self.config.plantid)
+                        self.config.plant_id)
                     # Fetch plant name
                     data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
                     self._plant_name = getattr(data, INVERTER_PLANT_NAME)
@@ -264,12 +264,12 @@ class GinlongAPI(BaseAPI):
             try:
                 for record in reversed(result_json['result']['paginationAjax']['data']):
                     serial = record.get('sn')
-                    updateDate = datetime.fromtimestamp(record.get('updateDate')/1000)
-                    twoDaysAgo = datetime.now() - timedelta(days = 2)
+                    update_date = datetime.fromtimestamp(record.get('updateDate')/1000)
+                    two_days_ago = datetime.now() - timedelta(days = 2)
                     active = record.get('dataloggerState')== '1'
                     device_id = record.get('deviceId')
                     # Ignore all device_id's inactive for more than 2 days
-                    if active or updateDate>twoDaysAgo:
+                    if active or update_date>two_days_ago:
                         device_ids[serial] = device_id
             except TypeError:
                 _LOGGER.warning("Unknown payload received")
@@ -391,9 +391,10 @@ class GinlongAPI(BaseAPI):
                         if type_ is int:
                             result = int(float(data_raw))
                         else:
-                          result = type_(data_raw)
+                            result = type_(data_raw)
                     except ValueError:
-                        _LOGGER.debug("Failed to convert %s(%s) to type %s, raw value = %s", record.get('name'), key, type_, data_raw)
+                        _LOGGER.debug("Failed to convert %s(%s) to type %s, \
+                            raw value = %s", record.get('name'), key, type_, data_raw)
                         if type_ is float:
                             _LOGGER.debug("Trying to convert to int as fallback")
                             try:
@@ -403,7 +404,7 @@ class GinlongAPI(BaseAPI):
                                 _LOGGER.debug("Convert to int failed, giving up")
                     # Round to specified precision
                     if type_ is float:
-                        result = round(float(result), precision)
+                        result = round(float(result), precision) # type: ignore
                 unit = record.get('unit')
         return result, unit
 
@@ -422,9 +423,10 @@ class GinlongAPI(BaseAPI):
                     result = type_(data_raw)
                 # Round to specified precision
                 if type_ is float:
-                    result = round(result, precision)
+                    result = round(result, precision) # type: ignore
             except ValueError:
-                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
+                _LOGGER.debug("Failed to convert %s to type %s, \
+                    raw value = %s", key, type_, data_raw)
         return result, None
 
     async def _get_data(self,
