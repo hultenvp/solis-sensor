@@ -10,16 +10,16 @@
                 "title": "Portal selection",
                 "description": "Enter the PV portal URL and portal version",
                 "data": {
-                    "inverter_name": "Name of the platform",
+                    "name": "Name of the platform",
                     "portal_domain": "PV Portal URL, e.g. https://www.soliscloud.com:13333",
-                    "portal_version": "PV Portal version"
+                    "portal_version": "PV Portal version (Soliscloud? Read the ReadMe!)"
                 }
             },
             "credentials_password": {
                 "data": {
                     "portal_username": "Portal username or email address",
                     "portal_password": "Portal password",
-                    "portal_plantid": "Plant ID as found on portal website"
+                    "portal_plant_id": "Plant ID as found on portal website"
                 },
                 "description": "Enter credentials and plantID",
                 "title": "Add Ginlong Portal v2 credentials"
@@ -29,7 +29,7 @@
                     "portal_username": "Portal username or email address",
                     "portal_key_id": "API Key ID provided by SolisCloud",
                     "portal_secret": "API Secret provided by SolisCloud",
-                    "portal_plantid": "Station ID as found on portal website"
+                    "portal_plant_id": "Station ID as found on portal website"
                 },
                 "description": "Enter credentials and stationID",
                 "title": "Add SolisCloud credentials"
