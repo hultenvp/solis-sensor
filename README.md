@@ -54,45 +54,15 @@ custom_components
 
 ## Configuration
 
-### Ginlong platform v2
-To enable this integration for Ginlong Solis platform v2 support, add the following lines to your configuration.yaml file:
+The integration can be configured via the UI.
 
-``` YAML
-sensor:
-  - platform: solis
-    name: "My Solis Inverter"
-    portal_domain: "m.ginlong.com" (replace for Solarman, Sofar)
-    portal_username: "portal_username"
-    portal_password: "portal_password"
-    portal_plant_id: "plantId"
-```
-### Soliscloud
-To enable this integration for SolisCloud, add the following lines to your configuration.yaml file:
+<img width="301" alt="image" src="https://user-images.githubusercontent.com/61835400/197206691-2ccf91d0-39c9-4440-9e08-afd444cca8a5.png">
 
-``` YAML
-sensor:
-  - platform: solis
-    name: "My Solis Inverter"
-    portal_domain: "www.soliscloud.com:13333"
-    portal_username: "portal_username"
-    portal_key_id: "portal_key_id"
-    portal_secret: "portal_secret"
-    portal_plant_id: "plantId/stationID as string"
-```
+Select the right platform and platform URL to use and click "Submit"
 
-Configuration variables:
+**Ginlong platform v2**   Provide username, password and plant id. If you want to add multiple plants just follow the configuration for each plant.
+**Soliscloud**            Provide username, key id, secret and station id. If you want to add multiple stations just follow the configuration for each plant.
 
-* **name** (Optional): Let you overwrite the name of the device in the frontend. *Default value: Solis*
-* **portal_domain** (Required): Portal domain name *Default value: m.ginlong.com*. 
-* **portal_username** (Required): Username of your portal account.
-* **portal_password** (Optional): Password of the portal account. 
-> Note: The integration uses https to communicate with the portal, but the username and password are sent over in plain text!
-* **portal_key_id** (Optional): Key ID needed for communication with SolisCloud (obtain via Ginlong support)
-* **portal_secret** (Optional): Secret needed for communication with SolisCloud (obtain via Ginlong support)
-* **portal_plant_id** (Required): PlantId (Ginlong v2 portal) or StationId (SolisCloud) on the platform the inverter belongs to. Can be found on the portal.
-> Dutch: Tab installatie: Installatie ID. 
-
-The integration will detect automatically which data is available at the backend and create the relevant sensors. Names are backward compatible with old manual configuaration.
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
