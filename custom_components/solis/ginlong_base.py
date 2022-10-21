@@ -22,11 +22,11 @@ class PortalConfig(ABC):
     def __init__(self,
         portal_domain: str,
         portal_username: str,
-        portal_plantid: str
+        portal_plant_id: str
     ) -> None:
         self._domain: str = portal_domain
         self._username: str = portal_username
-        self._plantid: str = portal_plantid
+        self._plant_id: str = portal_plant_id
 
     @property
     def domain(self) -> str:
@@ -39,9 +39,9 @@ class PortalConfig(ABC):
         return self._username
 
     @property
-    def plantid(self) -> str:
+    def plant_id(self) -> str:
         """ Configured plant ID."""
-        return self._plantid
+        return self._plant_id
 
 class GinlongData():
     """ Representing data measurement for one inverter from Ginlong API """
@@ -78,6 +78,7 @@ class BaseAPI(ABC):
         self._config: PortalConfig = config
         self._session: ClientSession | None = None
         self._inverter_list: dict[str, str] | None = None
+        self._plant_name: str | None = None
 
     @property
     def config(self) -> PortalConfig:
@@ -88,6 +89,21 @@ class BaseAPI(ABC):
     def inverters(self) -> dict[str, str] | None:
         """ Return the list of inverters for plant ID when logged in."""
         return self._inverter_list
+
+    @property
+    def plant_name(self) -> str | None:
+        """ Return plant name for this API instance."""
+        return self._plant_name
+
+    @property
+    def plant_id(self) -> str | None:
+        """ Return plant ID for this API instance."""
+        return self._config.plant_id
+
+    @property
+    @abstractmethod
+    def api_name(self) -> str:
+        """ Return name of the API."""
 
     @property
     @abstractmethod

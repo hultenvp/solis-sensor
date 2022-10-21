@@ -24,6 +24,9 @@ _LOGGER = logging.getLogger(__name__)
 # VERSION
 VERSION = '0.3.2'
 
+# API NAME
+API_NAME = 'Ginlong Platform 2.0'
+
 # Response constants
 SUCCESS = 'Success'
 CONTENT = 'Content'
@@ -42,6 +45,7 @@ INVERTER_DATA: InverterDataType = {
         VALUE_ELEMENT, {
             INVERTER_SERIAL:             ['sn', str, None],
             INVERTER_PLANT_ID:           ['plantId', str, None],
+            INVERTER_PLANT_NAME:         ['plantName', str, None],
             INVERTER_LAT:                ['lat', float, 7],
             INVERTER_LON:                ['lon', float, 7],
             INVERTER_ADDRESS:            ['address', str, None],
@@ -173,6 +177,11 @@ class GinlongAPI(BaseAPI):
         self._language = 2
 
     @property
+    def api_name(self) -> str:
+        """ Return name of the API."""
+        return API_NAME
+
+    @property
     def config(self) -> GinlongConfig:
         """ Config this for this API instance."""
         return self._config
@@ -192,7 +201,7 @@ class GinlongAPI(BaseAPI):
         self._session = session
         self._inverter_list = None
         # Building url & params
-        url = 'https://'+self._config.domain+'/cpro/login/validateLogin.json'
+        url = self._config.domain+'/cpro/login/validateLogin.json'
         params = {
             "userName": self._config.username,
             "password": self._config.password,
@@ -210,7 +219,10 @@ class GinlongAPI(BaseAPI):
                     self._online = True
                     _LOGGER.info('Login Successful!')
                     self._inverter_list = await self.fetch_inverter_list(
-                        self.config.plantid)
+                        self.config.plant_id)
+                    # Fetch plant name
+                    data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
+                    self._plant_name = getattr(data, INVERTER_PLANT_NAME)
             except KeyError:
                 _LOGGER.error(
                     'Unable to login to %s, are username and password correct?',
@@ -233,7 +245,7 @@ class GinlongAPI(BaseAPI):
 
         device_ids = None
 
-        url = 'http://'+self._config.domain+'/cpro/epc/plantDevice/inverterListAjax.json'
+        url = self._config.domain+'/cpro/epc/plantDevice/inverterListAjax.json'
         params = {
             'orderBy': 'updateDate',
             'orderType': 2,
@@ -252,12 +264,12 @@ class GinlongAPI(BaseAPI):
             try:
                 for record in reversed(result_json['result']['paginationAjax']['data']):
                     serial = record.get('sn')
-                    updateDate = datetime.fromtimestamp(record.get('updateDate')/1000)
-                    twoDaysAgo = datetime.now() - timedelta(days = 2)
+                    update_date = datetime.fromtimestamp(record.get('updateDate')/1000)
+                    two_days_ago = datetime.now() - timedelta(days = 2)
                     active = record.get('dataloggerState')== '1'
                     device_id = record.get('deviceId')
                     # Ignore all device_id's inactive for more than 2 days
-                    if active or updateDate>twoDaysAgo:
+                    if active or update_date>two_days_ago:
                         device_ids[serial] = device_id
             except TypeError:
                 _LOGGER.warning("Unknown payload received")
@@ -294,7 +306,7 @@ class GinlongAPI(BaseAPI):
         """
 
         # Get inverter details
-        url = 'http://'+self._config.domain+'/cpro/device/inverter/goDetailAjax.json'
+        url = self._config.domain+'/cpro/device/inverter/goDetailAjax.json'
         params = {
             'deviceId': device_id
         }
@@ -325,6 +337,12 @@ class GinlongAPI(BaseAPI):
                     if value is not None:
                         if unit == 'kW':
                             value *= 1000
+                        #if dictkey == INVERTER_ENERGY_TOTAL_LIFE:
+                        #    _LOGGER.info('Unit = %s', unit)
+                        #    if unit == "kWh":
+                        #        value = float(value/1000)
+                        #    elif unit == "GWh":
+                        #        value = float(value * 1000)
                         self._data[dictkey] = value
         # Ensure a minimal dataset has been collected
         if CHECK.issubset(self._data.keys()):
@@ -374,12 +392,20 @@ class GinlongAPI(BaseAPI):
                             result = int(float(data_raw))
                         else:
                             result = type_(data_raw)
-                        # Round to specified precision
-                        if type_ is float:
-                            result = round(result, precision)
-                        unit = record.get('unit')
                     except ValueError:
-                        _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
+                        _LOGGER.debug("Failed to convert %s(%s) to type %s, \
+                            raw value = %s", record.get('name'), key, type_, data_raw)
+                        if type_ is float:
+                            _LOGGER.debug("Trying to convert to int as fallback")
+                            try:
+                                result = int(data_raw)
+                                type_ = int
+                            except ValueError:
+                                _LOGGER.debug("Convert to int failed, giving up")
+                    # Round to specified precision
+                    if type_ is float:
+                        result = round(float(result), precision) # type: ignore
+                unit = record.get('unit')
         return result, unit
 
     def _get_value(self,
@@ -397,9 +423,10 @@ class GinlongAPI(BaseAPI):
                     result = type_(data_raw)
                 # Round to specified precision
                 if type_ is float:
-                    result = round(result, precision)
+                    result = round(result, precision) # type: ignore
             except ValueError:
-                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
+                _LOGGER.debug("Failed to convert %s to type %s, \
+                    raw value = %s", key, type_, data_raw)
         return result, None
 
     async def _get_data(self,
