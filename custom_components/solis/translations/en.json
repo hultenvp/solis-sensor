@@ -12,7 +12,7 @@
                 "data": {
                     "name": "Name of the platform",
                     "portal_domain": "PV Portal URL, e.g. https://www.soliscloud.com:13333",
-                    "portal_version": "PV Portal version"
+                    "portal_version": "PV Portal version (Soliscloud? Read the ReadMe!)"
                 }
             },
             "credentials_password": {
