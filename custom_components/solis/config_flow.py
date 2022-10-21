@@ -77,7 +77,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     api = GinlongAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
-                        return self.async_create_entry(title=f"Station {api.plant_name}",
+                        return self.async_create_entry(title=f"Plant {api.plant_name}",
                             data=self._data)
 
                     errors["base"] = "auth"
