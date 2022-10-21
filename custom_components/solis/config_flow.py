@@ -100,7 +100,11 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             plant_id = user_input.get(CONF_PLANT_ID)
             username = user_input.get(CONF_USERNAME)
             key_id = user_input.get(CONF_KEY_ID)
-            secret: bytes = bytes(user_input.get(CONF_SECRET), 'utf-8')
+            secret: bytes = bytes('', 'utf-8')
+            try:
+                secret = bytes(user_input.get(CONF_SECRET), 'utf-8')
+            except TypeError:
+                pass
             if url[:8] != 'https://':
                 errors["base"] = "invalid_path"
             else:
