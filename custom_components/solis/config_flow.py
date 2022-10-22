@@ -123,7 +123,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_USERNAME , default=None): cv.string,
             vol.Required(CONF_SECRET , default='00'): cv.string,
             vol.Required(CONF_KEY_ID , default=''): cv.string,
-            vol.Required(CONF_PLANT_ID, default=None): cv.positive_int,
+            vol.Required(CONF_PLANT_ID, default=None): cv.string,
         }
 
         return self.async_show_form(step_id="credentials_secret",
