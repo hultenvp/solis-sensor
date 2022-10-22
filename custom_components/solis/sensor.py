@@ -43,7 +43,7 @@ from .service import (ServiceSubscriber, InverterService)
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '3.0.1'
+VERSION = '3.0.2'
 
 # ATTRIBUTES
 LAST_UPDATED = 'Last updated'
@@ -62,7 +62,7 @@ def _check_config_schema(config: ConfigType):
     if portal_domain is None:
         raise vol.Invalid('configuration parameter [portal_domain] does not have a value')
     if portal_domain[:4] != 'http':
-        raise vol.Invalid('Ensure [portal_domain] starts with http(s)://')
+        portal_domain=f"https://{portal_domain}"
     if config.get(CONF_USERNAME) is None:
         raise vol.Invalid('configuration parameter [portal_username] does not have a value')
     if config.get(CONF_PLANT_ID) is None:
@@ -119,9 +119,7 @@ async def async_setup_entry(
     async_add_entities):
 
     """Setup sensors from a config entry created in the integrations UI."""
-    _LOGGER.debug("sensor.async_setup_entry")
     # Prepare the sensor entities.
-    #hass_sensors: list[SolisSensor] = []
     inverter_name = config_entry.data[CONF_NAME]
     service = hass.data[DOMAIN][config_entry.entry_id]
     cookie: dict[str, Any] = {
