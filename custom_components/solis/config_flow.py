@@ -115,7 +115,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
                         return self.async_create_entry(title=f"Station {api.plant_name}",
-                            data=user_input)
+                            data=self._data)
 
                     errors["base"] = "auth"
 
