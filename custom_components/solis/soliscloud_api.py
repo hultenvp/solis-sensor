@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.0'
+VERSION = '0.3.1'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -66,6 +66,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ACFREQUENCY:             ['fac', float, 2],
         #INVERTER_ENERGY_TODAY:            ['eToday', float, 2], # Moved to PLANT_DETAIL
         INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
+        INVERTER_ENERGY_THIS_MONTH_STR:   ['eMonthStr', str, None],
         INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
         INVERTER_ENERGY_THIS_YEAR_STR:    ['eYearStr', str, None],
         INVERTER_ENERGY_TOTAL_LIFE:       ['eTotal', float, 2],
@@ -393,6 +394,14 @@ class SoliscloudAPI(BaseAPI):
                     self._data[INVERTER_ACPOWER] = \
                         float(self._data[INVERTER_ACPOWER])*1000
                     self._data[INVERTER_ACPOWER_STR] = "W"
+            except KeyError:
+                pass
+
+            try:
+                if self._data[INVERTER_ENERGY_THIS_MONTH_STR] == "MWh":
+                    self._data[INVERTER_ENERGY_THIS_MONTH] = \
+                        float(self._data[INVERTER_ENERGY_THIS_MONTH])*1000
+                    self._data[INVERTER_ENERGY_THIS_MONTH_STR] = "kWh"
             except KeyError:
                 pass
 
