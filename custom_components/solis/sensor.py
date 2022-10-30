@@ -43,7 +43,7 @@ from .service import (ServiceSubscriber, InverterService)
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '3.0.6'
+VERSION = '3.0.7'
 
 # ATTRIBUTES
 LAST_UPDATED = 'Last updated'
@@ -171,7 +171,7 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         self._attr_native_unit_of_measurement = SENSOR_TYPES[sensor_type][1]
         self._attr_device_class = SENSOR_TYPES[sensor_type][3]
         self._attr_state_class = SENSOR_TYPES[sensor_type][4]
-        self._attr_unique_id = f"{inverter_sn}_{self._name}".replace(" ", "_")
+        self._attr_unique_id = f"{inverter_sn}{self._name}".replace(" ", "_")
         ginlong_service.subscribe(self, inverter_sn, SENSOR_TYPES[sensor_type][5])
 
     def do_update(self, value: Any, last_updated: datetime) -> bool:
