@@ -22,7 +22,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.2'
+VERSION = '0.3.3'
 
 # API NAME
 API_NAME = 'Ginlong Platform 2.0'
@@ -223,6 +223,9 @@ class GinlongAPI(BaseAPI):
                     # Fetch plant name
                     data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
                     self._plant_name = getattr(data, INVERTER_PLANT_NAME)
+            except AttributeError:
+                _LOGGER.debug("Could not fetch inverter data, retry loging attempt")
+                self._online = False
             except KeyError:
                 _LOGGER.error(
                     'Unable to login to %s, are username and password correct?',
