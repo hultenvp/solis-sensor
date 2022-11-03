@@ -41,6 +41,8 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._data = user_input
+            if user_input.get(CONF_PORTAL_VERSION) is None:
+                user_input[CONF_PORTAL_VERSION] = PLATFORMV2
             if user_input.get(CONF_PORTAL_VERSION) == PLATFORMV2:
                 return await self.async_step_credentials_password(user_input)
             return await self.async_step_credentials_secret(user_input)
