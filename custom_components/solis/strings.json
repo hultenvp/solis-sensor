@@ -10,7 +10,7 @@
                 "title": "Portal selection",
                 "description": "Enter the PV portal URL and portal version",
                 "data": {
-                    "name": "Name of the platform",
+                    "name": "Name of the inverter",
                     "portal_domain": "PV Portal URL, e.g. https://www.soliscloud.com:13333",
                     "portal_version": "PV Portal version (Soliscloud? Read the ReadMe!)"
                 }
