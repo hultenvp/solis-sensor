@@ -13,20 +13,20 @@ Also confirmed to work with:
 > Platform V2 backend is used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 
 ## SolisCloud
-:warning: ***READ CAREFULLY: As of 27/9 Ginlong has suspended access to the Soliscloud API claiming GDPR issues. They have indicated they will re-open the API in a next release somewhere Q1 2023. For now you can NOT request new API key and secret. If you have an API key and secret then the integration still works. People with older logger sticks can use the m.ginlong.com portal in combination with this integration. People with a newer S3 stick will have to use one of the local solutions (e.g. RS485 ethernet bridge). See [issue 162](https://github.com/hultenvp/solis-sensor/issues/162) and HA forum for discussions about local solutions.***
+:warning: ***READ CAREFULLY: As of 27/9 Ginlong has suspended access to the Soliscloud API claiming GDPR issues. It appears that from Oct 26 the [access has been restored](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud). Results to get the integration working have been mixed so far. Use at own risk***
 
 >❗This feature is in beta. The server still has some issues. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
 
 [SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. It's unknown to me if the other brands are also supported.
 
-~~The new portal requires a key-id, secret and username to function.~~<br>
-~~You can obtain key and secret via SolisCloud.~~<br>
-* ~~Go to https://www.soliscloud.com/#/apiManage.~~<br>
-* ~~Activate API management and agree with the usage conditions.~~<br>
-* ~~After activation, click on view key tot get a pop-up window asking for the verification code.~~<br>
-* ~~First click on "Verification code" after which you get an image with 2 puzzle pieces, which you need to overlap each other using the slider below.~~<br>
-* ~~After that, you will receive an email with the verification code you need to enter (within 60 seconds).~~<br>
-* ~~Once confirmed, you get the API ID, secret an API URL~~<br>
+The new portal requires a key-id, secret and username to function.
+You can obtain key and secret via SolisCloud.
+* Go to https://www.soliscloud.com/#/apiManage.
+* Activate API management and agree with the usage conditions.
+* After activation, click on view key tot get a pop-up window asking for the verification code.
+* First click on "Verification code" after which you get an image with 2 puzzle pieces, which you need to overlap each other using the slider below.
+* After that, you will receive an email with the verification code you need to enter (within 60 seconds).
+* Once confirmed, you get the API ID, secret an API URL
 
 ## HACS installation
 
