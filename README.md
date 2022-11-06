@@ -56,7 +56,7 @@ custom_components
 
 The integration can be configured via the UI.
 
-<img width="301" alt="image" src="https://user-images.githubusercontent.com/61835400/197206691-2ccf91d0-39c9-4440-9e08-afd444cca8a5.png">
+<img width="301" alt="image" src="https://user-images.githubusercontent.com/61835400/200194739-68444b7f-7144-4d84-abd0-2ac3bb82ecda.png">
 
 Select the right platform and platform URL to use and click "Submit"
 
