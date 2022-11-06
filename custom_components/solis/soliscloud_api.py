@@ -201,7 +201,7 @@ class SoliscloudAPI(BaseAPI):
                 self._plant_name = getattr(data, INVERTER_PLANT_NAME)
             except AttributeError:
                 _LOGGER.info("Failed to acquire plant name, login failed")
-                self.is_online = False
+                self._is_online = False
         return self.is_online
 
     async def logout(self) -> None:
