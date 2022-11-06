@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.1'
+VERSION = '0.3.2'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -196,8 +196,12 @@ class SoliscloudAPI(BaseAPI):
             _LOGGER.info("Login successful")
             _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
             self._is_online = True
-            data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
-            self._plant_name = getattr(data, INVERTER_PLANT_NAME)
+            try:
+                data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
+                self._plant_name = getattr(data, INVERTER_PLANT_NAME)
+            except AttributeError:
+                _LOGGER.info("Failed to acquire plant name, login failed")
+                self.is_online = False
         return self.is_online
 
     async def logout(self) -> None:

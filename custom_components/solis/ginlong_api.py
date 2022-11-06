@@ -22,7 +22,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.4'
+VERSION = '0.3.5'
 
 # API NAME
 API_NAME = 'Ginlong Platform 2.0'
@@ -491,4 +491,5 @@ class GinlongAPI(BaseAPI):
             return result
         finally:
             if resp is not None:
-                await resp.release()
+                _LOGGER.debug("Resp = %s", resp)
+#                await resp.release()

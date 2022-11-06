@@ -1,6 +1,6 @@
 {
   "domain": "solis",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "config_flow": true,
   "name": "Solis Inverter",
   "iot_class": "cloud_push",
