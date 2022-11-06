@@ -491,4 +491,5 @@ class GinlongAPI(BaseAPI):
             return result
         finally:
             if resp is not None:
+                _LOGGER.debug("Resp = %s", resp)
 #                await resp.release()
