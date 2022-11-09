@@ -31,7 +31,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -99,10 +99,10 @@ class InverterService():
 
     async def async_discover(self, *_) -> None:
         """ Try to discover and retry if needed."""
-        if self._discovery_callback and self._discovery_cookie:
-            capabilities: dict[str, list[str]] = {}
-            capabilities = await self._do_discover()
-            if capabilities:
+        capabilities: dict[str, list[str]] = {}
+        capabilities = await self._do_discover()
+        if capabilities:
+            if self._discovery_callback and self._discovery_cookie:
                 self._discovery_callback(capabilities, self._discovery_cookie)
             self._retry_delay_seconds = 0
         else:
