@@ -93,6 +93,7 @@ INVERTER_DATA: InverterDataType = {
         BAT_POWER:                        ['batteryPower', float, 3],
         BAT_POWER_STR:                    ['batteryPowerStr', str, None],
         BAT_REMAINING_CAPACITY:           ['batteryCapacitySoc', float, 2],
+        BAT_STATE_OF_HEALTH:              ['batteryHealthSoh', float, 2],
         BAT_TOTAL_ENERGY_CHARGED:         ['batteryTotalChargeEnergy', float, 3],
         BAT_TOTAL_ENERGY_CHARGED_STR:     ['batteryTotalChargeEnergyStr', str, None],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 3],

@@ -343,6 +343,14 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         BAT_REMAINING_CAPACITY
     ],
+    'batstateofhealth': [
+        'Remaining Battery Capacity',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        BAT_STATE_OF_HEALTH
+    ],
     'battotalenergycharged': [
         'Total Energy Charged',
         ENERGY_KILO_WATT_HOUR,
