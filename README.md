@@ -21,12 +21,13 @@ Also confirmed to work with:
 
 The new portal requires a key-id, secret and username to function.
 You can obtain key and secret via SolisCloud.
+* Submit a [service ticket](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud) and wait till it is resolved.
 * Go to https://www.soliscloud.com/#/apiManage.
 * Activate API management and agree with the usage conditions.
 * After activation, click on view key tot get a pop-up window asking for the verification code.
 * First click on "Verification code" after which you get an image with 2 puzzle pieces, which you need to overlap each other using the slider below.
 * After that, you will receive an email with the verification code you need to enter (within 60 seconds).
-* Once confirmed, you get the API ID, secret an API URL
+* Once confirmed, you get the API ID, secret and API URL
 
 ## HACS installation
 
@@ -55,13 +56,20 @@ custom_components
 ## Configuration
 
 The integration can be configured via the UI.
+* Go to Settings -> Devices and Services -> Click Add integration and select "Solis"
+* Select the right platform and platform URL to use and click "Submit"
+* If you add multiple configurations, make sure all of them have a unique name.
 
 <img width="301" alt="image" src="https://user-images.githubusercontent.com/61835400/200194739-68444b7f-7144-4d84-abd0-2ac3bb82ecda.png">
 
-Select the right platform and platform URL to use and click "Submit"
 
-**Ginlong platform v2**   Provide username, password and plant id. If you want to add multiple plants just follow the configuration for each plant.
-**Soliscloud**            Provide username, key id, secret and station id. If you want to add multiple stations just follow the configuration for each plant.
+**Ginlong platform v2**   
+* Provide username, password and plant id. If you want to add multiple plants just repeat "add integration" for each plant.
+
+**Soliscloud**            
+* Provide username, key id, secret and station id. If you want to add multiple plants just repeat "add integration" for each plant.
+* To get StationId: go so SolisCloud and click in the plant list on the plant. A new browser window will open. 
+  * Copy the 19-digit number from the URL: https://www.soliscloud.com/#/station/stationdetail_1?id=XXXXXXXXXXXXXXXXXXX and paste it in the station ID field
 
 
 # Energy dashboard
