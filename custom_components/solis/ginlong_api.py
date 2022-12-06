@@ -22,7 +22,7 @@ from .ginlong_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.5'
+VERSION = '0.3.6'
 
 # API NAME
 API_NAME = 'Ginlong Platform 2.0'
@@ -223,6 +223,8 @@ class GinlongAPI(BaseAPI):
                     # Fetch plant name
                     data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
                     self._plant_name = getattr(data, INVERTER_PLANT_NAME)
+            except StopIteration:
+                pass
             except TypeError:
                 _LOGGER.debug("Could not fetch inverter list, retry loging attempt")
                 self._online = False
@@ -277,6 +279,8 @@ class GinlongAPI(BaseAPI):
                     # Ignore all device_id's inactive for more than 2 days
                     if active or update_date>two_days_ago:
                         device_ids[serial] = device_id
+                    else:
+                        _LOGGER.warning("Inverter %s inactive more than 48hrs, ignoring", serial)
             except TypeError:
                 _LOGGER.warning("Unknown payload received")
                 _LOGGER.debug("%s", result_json)
@@ -489,7 +493,3 @@ class GinlongAPI(BaseAPI):
             result[MESSAGE] = "Exception: %s" % err.__class__
             _LOGGER.debug("Error: %s", result[MESSAGE])
             return result
-        finally:
-            if resp is not None:
-                _LOGGER.debug("Resp = %s", resp)
-#                await resp.release()
