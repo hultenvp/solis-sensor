@@ -344,7 +344,7 @@ SENSOR_TYPES = {
         BAT_REMAINING_CAPACITY
     ],
     'batstateofhealth': [
-        'Remaining Battery Capacity',
+        'Battery State Of Health',
         PERCENTAGE,
         'mdi:battery',
         DEVICE_CLASS_BATTERY,
@@ -470,6 +470,14 @@ SENSOR_TYPES = {
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
         GRID_TOTAL_CONSUMPTION_POWER
+    ],
+    'gridtotalenergypurchased': [
+        'Total Energy Purchased',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_TOTAL_ENERGY_PURCHASED
     ],
     'gridtotalenergyused': [
         'Total Energy Used',

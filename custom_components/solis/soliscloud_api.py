@@ -94,6 +94,10 @@ INVERTER_DATA: InverterDataType = {
         BAT_POWER_STR:                    ['batteryPowerStr', str, None],
         BAT_REMAINING_CAPACITY:           ['batteryCapacitySoc', float, 2],
         BAT_STATE_OF_HEALTH:              ['batteryHealthSoh', float, 2],
+        BAT_CURRENT:                      ['storageBatteryCurrent', float, 2],
+        BAT_CURRENT_STR:                  ['storageBatteryCurrentStr', str, None],
+        BAT_VOLTAGE:                      ['storageBatteryVoltage', float, 2],
+        BAT_VOLTAGE_STR:                  ['storageBatteryVoltageStr', str, None],
         BAT_TOTAL_ENERGY_CHARGED:         ['batteryTotalChargeEnergy', float, 3],
         BAT_TOTAL_ENERGY_CHARGED_STR:     ['batteryTotalChargeEnergyStr', str, None],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 3],
@@ -101,11 +105,15 @@ INVERTER_DATA: InverterDataType = {
         BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
         BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
         GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2],
+        GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None],
         GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2],
         GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2],
         GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
         GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
+        GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 2],
+        GRID_TOTAL_ENERGY_PURCHASED_STR:  ['gridPurchasedTotalEnergyStr', str, None],
         GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 2],
+        GRID_TOTAL_ON_GRID_ENERGY_STR:    ['gridSellTotalEnergyStr', str, None],
         GRID_TOTAL_POWER:                 ['psum', float, 3],
         GRID_TOTAL_POWER_STR:             ['psumStr', str, None],
         GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
@@ -342,93 +350,16 @@ class SoliscloudAPI(BaseAPI):
                 pass
 
             # Convert kW into W depending on unit returned from API.
-            try:
-                if self._data[GRID_TOTAL_POWER_STR] == "kW":
-                    self._data[GRID_TOTAL_POWER] = \
-                        float(self._data[GRID_TOTAL_POWER])*1000
-                    self._data[GRID_TOTAL_POWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[BAT_POWER_STR] == "kW":
-                    self._data[BAT_POWER] = \
-                        float(self._data[BAT_POWER])*1000
-                    self._data[BAT_POWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[BAT_TOTAL_ENERGY_CHARGED_STR] == "MWh":
-                    self._data[BAT_TOTAL_ENERGY_CHARGED] = \
-                        float(self._data[BAT_TOTAL_ENERGY_CHARGED])*1000
-                    self._data[BAT_TOTAL_ENERGY_CHARGED_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] == "MWh":
-                    self._data[BAT_TOTAL_ENERGY_DISCHARGED] = \
-                        float(self._data[BAT_TOTAL_ENERGY_DISCHARGED])*1000
-                    self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
-                    self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
-                        float(self._data[GRID_TOTAL_CONSUMPTION_POWER])*1000
-                    self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[GRID_TOTAL_ENERGY_USED_STR] == "MWh":
-                    self._data[GRID_TOTAL_ENERGY_USED] = \
-                        float(self._data[GRID_TOTAL_ENERGY_USED])*1000
-                    self._data[GRID_TOTAL_ENERGY_USED_STR] = "kWh"
-                elif self._data[GRID_TOTAL_ENERGY_USED_STR] == "GWh":
-                    self._data[GRID_TOTAL_ENERGY_USED] = \
-                        float(self._data[GRID_TOTAL_ENERGY_USED])*1000*1000
-                    self._data[GRID_TOTAL_ENERGY_USED_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ACPOWER_STR] == "kW":
-                    self._data[INVERTER_ACPOWER] = \
-                        float(self._data[INVERTER_ACPOWER])*1000
-                    self._data[INVERTER_ACPOWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ENERGY_THIS_MONTH_STR] == "MWh":
-                    self._data[INVERTER_ENERGY_THIS_MONTH] = \
-                        float(self._data[INVERTER_ENERGY_THIS_MONTH])*1000
-                    self._data[INVERTER_ENERGY_THIS_MONTH_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ENERGY_THIS_YEAR_STR] == "MWh":
-                    self._data[INVERTER_ENERGY_THIS_YEAR] = \
-                        float(self._data[INVERTER_ENERGY_THIS_YEAR])*1000
-                    self._data[INVERTER_ENERGY_THIS_YEAR_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "MWh":
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
-                        float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
-                elif self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "GWh":
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
-                        float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
-            except KeyError:
-                pass
+            self._fix_units(GRID_TOTAL_POWER, GRID_TOTAL_POWER_STR)
+            self._fix_units(BAT_POWER, BAT_POWER_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
+            self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)
+            self._fix_units(GRID_TOTAL_ENERGY_USED, GRID_TOTAL_ENERGY_USED_STR)
+            self._fix_units(INVERTER_ACPOWER, INVERTER_ACPOWER_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_MONTH, INVERTER_ENERGY_THIS_MONTH_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_YEAR, INVERTER_ENERGY_THIS_YEAR_STR)
+            self._fix_units(INVERTER_ENERGY_TOTAL_LIFE, INVERTER_ENERGY_TOTAL_LIFE_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
@@ -452,6 +383,24 @@ class SoliscloudAPI(BaseAPI):
             for i, stringlist in enumerate(STRING_LISTS):
                 if i > int(self._data[STRING_COUNT]):
                     self._purge_if_unused(0, *stringlist)
+
+    def _fix_units(self, num_key: str, units_key: str) -> None:
+        """ Convert numeric values according to the units reported by the API. """
+        try:
+            if self._data[units_key] == "kW":
+                self._data[num_key] = float(self._data[num_key])*1000
+                self._data[units_key] = "W"
+
+            elif self._data[units_key] == "MWh":
+                self._data[num_key] = float(self._data[num_key])*1000
+                self._data[units_key] = "kWh"
+
+            elif self._data[units_key] == "GWh":
+                self._data[num_key] = float(self._data[num_key])*1000*1000
+                self._data[units_key] = "kWh"
+
+        except KeyError:
+            pass
 
     def _purge_if_unused(self, value: Any, *elements: str) -> None:
         for element in elements:
