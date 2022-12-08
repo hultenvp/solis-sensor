@@ -349,9 +349,11 @@ class SoliscloudAPI(BaseAPI):
             except KeyError:
                 pass
 
-            # Convert kW into W depending on unit returned from API.
+            # Convert kW into W, etc. depending on unit returned from API.
             self._fix_units(GRID_TOTAL_POWER, GRID_TOTAL_POWER_STR)
             self._fix_units(BAT_POWER, BAT_POWER_STR)
+            self._fix_units(BAT_CURRENT, BAT_CURRENT_STR)
+            self._fix_units(BAT_VOLTAGE, BAT_VOLTAGE_STR)
             self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
             self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
             self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)
@@ -360,6 +362,9 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(INVERTER_ENERGY_THIS_MONTH, INVERTER_ENERGY_THIS_MONTH_STR)
             self._fix_units(INVERTER_ENERGY_THIS_YEAR, INVERTER_ENERGY_THIS_YEAR_STR)
             self._fix_units(INVERTER_ENERGY_TOTAL_LIFE, INVERTER_ENERGY_TOTAL_LIFE_STR)
+            self._fix_units(GRID_TOTAL_ENERGY_PURCHASED, GRID_TOTAL_ENERGY_PURCHASED_STR
+            self._fix_units(GRID_DAILY_ON_GRID_ENERGY, GRID_DAILY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_TOTAL_ON_GRID_ENERGY, GRID_TOTAL_ON_GRID_ENERGY_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
