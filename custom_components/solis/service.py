@@ -25,7 +25,7 @@ from .ginlong_const import (
 )
 
 # REFRESH CONSTANTS
-SCHEDULE_OK = 2
+SCHEDULE_OK = 1
 SCHEDULE_NOK = 1
 
 _LOGGER = logging.getLogger(__name__)

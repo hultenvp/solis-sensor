@@ -451,7 +451,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            with async_timeout.timeout(10):
+            with async_timeout.timeout(120):
                 resp = await self._session.get(url, params=params)
 
                 result[STATUS_CODE] = resp.status
@@ -512,10 +512,11 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            with async_timeout.timeout(10):
+            with async_timeout.timeout(120):
                 url = f"{self.config.domain}{canonicalized_resource}"
                 resp = await self._session.post(url, json=params, headers=header)
 
+#               _LOGGER.info("Output from URI (%s) : %s", canonicalized_resource, await resp.text())
                 result[STATUS_CODE] = resp.status
                 result[CONTENT] = await resp.json()
                 if resp.status == HTTPStatus.OK:
