@@ -14,6 +14,7 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
+    POWER_KILO_WATT,
     ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
@@ -305,7 +306,7 @@ SENSOR_TYPES = {
     ],
     'batpower': [
         'Battery Power',
-        POWER_WATT,
+        POWER_KILO_WATT,
         'mdi:battery',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -342,14 +343,6 @@ SENSOR_TYPES = {
         DEVICE_CLASS_BATTERY,
         STATE_CLASS_MEASUREMENT,
         BAT_REMAINING_CAPACITY
-    ],
-    'batstateofhealth': [
-        'Battery State Of Health',
-        PERCENTAGE,
-        'mdi:battery',
-        DEVICE_CLASS_BATTERY,
-        STATE_CLASS_MEASUREMENT,
-        BAT_STATE_OF_HEALTH
     ],
     'battotalenergycharged': [
         'Total Energy Charged',
@@ -486,5 +479,29 @@ SENSOR_TYPES = {
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         GRID_TOTAL_ENERGY_USED
+    ],
+    'batstateofhealth': [
+        'Battery State Of Health',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        BAT_STATE_OF_HEALTH
+    ],
+    'socChargingSet': [
+        'Force Charge SOC',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        SOC_CHARGING_SET
+    ],
+    'socDischargeSet': [
+        'Force Discharge SOC',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        SOC_DISCHARGE_SET
     ],
 }

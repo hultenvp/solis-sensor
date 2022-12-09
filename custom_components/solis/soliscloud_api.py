@@ -120,6 +120,8 @@ INVERTER_DATA: InverterDataType = {
         GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         GRID_TOTAL_ENERGY_USED:           ['homeLoadTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
+        SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
+        SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0]
     },
     PLANT_DETAIL: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
