@@ -306,7 +306,7 @@ SENSOR_TYPES = {
     ],
     'batpower': [
         'Battery Power',
-        POWER_KILO_WATT,
+        POWER_WATT,
         'mdi:battery',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
