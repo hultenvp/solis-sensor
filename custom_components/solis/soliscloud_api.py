@@ -375,7 +375,14 @@ class SoliscloudAPI(BaseAPI):
                         float(self._data[GRID_DAILY_ON_GRID_ENERGY])*10
             except KeyError:
                 pass
-            
+
+            # turn batteryPower negative when discharging (fix for https://github.com/hultenvp/solis-sensor/issues/158)
+            try:
+                if self._data[BAT_CURRENT] < 0:
+                    self._data[BAT_POWER] = self._data[BAT_POWER] * -1
+            except KeyError:
+                pass
+
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
