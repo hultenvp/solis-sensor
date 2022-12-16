@@ -68,8 +68,13 @@ The integration can be configured via the UI.
 
 **Soliscloud**            
 * Provide username, key id, secret and station id. If you want to add multiple plants just repeat "add integration" for each plant.
-* To get StationId: go so SolisCloud and click in the plant list on the plant. A new browser window will open. 
-  * Copy the 19-digit number from the URL: https://www.soliscloud.com/#/station/stationdetail_1?id=XXXXXXXXXXXXXXXXXXX and paste it in the station ID field
+* To get StationId: 
+  1. Log in to SolisCoud.com
+  2. In the Plant Overview tab, under the Plant Name column, Click on your actual plant name, per the screenshot below:
+  <img width="301" alt="image" src="https://github.com/hultenvp/solis-sensor/blob/master/image/soliscloud_mainpage.png">
+  
+  3. Copy the 19-digit number from the URL: https://www.soliscloud.com/#/station/stationdetail_1?id=XXXXXXXXXXXXXXXXXXX and paste it in the station ID field:
+  <img width="301" alt="image" src="https://github.com/hultenvp/solis-sensor/blob/master/image/soliscloud_stationdetail.png">
 
 
 # Energy dashboard
