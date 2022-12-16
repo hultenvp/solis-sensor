@@ -385,7 +385,7 @@ class SoliscloudAPI(BaseAPI):
 
             # turn batteryPower negative when discharging (fix for https://github.com/hultenvp/solis-sensor/issues/158)
             try:
-                if self._data[BAT_CURRENT] < 0:
+                if self._data[BAT_CURRENT] < 0 and self._data[BAT_POWER] > 0:
                     self._data[BAT_POWER] = self._data[BAT_POWER] * -1
             except KeyError:
                 pass
