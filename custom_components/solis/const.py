@@ -463,6 +463,14 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         GRID_TOTAL_CONSUMPTION_POWER
     ],
+    'gridtotalenergypurchased': [
+        'Total Energy Purchased',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_TOTAL_ENERGY_PURCHASED
+    ],
     'gridtotalenergyused': [
         'Total Energy Used',
         ENERGY_KILO_WATT_HOUR,
@@ -470,5 +478,29 @@ SENSOR_TYPES = {
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         GRID_TOTAL_ENERGY_USED
+    ],
+    'batstateofhealth': [
+        'Battery State Of Health',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        BAT_STATE_OF_HEALTH
+    ],
+    'socChargingSet': [
+        'Force Charge SOC',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        SOC_CHARGING_SET
+    ],
+    'socDischargeSet': [
+        'Force Discharge SOC',
+        PERCENTAGE,
+        'mdi:battery',
+        DEVICE_CLASS_BATTERY,
+        STATE_CLASS_MEASUREMENT,
+        SOC_DISCHARGE_SET
     ],
 }
