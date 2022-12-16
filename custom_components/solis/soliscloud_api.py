@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.2'
+VERSION = '0.4.0'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -44,7 +44,7 @@ MESSAGE = 'Message'
 
 VERB = "POST"
 
-INVERTER_DETAIL = '/v1/api/inveterDetail'
+INVERTER_DETAIL = '/v1/api/inverterDetail'
 PLANT_DETAIL = '/v1/api/stationDetail'
 
 InverterDataType = dict[str, dict[str, list]]
@@ -220,7 +220,7 @@ class SoliscloudAPI(BaseAPI):
         params = {
             'stationId': plant_id
         }
-        result = await self._post_data_json('/v1/api/inveterList', params)
+        result = await self._post_data_json('/v1/api/inverterList', params)
 
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
@@ -228,6 +228,10 @@ class SoliscloudAPI(BaseAPI):
                 serial = record.get('sn')
                 device_id = record.get('id')
                 device_ids[serial] = device_id
+        elif result[STATUS_CODE] == 408:
+            now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
+            _LOGGER.warning("Your system time must be set correctly for this integration \
+            to work, your time is %s", now)
         return device_ids
 
     async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
@@ -241,7 +245,10 @@ class SoliscloudAPI(BaseAPI):
         if self.is_online:
             if self._inverter_list is not None and inverter_serial in self._inverter_list:
                 device_id = self._inverter_list[inverter_serial]
+                # Throttle http calls to avoid 502 error
+                await asyncio.sleep(1)
                 payload = await self._get_inverter_details(device_id, inverter_serial)
+                await asyncio.sleep(1)
                 payload2 = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
@@ -494,7 +501,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            with async_timeout.timeout(10):
+            async with async_timeout.timeout(10):
                 resp = await self._session.get(url, params=params)
 
                 result[STATUS_CODE] = resp.status
@@ -555,7 +562,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            with async_timeout.timeout(10):
+            async with async_timeout.timeout(10):
                 url = f"{self.config.domain}{canonicalized_resource}"
                 resp = await self._session.post(url, json=params, headers=header)
 
@@ -566,12 +573,10 @@ class SoliscloudAPI(BaseAPI):
                     result[MESSAGE] = "OK"
                 else:
                     result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
-
-                return result
         except (asyncio.TimeoutError, ClientError) as err:
             result[MESSAGE] = "%s" % err
             _LOGGER.debug("Error from URI (%s) : %s", canonicalized_resource, result[MESSAGE])
-            return result
         finally:
             if resp is not None:
                 await resp.release()
+            return result
