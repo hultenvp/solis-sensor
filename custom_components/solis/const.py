@@ -7,14 +7,13 @@ from homeassistant.components.sensor import (
 )
 
 from homeassistant.const import (
-    TEMP_CELSIUS,
+    UnitOfPower,
+    UnitOfEnergy,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfTemperature,
     PERCENTAGE,
     FREQUENCY_HERTZ,
-    ELECTRIC_POTENTIAL_VOLT,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_MEGA_WATT_HOUR,
-    POWER_WATT,
-    ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
@@ -81,7 +80,7 @@ SENSOR_TYPES = {
     ],
     'temperature': [
         'Temperature',
-        TEMP_CELSIUS,
+        UnitOfTemperature.CELSIUS,
         'mdi:thermometer',
         DEVICE_CLASS_TEMPERATURE,
         STATE_CLASS_MEASUREMENT,
@@ -89,7 +88,7 @@ SENSOR_TYPES = {
     ],
     'radiatortemperature1': [
         'Radiator temperature 1', # Solarman only
-        TEMP_CELSIUS,
+        UnitOfTemperature.CELSIUS,
         'mdi:thermometer',
         DEVICE_CLASS_TEMPERATURE,
         STATE_CLASS_MEASUREMENT,
@@ -97,7 +96,7 @@ SENSOR_TYPES = {
     ],
     'dcinputvoltagepv1': [
         'DC Voltage PV1',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -105,7 +104,7 @@ SENSOR_TYPES = {
     ],
     'dcinputvoltagepv2': [
         'DC Voltage PV2',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -113,7 +112,7 @@ SENSOR_TYPES = {
     ],
     'dcinputvoltagepv3': [
         'DC Voltage PV3',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -121,7 +120,7 @@ SENSOR_TYPES = {
     ],
     'dcinputvoltagepv4': [
         'DC Voltage PV4',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -129,7 +128,7 @@ SENSOR_TYPES = {
     ],
     'dcinputcurrentpv1': [
         'DC Current PV1',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -137,7 +136,7 @@ SENSOR_TYPES = {
     ],
     'dcinputcurrentpv2': [
         'DC Current PV2',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -145,7 +144,7 @@ SENSOR_TYPES = {
     ],
     'dcinputcurrentpv3': [
         'DC Current PV3',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -153,7 +152,7 @@ SENSOR_TYPES = {
     ],
     'dcinputcurrentpv4': [
         'DC Current PV4',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -161,7 +160,7 @@ SENSOR_TYPES = {
     ],
     'dcinputpowerpv1': [
         'DC Power PV1',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:solar-power',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -169,7 +168,7 @@ SENSOR_TYPES = {
     ],
     'dcinputpowerpv2': [
         'DC Power PV2',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:solar-power',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -177,7 +176,7 @@ SENSOR_TYPES = {
     ],
     'dcinputpowerpv3': [
         'DC Power PV3',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:solar-power',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -185,7 +184,7 @@ SENSOR_TYPES = {
     ],
     'dcinputpowerpv4': [
         'DC Power PV4',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:solar-power',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -193,7 +192,7 @@ SENSOR_TYPES = {
     ],
     'acoutputvoltage1': [
         'AC Voltage R',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -201,7 +200,7 @@ SENSOR_TYPES = {
     ],
     'acoutputvoltage2': [
         'AC Voltage S',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -209,7 +208,7 @@ SENSOR_TYPES = {
     ],
     'acoutputvoltage3': [
         'AC Voltage T',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:flash-outline',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -217,7 +216,7 @@ SENSOR_TYPES = {
     ],
     'acoutputcurrent1': [
         'AC Current R',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -225,7 +224,7 @@ SENSOR_TYPES = {
     ],
     'acoutputcurrent2': [
         'AC Current S',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -233,7 +232,7 @@ SENSOR_TYPES = {
     ],
     'acoutputcurrent3': [
         'AC Current T',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:flash-outline',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -241,7 +240,7 @@ SENSOR_TYPES = {
     ],
     'actualpower': [
         'AC Output Total Power',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:solar-power',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -257,7 +256,7 @@ SENSOR_TYPES = {
     ],
     'energylastmonth': [
         'Energy Last Month',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:flash-outline',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -265,7 +264,7 @@ SENSOR_TYPES = {
     ],
     'energytoday': [
         'Energy Today',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:flash-outline',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -273,7 +272,7 @@ SENSOR_TYPES = {
     ],
     'energythismonth': [
         'Energy This Month',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:flash-outline',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -281,7 +280,7 @@ SENSOR_TYPES = {
     ],
     'energythisyear': [
         'Energy This Year',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:flash-outline',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -289,7 +288,7 @@ SENSOR_TYPES = {
     ],
     'energytotal': [
         'Energy Total',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:flash-outline',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -305,7 +304,7 @@ SENSOR_TYPES = {
     ],
     'batpower': [
         'Battery Power',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:battery',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -313,7 +312,7 @@ SENSOR_TYPES = {
     ],
     'batvoltage': [
         'Battery Voltage',
-        ELECTRIC_POTENTIAL_VOLT,
+        UnitOfElectricPotential.VOLT,
         'mdi:battery',
         DEVICE_CLASS_VOLTAGE,
         STATE_CLASS_MEASUREMENT,
@@ -329,7 +328,7 @@ SENSOR_TYPES = {
     ],
     'batcurrent': [
         'Battery Current',
-        ELECTRIC_CURRENT_AMPERE,
+        UnitOfElectricCurrent.AMPERE,
         'mdi:battery',
         DEVICE_CLASS_CURRENT,
         STATE_CLASS_MEASUREMENT,
@@ -345,7 +344,7 @@ SENSOR_TYPES = {
     ],
     'battotalenergycharged': [
         'Total Energy Charged',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:battery-plus',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -353,7 +352,7 @@ SENSOR_TYPES = {
     ],
     'battotalenergydischarged': [
         'Total Energy Discharged',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:battery-minus',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -361,7 +360,7 @@ SENSOR_TYPES = {
     ],
     'batdailyenergycharged': [
         'Daily Energy Charged',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:battery-plus',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -369,7 +368,7 @@ SENSOR_TYPES = {
     ],
     'batdailyenergydischarged': [
         'Daily Energy Discharged',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:battery-minus',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -377,7 +376,7 @@ SENSOR_TYPES = {
     ],
     'griddailyongridenergy': [
         'Daily On-grid Energy',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -385,7 +384,7 @@ SENSOR_TYPES = {
     ],
     'griddailyenergypurchased': [
         'Daily Grid Energy Purchased',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -393,7 +392,7 @@ SENSOR_TYPES = {
     ],
     'griddailyenergyused': [
         'Daily Grid Energy Used',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -401,7 +400,7 @@ SENSOR_TYPES = {
     ],
     'gridmonthlyenergypurchased': [
         'Monthly Grid Energy Purchased',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -409,7 +408,7 @@ SENSOR_TYPES = {
     ],
     'gridmonthlyenergyused': [
         'Monthly Grid Energy Used',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -417,7 +416,7 @@ SENSOR_TYPES = {
     ],
     'gridyearlyenergypurchased': [
         'Yearly Grid Energy Purchased',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -425,7 +424,7 @@ SENSOR_TYPES = {
     ],
     'gridyearlyenergyused': [
         'Yearly Grid Energy Used',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -433,7 +432,7 @@ SENSOR_TYPES = {
     ],
     'gridtotalongridenergy': [
         'Total On-grid Energy',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -441,7 +440,7 @@ SENSOR_TYPES = {
     ],
     'gridtotalconsumptionenergy':[
         'Total Consumption Energy',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -449,7 +448,7 @@ SENSOR_TYPES = {
     ],
     'gridpowergridtotalpower': [
         'Power Grid total power',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:home-export-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -457,7 +456,7 @@ SENSOR_TYPES = {
     ],
     'gridtotalconsumptionpower': [
         'Total Consumption power',
-        POWER_WATT,
+        UnitOfPower.WATT,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -465,7 +464,7 @@ SENSOR_TYPES = {
     ],
     'gridtotalenergypurchased': [
         'Total Energy Purchased',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
@@ -473,7 +472,7 @@ SENSOR_TYPES = {
     ],
     'gridtotalenergyused': [
         'Total Energy Used',
-        ENERGY_KILO_WATT_HOUR,
+        UnitOfEnergy.KILO_WATT_HOUR,
         'mdi:transmission-tower',
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
