@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.3.2'
+VERSION = '0.4.0'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -44,7 +44,7 @@ MESSAGE = 'Message'
 
 VERB = "POST"
 
-INVERTER_DETAIL = '/v1/api/inveterDetail'
+INVERTER_DETAIL = '/v1/api/inverterDetail'
 PLANT_DETAIL = '/v1/api/stationDetail'
 
 InverterDataType = dict[str, dict[str, list]]
@@ -93,6 +93,11 @@ INVERTER_DATA: InverterDataType = {
         BAT_POWER:                        ['batteryPower', float, 3],
         BAT_POWER_STR:                    ['batteryPowerStr', str, None],
         BAT_REMAINING_CAPACITY:           ['batteryCapacitySoc', float, 2],
+        BAT_STATE_OF_HEALTH:              ['batteryHealthSoh', float, 2],
+        BAT_CURRENT:                      ['storageBatteryCurrent', float, 2],
+        BAT_CURRENT_STR:                  ['storageBatteryCurrentStr', str, None],
+        BAT_VOLTAGE:                      ['storageBatteryVoltage', float, 2],
+        BAT_VOLTAGE_STR:                  ['storageBatteryVoltageStr', str, None],
         BAT_TOTAL_ENERGY_CHARGED:         ['batteryTotalChargeEnergy', float, 3],
         BAT_TOTAL_ENERGY_CHARGED_STR:     ['batteryTotalChargeEnergyStr', str, None],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 3],
@@ -100,17 +105,23 @@ INVERTER_DATA: InverterDataType = {
         BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
         BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
         GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2],
+        GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None],
         GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2],
         GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2],
         GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
         GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
+        GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 2],
+        GRID_TOTAL_ENERGY_PURCHASED_STR:  ['gridPurchasedTotalEnergyStr', str, None],
         GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 2],
+        GRID_TOTAL_ON_GRID_ENERGY_STR:    ['gridSellTotalEnergyStr', str, None],
         GRID_TOTAL_POWER:                 ['psum', float, 3],
         GRID_TOTAL_POWER_STR:             ['psumStr', str, None],
         GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
         GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         GRID_TOTAL_ENERGY_USED:           ['homeLoadTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
+        SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
+        SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0]
     },
     PLANT_DETAIL: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
@@ -220,7 +231,7 @@ class SoliscloudAPI(BaseAPI):
         params = {
             'stationId': plant_id
         }
-        result = await self._post_data_json('/v1/api/inveterList', params)
+        result = await self._post_data_json('/v1/api/inverterList', params)
 
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
@@ -228,6 +239,10 @@ class SoliscloudAPI(BaseAPI):
                 serial = record.get('sn')
                 device_id = record.get('id')
                 device_ids[serial] = device_id
+        elif result[STATUS_CODE] == 408:
+            now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
+            _LOGGER.warning("Your system time must be set correctly for this integration \
+            to work, your time is %s", now)
         return device_ids
 
     async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
@@ -241,7 +256,10 @@ class SoliscloudAPI(BaseAPI):
         if self.is_online:
             if self._inverter_list is not None and inverter_serial in self._inverter_list:
                 device_id = self._inverter_list[inverter_serial]
+                # Throttle http calls to avoid 502 error
+                await asyncio.sleep(1)
                 payload = await self._get_inverter_details(device_id, inverter_serial)
+                await asyncio.sleep(1)
                 payload2 = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
@@ -340,94 +358,22 @@ class SoliscloudAPI(BaseAPI):
             except KeyError:
                 pass
 
-            # Convert kW into W depending on unit returned from API.
-            try:
-                if self._data[GRID_TOTAL_POWER_STR] == "kW":
-                    self._data[GRID_TOTAL_POWER] = \
-                        float(self._data[GRID_TOTAL_POWER])*1000
-                    self._data[GRID_TOTAL_POWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[BAT_POWER_STR] == "kW":
-                    self._data[BAT_POWER] = \
-                        float(self._data[BAT_POWER])*1000
-                    self._data[BAT_POWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[BAT_TOTAL_ENERGY_CHARGED_STR] == "MWh":
-                    self._data[BAT_TOTAL_ENERGY_CHARGED] = \
-                        float(self._data[BAT_TOTAL_ENERGY_CHARGED])*1000
-                    self._data[BAT_TOTAL_ENERGY_CHARGED_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] == "MWh":
-                    self._data[BAT_TOTAL_ENERGY_DISCHARGED] = \
-                        float(self._data[BAT_TOTAL_ENERGY_DISCHARGED])*1000
-                    self._data[BAT_TOTAL_ENERGY_DISCHARGED_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] == "kW":
-                    self._data[GRID_TOTAL_CONSUMPTION_POWER] = \
-                        float(self._data[GRID_TOTAL_CONSUMPTION_POWER])*1000
-                    self._data[GRID_TOTAL_CONSUMPTION_POWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[GRID_TOTAL_ENERGY_USED_STR] == "MWh":
-                    self._data[GRID_TOTAL_ENERGY_USED] = \
-                        float(self._data[GRID_TOTAL_ENERGY_USED])*1000
-                    self._data[GRID_TOTAL_ENERGY_USED_STR] = "kWh"
-                elif self._data[GRID_TOTAL_ENERGY_USED_STR] == "GWh":
-                    self._data[GRID_TOTAL_ENERGY_USED] = \
-                        float(self._data[GRID_TOTAL_ENERGY_USED])*1000*1000
-                    self._data[GRID_TOTAL_ENERGY_USED_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ACPOWER_STR] == "kW":
-                    self._data[INVERTER_ACPOWER] = \
-                        float(self._data[INVERTER_ACPOWER])*1000
-                    self._data[INVERTER_ACPOWER_STR] = "W"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ENERGY_THIS_MONTH_STR] == "MWh":
-                    self._data[INVERTER_ENERGY_THIS_MONTH] = \
-                        float(self._data[INVERTER_ENERGY_THIS_MONTH])*1000
-                    self._data[INVERTER_ENERGY_THIS_MONTH_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ENERGY_THIS_YEAR_STR] == "MWh":
-                    self._data[INVERTER_ENERGY_THIS_YEAR] = \
-                        float(self._data[INVERTER_ENERGY_THIS_YEAR])*1000
-                    self._data[INVERTER_ENERGY_THIS_YEAR_STR] = "kWh"
-            except KeyError:
-                pass
-
-            try:
-                if self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "MWh":
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
-                        float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
-                elif self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] == "GWh":
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE] = \
-                        float(self._data[INVERTER_ENERGY_TOTAL_LIFE])*1000*1000
-                    self._data[INVERTER_ENERGY_TOTAL_LIFE_STR] = "kWh"
-            except KeyError:
-                pass
+            # Convert kW into W, etc. depending on unit returned from API.
+            self._fix_units(GRID_TOTAL_POWER, GRID_TOTAL_POWER_STR)
+            self._fix_units(BAT_POWER, BAT_POWER_STR)
+            self._fix_units(BAT_CURRENT, BAT_CURRENT_STR)
+            self._fix_units(BAT_VOLTAGE, BAT_VOLTAGE_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
+            self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)
+            self._fix_units(GRID_TOTAL_ENERGY_USED, GRID_TOTAL_ENERGY_USED_STR)
+            self._fix_units(INVERTER_ACPOWER, INVERTER_ACPOWER_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_MONTH, INVERTER_ENERGY_THIS_MONTH_STR)
+            self._fix_units(INVERTER_ENERGY_THIS_YEAR, INVERTER_ENERGY_THIS_YEAR_STR)
+            self._fix_units(INVERTER_ENERGY_TOTAL_LIFE, INVERTER_ENERGY_TOTAL_LIFE_STR)
+            self._fix_units(GRID_TOTAL_ENERGY_PURCHASED, GRID_TOTAL_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_DAILY_ON_GRID_ENERGY, GRID_DAILY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_TOTAL_ON_GRID_ENERGY, GRID_TOTAL_ON_GRID_ENERGY_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
@@ -436,7 +382,14 @@ class SoliscloudAPI(BaseAPI):
                         float(self._data[GRID_DAILY_ON_GRID_ENERGY])*10
             except KeyError:
                 pass
-            
+
+            # turn batteryPower negative when discharging (fix for https://github.com/hultenvp/solis-sensor/issues/158)
+            try:
+                if self._data[BAT_CURRENT] < 0:
+                    self._data[BAT_POWER] = self._data[BAT_POWER] * -1
+            except KeyError:
+                pass
+
             # Unused phases are still in JSON payload as 0.0, remove them
             # FIXME: use acOutputType
             self._purge_if_unused(0.0, PHASE1_CURRENT, PHASE1_VOLTAGE)
@@ -451,6 +404,24 @@ class SoliscloudAPI(BaseAPI):
             for i, stringlist in enumerate(STRING_LISTS):
                 if i > int(self._data[STRING_COUNT]):
                     self._purge_if_unused(0, *stringlist)
+
+    def _fix_units(self, num_key: str, units_key: str) -> None:
+        """ Convert numeric values according to the units reported by the API. """
+        try:
+            if self._data[units_key] == "kW":
+                self._data[num_key] = float(self._data[num_key])*1000
+                self._data[units_key] = "W"
+
+            elif self._data[units_key] == "MWh":
+                self._data[num_key] = float(self._data[num_key])*1000
+                self._data[units_key] = "kWh"
+
+            elif self._data[units_key] == "GWh":
+                self._data[num_key] = float(self._data[num_key])*1000*1000
+                self._data[units_key] = "kWh"
+
+        except KeyError:
+            pass
 
     def _purge_if_unused(self, value: Any, *elements: str) -> None:
         for element in elements:
@@ -494,7 +465,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            with async_timeout.timeout(10):
+            async with async_timeout.timeout(10):
                 resp = await self._session.get(url, params=params)
 
                 result[STATUS_CODE] = resp.status
@@ -555,7 +526,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            with async_timeout.timeout(10):
+            async with async_timeout.timeout(10):
                 url = f"{self.config.domain}{canonicalized_resource}"
                 resp = await self._session.post(url, json=params, headers=header)
 
@@ -566,12 +537,10 @@ class SoliscloudAPI(BaseAPI):
                     result[MESSAGE] = "OK"
                 else:
                     result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
-
-                return result
         except (asyncio.TimeoutError, ClientError) as err:
             result[MESSAGE] = "%s" % err
             _LOGGER.debug("Error from URI (%s) : %s", canonicalized_resource, result[MESSAGE])
-            return result
         finally:
             if resp is not None:
                 await resp.release()
+            return result

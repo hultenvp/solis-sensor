@@ -41,17 +41,19 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
         return True
 
     for entry in config["sensor"]:
-        if DOMAIN.lower() == entry["platform"]:
-            async_create_issue(
-                hass,
-                DOMAIN,
-                "deprecated_yaml",
-                breaks_in_ha_version="2022.12.0",
-                is_fixable=False,
-                severity=IssueSeverity.WARNING,
-                translation_key="deprecated_yaml",
-            )
-
+        try:
+            if DOMAIN.lower() == entry["platform"]:
+                async_create_issue(
+                    hass,
+                    DOMAIN,
+                    "deprecated_yaml",
+                    breaks_in_ha_version="2023.2.0",
+                    is_fixable=False,
+                    severity=IssueSeverity.WARNING,
+                    translation_key="deprecated_yaml",
+                )
+        except TypeError:
+            continue
     return True
 
 
