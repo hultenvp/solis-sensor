@@ -485,13 +485,14 @@ class SoliscloudAPI(BaseAPI):
                 await resp.release()
 
     def _prepare_header(self, body: dict[str, str], canonicalized_resource: str) -> dict[str, str]:
-        now = datetime.now(timezone.utc)
-        date = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
-
         content_md5 = base64.b64encode(
             hashlib.md5(json.dumps(body,separators=(",", ":")).encode('utf-8')).digest()
         ).decode('utf-8')
+
         content_type = "application/json"
+
+        now = datetime.now(timezone.utc)
+        date = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
         encrypt_str = (VERB + "\n"
             + content_md5 + "\n"
@@ -506,6 +507,7 @@ class SoliscloudAPI(BaseAPI):
         )
         sign = base64.b64encode(hmac_obj.digest())
         authorization = "API " + self.config.key_id + ":" + sign.decode('utf-8')
+        
         header: dict [str, str] = {
             "Content-MD5":content_md5,
             "Content-Type":content_type,
@@ -521,7 +523,7 @@ class SoliscloudAPI(BaseAPI):
         """ Http-post data to specified domain/canonicalized_resource. """
 
         header: dict[str, str] = self._prepare_header(params, canonicalized_resource)
-        result: dict[str, Any] = {SUCCESS: False, MESSAGE: None}
+        result: dict[str, Any] = {SUCCESS: False, MESSAGE: None, STATUS_CODE: None}
         resp = None
         if self._session is None:
             return result
