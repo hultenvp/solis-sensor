@@ -235,10 +235,13 @@ class SoliscloudAPI(BaseAPI):
 
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
-            for record in result_json['data']['page']['records']:
-                serial = record.get('sn')
-                device_id = record.get('id')
-                device_ids[serial] = device_id
+            try:
+                for record in result_json['data']['page']['records']:
+                    serial = record.get('sn')
+                    device_id = record.get('id')
+                    device_ids[serial] = device_id
+            except TypeError:
+                _LOGGER.debug("Response contains unexpected data: %s", result_json)
         elif result[STATUS_CODE] == 408:
             now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
             _LOGGER.warning("Your system time must be set correctly for this integration \
