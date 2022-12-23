@@ -28,7 +28,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.4.0'
+VERSION = '0.4.1'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -46,6 +46,7 @@ VERB = "POST"
 
 INVERTER_DETAIL = '/v1/api/inverterDetail'
 PLANT_DETAIL = '/v1/api/stationDetail'
+PLANT_LIST = '/v1/api/userStationList'
 
 InverterDataType = dict[str, dict[str, list]]
 
@@ -127,6 +128,11 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
+        INVERTER_ADDRESS:                 ['cityStr', str, None],
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]
+    },
+    PLANT_LIST: {
+        INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
         INVERTER_ADDRESS:                 ['cityStr', str, None],
         INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]
     },
@@ -235,6 +241,10 @@ class SoliscloudAPI(BaseAPI):
 
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
+            if result_json['code'] != '0':
+                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL, \
+                    result_json['code'], result_json['msg'])
+                return device_ids
             try:
                 for record in result_json['data']['page']['records']:
                     serial = record.get('sn')
@@ -263,7 +273,7 @@ class SoliscloudAPI(BaseAPI):
                 await asyncio.sleep(1)
                 payload = await self._get_inverter_details(device_id, inverter_serial)
                 await asyncio.sleep(1)
-                payload2 = await self._get_station_details(self.config.plant_id)
+                payload2 = await self._get_station_from_list(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
@@ -337,9 +347,34 @@ class SoliscloudAPI(BaseAPI):
             _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
         return None
 
+    async def _get_station_from_list(self, plant_id: str) -> dict[str, str] | None:
+        """
+        Fetch Station from Station List
+        """
+
+        params = {}
+        result = await self._post_data_json(PLANT_LIST, params)
+
+        if result[SUCCESS] is True:
+            jsondata : dict[str, str] = result[CONTENT]
+            if jsondata['code'] == '0':
+                try:
+                    for record in jsondata['data']['page']['records']:
+                        if int(record.get('id')) == int(plant_id):
+                            return record
+                    _LOGGER.warning("Not able to find station %s", plant_id)
+                except TypeError:
+                    _LOGGER.debug("Response contains unexpected data: %s", jsondata)
+            else:
+                _LOGGER.info("%s responded with error: %s:%s",PLANT_LIST, \
+                    jsondata['code'], jsondata['msg'])
+        else:
+            _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
+        return None
+
     def _collect_station_data(self, payload: dict[str, Any]) -> None:
         """ Fetch dynamic properties """
-        jsondata = payload['data']
+        jsondata = payload
         attributes = INVERTER_DATA[PLANT_DETAIL]
         for dictkey in attributes:
             key = attributes[dictkey][0]
@@ -543,7 +578,7 @@ class SoliscloudAPI(BaseAPI):
                 else:
                     result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
         except (asyncio.TimeoutError, ClientError) as err:
-            result[MESSAGE] = "%s" % err
+            result[MESSAGE] = f"{repr(err)}"
             _LOGGER.debug("Error from URI (%s) : %s", canonicalized_resource, result[MESSAGE])
         finally:
             if resp is not None:
