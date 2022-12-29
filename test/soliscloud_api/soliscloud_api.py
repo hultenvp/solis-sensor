@@ -299,7 +299,7 @@ class SoliscloudAPI():
         time: str,
         time_zone: int,
         inverter_id : int = None,
-        nmi_code = None
+        inverter_sn: str = None
     ) -> dict[str, str]:
         """Inverter daily graph"""
 
@@ -307,12 +307,12 @@ class SoliscloudAPI():
             raise SoliscloudAPI.ApiError("time must be in format YYYY-MM-DD")
         params: dict[str, Any] = {'money': currency, 'time' : time, 'timeZone': time_zone}
 
-        if (inverter_id is not None and nmi_code is None):
+        if (inverter_id is not None and inverter_sn is None):
             params['id'] = inverter_id
-        elif (inverter_id is None and nmi_code is not None):
-            params['nmiCode'] = nmi_code
+        elif (inverter_id is None and inverter_sn is not None):
+            params['sn'] = inverter_sn
         else:
-            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or nmi_code as identifier")
+            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or inverter_sn as identifier")
 
         return await self._get_data(INVERTER_DAY, key_id, secret, params)
 
@@ -320,7 +320,7 @@ class SoliscloudAPI():
         currency: str,
         month: str,
         inverter_id : int = None,
-        nmi_code = None
+        inverter_sn: str = None
     ) -> dict[str, str]:
         """Inverter monthly graph"""
 
@@ -328,12 +328,12 @@ class SoliscloudAPI():
             raise SoliscloudAPI.ApiError("month must be in format YYYY-MM")
         params: dict[str, Any] = {'money': currency, 'month' : month}
 
-        if (inverter_id is not None and nmi_code is None):
+        if (inverter_id is not None and inverter_sn is None):
             params['id'] = inverter_id
-        elif (inverter_id is None and nmi_code is not None):
-            params['nmiCode'] = nmi_code
+        elif (inverter_id is None and inverter_sn is not None):
+            params['sn'] = inverter_sn
         else:
-            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or nmi_code as identifier")
+            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or inverter_sn as identifier")
 
         return await self._get_data(INVERTER_MONTH, key_id, secret, params)
 
@@ -341,7 +341,7 @@ class SoliscloudAPI():
         currency: str,
         year: str,
         inverter_id : int = None,
-        nmi_code = None
+        inverter_sn: str = None
     ) -> dict[str, str]:
         """Inverter yearly graph"""
 
@@ -349,29 +349,29 @@ class SoliscloudAPI():
             raise SoliscloudAPI.ApiError("month must be in format YYYY")
         params: dict[str, Any] = {'money': currency, 'year' : year}
 
-        if (inverter_id is not None and nmi_code is None):
+        if (inverter_id is not None and inverter_sn is None):
             params['id'] = inverter_id
-        elif (inverter_id is None and nmi_code is not None):
-            params['nmiCode'] = nmi_code
+        elif (inverter_id is None and inverter_sn is not None):
+            params['sn'] = inverter_sn
         else:
-            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or nmi_code as identifier")
+            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or inverter_sn as identifier")
 
         return await self._get_data(INVERTER_YEAR, key_id, secret, params)
 
     async def inverter_all(self, key_id: str, secret: bytes, /, *,
         currency: str,
         inverter_id: int = None,
-        nmi_code: str = None
+        inverter_sn: str = None
     ) -> dict[str, str]:
         """Inverter cumulative graph"""
 
         params: dict[str, Any] = {'money': currency}
-        if (inverter_id is not None and nmi_code is None):
+        if (inverter_id is not None and inverter_sn is None):
             params['id'] = inverter_id
-        elif (inverter_id is None and nmi_code is not None):
-            params['nmiCode'] = nmi_code
+        elif (inverter_id is None and inverter_sn is not None):
+            params['sn'] = inverter_sn
         else:
-            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or nmi_code as identifier")
+            raise SoliscloudAPI.ApiError("Only pass one of inverter_id or inverter_sn as identifier")
 
         return await self._get_data(INVERTER_ALL, key_id, secret, params)
 
@@ -554,7 +554,7 @@ class SoliscloudAPI():
         Return all records from call
         """
 
-        header: dict[str, str] = SoliscloudAPI._prepare_header(key_id, secret, 
+        header: dict[str, str] = SoliscloudAPI._prepare_header(key_id, secret,
             params, canonicalized_resource)
 
         url = f"{self.domain}{canonicalized_resource}"
@@ -569,7 +569,7 @@ class SoliscloudAPI():
         Return data from call
         """
 
-        header: dict[str, str] = SoliscloudAPI._prepare_header(key_id, secret, 
+        header: dict[str, str] = SoliscloudAPI._prepare_header(key_id, secret,
             params, canonicalized_resource)
 
         url = f"{self.domain}{canonicalized_resource}"
