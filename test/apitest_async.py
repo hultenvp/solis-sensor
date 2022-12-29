@@ -154,13 +154,13 @@ async def call_solis(api):
             print("user_station_list(): Failed with:",err)
             print("Falling back to station_detail_list")
             try:
-                response = await api.user_station_list(KeyId, secretKey)
+                response = await api.station_detail_list(KeyId, secretKey)
                 if response is not None:
                     print("station_detail_list: [OK]")
                     if verbose: print(json.dumps(response,sort_keys=True))
                     plant_ids = [record["id"] for record in response]
             except SoliscloudAPI.SolisCloudError as err:
-                print("station__detail_list(): Failed with:",err)
+                print("station_detail_list(): Failed with:",err)
     else:
         print("Using predefined station list")
     if plant_ids is None:
