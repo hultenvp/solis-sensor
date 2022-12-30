@@ -16,9 +16,9 @@ DELAY = 1 #seconds
 plant_ids = None
 inverter_ids = {}
 # Provided by Solis Support
-KeyId = "YOUR KEY GOES HERE"
-secretKey = b'YOUR KEY GOES HERE'
-#plant_ids = [ADD PLANTID LIST HERE IF YOU WANT TO OVERRIDE DETECTION]
+KeyId = 'XXXXXXXXXXXXXX'
+secretKey = b'YYYYYYYYYYYY'
+#plant_ids = [1234567891234567891] # 19-digit value, separate multiple ID's with a comma ([ID1, ID2, ID3])
 
 async def details_per_station(api, station_ids):
     for sid in station_ids:
@@ -149,7 +149,8 @@ async def call_solis(api):
             if response is not None:
                 print("user_station_list: [OK]")
                 if verbose: print(json.dumps(response,sort_keys=True))
-                plant_ids = [record["id"] for record in response]
+                plant_ids = [int(record["id"]) for record in response]
+                print(plant_ids)
         except SoliscloudAPI.SolisCloudError as err:
             print("user_station_list(): Failed with:",err)
             print("Falling back to station_detail_list")
