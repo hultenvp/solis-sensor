@@ -17,6 +17,24 @@ Also confirmed to work with:
 
 >❗This feature is in beta. The server still has some issues. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
 
+### Having issues?
+There are 3 known issues:
+1. The Chinese error message that translates into "Abnormal data"
+2. 408 timeout error, caused by differences between your local time and server time. --> Can happen when you run HA in a VM, update your local time.
+3. Server timeouts. --> Just wait, they'll pass
+
+Continue reading of you have issue 1:
+* Before taking actions first verify you are having API issues: 
+  * Make sure debug is ON and make confirm you get an error messsage with Chinese text: [custom_components.solis.soliscloud_api] {'Success': True, 'Message': 'OK', 'StatusCode': 200, 'Content': {'success': True, 'code': '1', 'msg': '数据异常 请联系管理员', 'data': None}}. 
+  * Alternatively copy all files from the [/test folder](https://github.com/hultenvp/solis-sensor/tree/master/test) to a local machine and make sure you have python 3 installed. Edit apitest_async.py, add your key/secret and run the test app with python apitest_async.py. This test will call most API endpoints and return if the call was successful or not. You'll get the same Chinese error message if you have the "Abnormal data" problem.
+* Users have reported the following options as possible solutions:
+
+  a. File a ticket with Solis, to solve the issue. Be prepared to wait. Can take weeks
+  
+  b. Deactivating (disable) the API administration in soliscloud.com and reactivating the API
+* Results may vary. Do not create new tickets, it is a server error and I cannot fix it.
+
+
 [SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. It's unknown to me if the other brands are also supported.
 
 The new portal requires a key-id, secret and username to function.
