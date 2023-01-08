@@ -13,27 +13,7 @@ Also confirmed to work with:
 > Platform V2 backend is used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
 
 ## SolisCloud
-:warning: ***READ CAREFULLY: As of 27/9 Ginlong has suspended access to the Soliscloud API claiming GDPR issues. It appears that from Oct 26 the [access has been restored](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud). Results to get the integration working have been mixed so far. Use at own risk***
-
->❗This feature is in beta. The server still has some issues. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
-
-### Having issues?
-There are 3 known issues:
-1. The Chinese error message that translates into "Abnormal data"
-2. 408 timeout error, caused by differences between your local time and server time. --> Can happen when you run HA in a VM, update your local time.
-3. Server timeouts. --> Just wait, they'll pass
-
-Continue reading of you have issue 1:
-* Before taking actions first verify you are having API issues: 
-  * Make sure debug is ON and make confirm you get an error messsage with Chinese text: [custom_components.solis.soliscloud_api] {'Success': True, 'Message': 'OK', 'StatusCode': 200, 'Content': {'success': True, 'code': '1', 'msg': '数据异常 请联系管理员', 'data': None}}. 
-  * Alternatively copy all files from the [/test folder](https://github.com/hultenvp/solis-sensor/tree/master/test) to a local machine and make sure you have python 3 installed. Edit apitest_async.py, add your key/secret and run the test app with python apitest_async.py. This test will call most API endpoints and return if the call was successful or not. You'll get the same Chinese error message if you have the "Abnormal data" problem.
-* Users have reported the following options as possible solutions:
-
-  a. File a ticket with Solis, to solve the issue. Be prepared to wait. Can take weeks
-  
-  b. Deactivating (disable) the API administration in soliscloud.com and reactivating the API
-* Results may vary. Do not create new tickets, it is a server error and I cannot fix it.
-
+>❗This feature is in beta. The server still has some issues, see [known limitations](#warning--known-limitations) section. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
 
 [SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. It's unknown to me if the other brands are also supported.
 
@@ -61,6 +41,7 @@ This is how your custom_components directory should be:
 custom_components
 ├── solis
 │   ├── __init__.py
+│   ├── config_flow.py
 │   ├── const.py
 │   ├── ginlong_api.py
 │   ├── ginlong_base.py
@@ -69,7 +50,32 @@ custom_components
 │   ├── sensor.py
 │   ├── service.py
 │   └── soliscloud_api.py
+│   └── soliscloud_const.py
+│   └── strings.json
+│   └── workarounds.yaml
 ```
+
+### :warning:  Known limitations
+
+#### Obtaining API access
+As of 27/9/2022 Ginlong had suspended access to the Soliscloud API claiming GDPR issues. From Oct 26 the [access has been restored](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud).
+All should be fine again, but be aware the API is still under active development and unpredictable events may occur.
+
+#### HTTP 408 Error
+Not a real limitation, but a feature of the API. It caused by differences of more than 15 minutes between your local time and server time. This can happen when you run HA in a VM. ***Update your local time.***
+
+#### Server timeouts
+Just wait, they'll pass. Sometimes minutes, sometimes longer. This can be frustrating however if it happens during configuration.
+
+#### The Chinese error message that translates into "Abnormal data"
+Make sure debug is ON and make confirm you get an error messsage with Chinese text: [custom_components.solis.soliscloud_api] {'Success': True, 'Message': 'OK', 'StatusCode': 200, 'Content': {'success': True, 'code': '1', 'msg': '数据异常 请联系管理员', 'data': None}}. 
+  * Alternatively copy all files from the [/test folder](https://github.com/hultenvp/solis-sensor/tree/master/test) to a local machine and make sure you have python 3 installed. Edit apitest_async.py, add your key/secret and run the test app with ```python apitest_async.py```. This test will call most API endpoints and return if the call was successful or not. You'll get the same Chinese error message if you have the "Abnormal data" problem.
+
+Users have reported the following options as possible solutions:
+* File a ticket with Solis, to solve the issue. Be prepared to wait. Can take weeks
+* Deactivating (disable) the API administration in soliscloud.com and reactivating the API
+
+***Results may vary. Do not create new tickets for this issue, it is a server error and Solis servicedesk needs to fix it for you!***
 
 ## Configuration
 
