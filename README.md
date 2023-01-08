@@ -49,9 +49,9 @@ custom_components
 │   ├── manifest.json
 │   ├── sensor.py
 │   ├── service.py
-│   └── soliscloud_api.py
-│   └── soliscloud_const.py
-│   └── strings.json
+│   ├── soliscloud_api.py
+│   ├── soliscloud_const.py
+│   ├── strings.json
 │   └── workarounds.yaml
 ```
 
