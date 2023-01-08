@@ -74,11 +74,12 @@ class SoliscloudAPI():
 
         def __init__(self, statuscode, message=None):
             self.statuscode = statuscode
-            if statuscode == 408:
-                now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
-                self.message = f"Your system is different from server time, your time is {now}"
-            elif not message:
-                self.message = f"Http status code: {statuscode}"
+            if not message:
+                if statuscode == 408:
+                    now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
+                    self.message = f"Your system is different from server time, your time is {now}"
+                else:
+                    self.message = f"Http status code: {statuscode}"
             super().__init__(self.message)
 
     class TimeoutError(SolisCloudError):
@@ -96,11 +97,15 @@ class SoliscloudAPI():
         Exception raised for errors during API calls.
         """
 
-        def __init__(self, message="Undefined API error occurred", response = None):
+        def __init__(self, message="Undefined API error occurred", code="Unknown", response=None):
 
             self.message = message
+            self.code = code
             self.response = response
             super().__init__(self.message)
+
+        def __str__(self):
+            return f'API returned an error: {self.message}, error code: {self.response}, response {self.response}'
 
     def __init__(self, domain: str, session: ClientSession) -> None:
         self._domain = domain.rstrip("/")
@@ -634,10 +639,10 @@ class SoliscloudAPI():
                 if resp.status == HTTPStatus.OK:
                     try:
                         if result['code'] != '0':
-                            raise SoliscloudAPI.ApiError(result['msg'])
+                            raise SoliscloudAPI.ApiError(result['msg'], result['code'])
                         return result['data']
                     except (KeyError, TypeError) as err:
-                        raise SoliscloudAPI.ApiError("Malformed data", result) from err
+                        raise SoliscloudAPI.ApiError("Malformed server response", response=result) from err
                 else:
                     raise SoliscloudAPI.HttpError(resp.status)
         except asyncio.TimeoutError as err:
