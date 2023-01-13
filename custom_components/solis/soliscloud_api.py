@@ -16,6 +16,7 @@ from datetime import timezone
 from http import HTTPStatus
 import json
 import logging
+import math
 from typing import Any
 from aiohttp import ClientError, ClientSession
 import async_timeout
@@ -423,8 +424,7 @@ class SoliscloudAPI(BaseAPI):
 
             # turn batteryPower negative when discharging (fix for https://github.com/hultenvp/solis-sensor/issues/158)
             try:
-                if self._data[BAT_CURRENT] < 0 and self._data[BAT_POWER] > 0:
-                    self._data[BAT_POWER] = self._data[BAT_POWER] * -1
+                math.copysign(self._data[BAT_POWER],self._data[BAT_CURRENT])
             except KeyError:
                 pass
 
