@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.4.1'
+VERSION = '0.4.2'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -66,7 +66,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ACPOWER:                 ['pac', float, 3],
         INVERTER_ACPOWER_STR:             ['pacStr', str, None],
         INVERTER_ACFREQUENCY:             ['fac', float, 2],
-        #INVERTER_ENERGY_TODAY:            ['eToday', float, 2], # Moved to PLANT_DETAIL
+        INVERTER_ENERGY_TODAY:            ['eToday', float, 2], # Default
         INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
         INVERTER_ENERGY_THIS_MONTH_STR:   ['eMonthStr', str, None],
         INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
@@ -130,12 +130,12 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
     },
     PLANT_LIST: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2]
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
     },
 }
 
@@ -318,12 +318,23 @@ class SoliscloudAPI(BaseAPI):
         """ Fetch dynamic properties """
         jsondata = payload['data']
         attributes = INVERTER_DATA[INVERTER_DETAIL]
+        collect_energy_today = True
+        try:
+            collect_energy_today = \
+                not self.config.workarounds['use_energy_today_from_plant']
+        except KeyError:
+            pass
+        if collect_energy_today:
+            _LOGGER.debug("Using inverterDetail for energy_today")
+
         for dictkey in attributes:
             key = attributes[dictkey][0]
             type_ = attributes[dictkey][1]
             precision = attributes[dictkey][2]
             if key is not None:
-                value = self._get_value(jsondata, key, type_, precision)
+                value = None
+                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                    value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
 
@@ -377,12 +388,23 @@ class SoliscloudAPI(BaseAPI):
         """ Fetch dynamic properties """
         jsondata = payload
         attributes = INVERTER_DATA[PLANT_DETAIL]
+        collect_energy_today = False
+        try:
+            collect_energy_today = \
+                self.config.workarounds['use_energy_today_from_plant']
+        except KeyError:
+            pass
+        if collect_energy_today:
+            _LOGGER.debug("Using stationDetail for energy_today")
+
         for dictkey in attributes:
             key = attributes[dictkey][0]
             type_ = attributes[dictkey][1]
             precision = attributes[dictkey][2]
             if key is not None:
-                value = self._get_value(jsondata, key, type_, precision)
+                value = None
+                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                    value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
 

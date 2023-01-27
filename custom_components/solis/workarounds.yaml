@@ -2,3 +2,7 @@
 
 #SolisCloud returns daily on grid energy a factor 10 off
 correct_daily_on_grid_energy_enabled: false
+#Default energy today is taken from inverter detail. Some experience issues, 
+#alternatively use energy today from plant, as it is the sum of all #inverters 
+#registered under the plant it can only be used with single inverter per plant
+use_energy_today_from_plant: false
