@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.4.2'
+VERSION = '0.4.3'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -446,7 +446,7 @@ class SoliscloudAPI(BaseAPI):
 
             # turn batteryPower negative when discharging (fix for https://github.com/hultenvp/solis-sensor/issues/158)
             try:
-                math.copysign(self._data[BAT_POWER],self._data[BAT_CURRENT])
+                self._data[BAT_POWER] = math.copysign(self._data[BAT_POWER],self._data[BAT_CURRENT])
             except KeyError:
                 pass
 
