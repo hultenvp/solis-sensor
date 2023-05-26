@@ -21,6 +21,7 @@ from .ginlong_api import GinlongAPI, GinlongConfig
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
     INVERTER_ENERGY_TODAY,
+    INVERTER_ACPOWER,
     INVERTER_SERIAL,
     INVERTER_STATE,
     INVERTER_TIMESTAMP_UPDATE
@@ -154,10 +155,11 @@ class InverterService():
         for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
-                if attribute == INVERTER_ENERGY_TODAY:
-                    # Energy_today is not reset at midnight, but in the morning at
-                    # sunrise when the inverter switches back on. This messes up the
-                    # energy dashboard. Return 0 while inverter is still off.
+                if attribute == INVERTER_ENERGY_TODAY or attribute == INVERTER_ACPOWER:
+                    # Energy_today and AC power are not reset at midnight, but in the 
+                    # morning at sunrise when the inverter switches back on. This 
+                    # messes up the energy dashboard. Return 0 while inverter is 
+                    # still off.
                     is_am = datetime.now().hour < 12
                     if getattr(data, INVERTER_STATE) == 2 and is_am:
                         value = 0
