@@ -70,7 +70,6 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             plant_id = user_input.get(CONF_PLANT_ID)
             username = user_input.get(CONF_USERNAME)
             password = user_input.get(CONF_PASSWORD)
-            url.rstrip("/")
             if url[:8] != 'https://':
                 errors["base"] = "invalid_path"
             else:
