@@ -34,7 +34,7 @@ CONF_PLANT_ID = 'portal_plant_id'
 
 DOMAIN = "solis"
 SENSOR_PREFIX = 'Solis'
-DEFAULT_DOMAIN = 'https://m.ginlong.com'
+DEFAULT_DOMAIN = 'https://www.soliscloud.com:13333'
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
