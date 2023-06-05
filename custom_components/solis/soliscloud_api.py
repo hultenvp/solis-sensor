@@ -130,7 +130,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2], #If override set
+        #INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2], #If override set
         GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedDayEnergy', float, 2],
         GRID_DAILY_ENERGY_PURCHASED_STR:  ['gridPurchasedDayEnergyStr', str, None],
         GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
@@ -285,12 +285,17 @@ class SoliscloudAPI(BaseAPI):
                 payload = await self._get_inverter_details(device_id, inverter_serial)
                 await asyncio.sleep(1)
                 payload2 = await self._get_station_from_list(self.config.plant_id)
+                await asyncio.sleep(1)
+                payload_detail = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
                 if payload2 is not None:
                     self._collect_station_data(payload2)
+                if payload_detail is not None:
+                    self._collect_plant_data(payload_detail)
+                    self._post_process()
                 if self._data is not None and INVERTER_SERIAL in self._data:
                     return GinlongData(self._data)
                 _LOGGER.debug("Unexpected response from server: %s", payload)
@@ -418,6 +423,19 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
+    def _collect_plant_data(self, payload: dict[str, Any]) -> None:
+        """ Fetch dynamic properties """
+        jsondata = payload['data']
+        attributes = INVERTER_DATA[PLANT_DETAIL]
+
+        for dictkey in attributes:
+            key = attributes[dictkey][0]
+            type_ = attributes[dictkey][1]
+            precision = attributes[dictkey][2]
+            if key is not None:
+                value = self._get_value(jsondata, key, type_, precision)
+                if value is not None:
+                    self._data[dictkey] = value
 
     def _post_process(self) -> None:
         """ Cleanup received data. """
