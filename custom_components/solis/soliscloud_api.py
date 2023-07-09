@@ -106,12 +106,12 @@ INVERTER_DATA: InverterDataType = {
         BAT_TOTAL_ENERGY_DISCHARGED_STR:  ['batteryTotalDischargeEnergyStr', str, None],
         BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
         BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
-        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2],
-        GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None],
-        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2],
-        GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2],
-        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
-        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
+        #GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2], #On Plant detail
+        #GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None], #On Plant detail
+        #GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2], #On Plant detail
+        #GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2], #On Plant detail
+        #GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2], #On Plant detail
+        #GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2], #On Plant detail
         GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 2],
         GRID_TOTAL_ENERGY_PURCHASED_STR:  ['gridPurchasedTotalEnergyStr', str, None],
         GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 2],
@@ -130,7 +130,17 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
+        #INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2], #If override set
+        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedDayEnergy', float, 2],
+        GRID_DAILY_ENERGY_PURCHASED_STR:  ['gridPurchasedDayEnergyStr', str, None],
+        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
+        GRID_MONTHLY_ENERGY_PURCHASED_STR: ['gridPurchasedMonthEnergyStr', str, None],
+        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
+        GRID_YEARLY_ENERGY_PURCHASED_STR: ['gridPurchasedYearEnergyStr', str, None],
+        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellDayEnergy', float, 2],
+        GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
+        GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 2],
+        GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None]
     },
     PLANT_LIST: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
@@ -275,12 +285,17 @@ class SoliscloudAPI(BaseAPI):
                 payload = await self._get_inverter_details(device_id, inverter_serial)
                 await asyncio.sleep(1)
                 payload2 = await self._get_station_from_list(self.config.plant_id)
+                await asyncio.sleep(1)
+                payload_detail = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
                 if payload2 is not None:
                     self._collect_station_data(payload2)
+                if payload_detail is not None:
+                    self._collect_plant_data(payload_detail)
+                    self._post_process()
                 if self._data is not None and INVERTER_SERIAL in self._data:
                     return GinlongData(self._data)
                 _LOGGER.debug("Unexpected response from server: %s", payload)
@@ -408,6 +423,19 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
+    def _collect_plant_data(self, payload: dict[str, Any]) -> None:
+        """ Fetch dynamic properties """
+        jsondata = payload['data']
+        attributes = INVERTER_DATA[PLANT_DETAIL]
+
+        for dictkey in attributes:
+            key = attributes[dictkey][0]
+            type_ = attributes[dictkey][1]
+            precision = attributes[dictkey][2]
+            if key is not None:
+                value = self._get_value(jsondata, key, type_, precision)
+                if value is not None:
+                    self._data[dictkey] = value
 
     def _post_process(self) -> None:
         """ Cleanup received data. """
@@ -435,6 +463,10 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(GRID_TOTAL_ENERGY_PURCHASED, GRID_TOTAL_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_DAILY_ON_GRID_ENERGY, GRID_DAILY_ON_GRID_ENERGY_STR)
             self._fix_units(GRID_TOTAL_ON_GRID_ENERGY, GRID_TOTAL_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_DAILY_ENERGY_PURCHASED, GRID_DAILY_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_MONTHLY_ENERGY_PURCHASED, GRID_MONTHLY_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_YEARLY_ENERGY_PURCHASED, GRID_YEARLY_ENERGY_PURCHASED_STR)
+            self._fix_units(GRID_DAILY_ENERGY_USED, GRID_DAILY_ENERGY_USED_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
