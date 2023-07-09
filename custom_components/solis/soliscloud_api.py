@@ -130,7 +130,7 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        #INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2], #If override set
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2], #If override set
         GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedDayEnergy', float, 2],
         GRID_DAILY_ENERGY_PURCHASED_STR:  ['gridPurchasedDayEnergyStr', str, None],
         GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
@@ -141,11 +141,6 @@ INVERTER_DATA: InverterDataType = {
         GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
         GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 2],
         GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None]
-    },
-    PLANT_LIST: {
-        INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
-        INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
     },
 }
 
@@ -284,15 +279,13 @@ class SoliscloudAPI(BaseAPI):
                 await asyncio.sleep(1)
                 payload = await self._get_inverter_details(device_id, inverter_serial)
                 await asyncio.sleep(1)
-                payload2 = await self._get_station_from_list(self.config.plant_id)
-                await asyncio.sleep(1)
                 payload_detail = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
                     self._post_process()
-                if payload2 is not None:
-                    self._collect_station_data(payload2)
+                #if payload2 is not None:
+                #    self._collect_station_list_data(payload2)
                 if payload_detail is not None:
                     self._collect_plant_data(payload_detail)
                     self._post_process()
@@ -374,35 +367,10 @@ class SoliscloudAPI(BaseAPI):
             _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
         return None
 
-    async def _get_station_from_list(self, plant_id: str) -> dict[str, str] | None:
-        """
-        Fetch Station from Station List
-        """
-
-        params = {}
-        result = await self._post_data_json(PLANT_LIST, params)
-
-        if result[SUCCESS] is True:
-            jsondata : dict[str, str] = result[CONTENT]
-            if jsondata['code'] == '0':
-                try:
-                    for record in jsondata['data']['page']['records']:
-                        if int(record.get('id')) == int(plant_id):
-                            return record
-                    _LOGGER.warning("Not able to find station %s", plant_id)
-                except TypeError:
-                    _LOGGER.debug("Response contains unexpected data: %s", jsondata)
-            else:
-                _LOGGER.info("%s responded with error: %s:%s",PLANT_LIST, \
-                    jsondata['code'], jsondata['msg'])
-        else:
-            _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
-        return None
-
-    def _collect_station_data(self, payload: dict[str, Any]) -> None:
+    def _collect_station_list_data(self, payload: dict[str, Any]) -> None:
         """ Fetch dynamic properties """
         jsondata = payload
-        attributes = INVERTER_DATA[PLANT_DETAIL]
+        attributes = INVERTER_DATA[PLANT_LIST]
         collect_energy_today = False
         try:
             collect_energy_today = \
@@ -427,13 +395,23 @@ class SoliscloudAPI(BaseAPI):
         """ Fetch dynamic properties """
         jsondata = payload['data']
         attributes = INVERTER_DATA[PLANT_DETAIL]
+        collect_energy_today = False
+        try:
+            collect_energy_today = \
+                self.config.workarounds['use_energy_today_from_plant']
+        except KeyError:
+            pass
+        if collect_energy_today:
+            _LOGGER.debug("Using stationDetail for energy_today")
 
         for dictkey in attributes:
             key = attributes[dictkey][0]
             type_ = attributes[dictkey][1]
             precision = attributes[dictkey][2]
             if key is not None:
-                value = self._get_value(jsondata, key, type_, precision)
+                value = None
+                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                    value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
 
