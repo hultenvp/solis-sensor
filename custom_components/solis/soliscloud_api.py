@@ -142,11 +142,6 @@ INVERTER_DATA: InverterDataType = {
         GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 2],
         GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None]
     },
-    PLANT_LIST: {
-        INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
-        INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2] #If override set
-    },
 }
 
 class SoliscloudConfig(PortalConfig):
@@ -283,8 +278,6 @@ class SoliscloudAPI(BaseAPI):
                 # Throttle http calls to avoid 502 error
                 await asyncio.sleep(1)
                 payload = await self._get_inverter_details(device_id, inverter_serial)
-                #await asyncio.sleep(1)
-                #payload2 = await self._get_station_from_list(self.config.plant_id)
                 await asyncio.sleep(1)
                 payload_detail = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
@@ -369,31 +362,6 @@ class SoliscloudAPI(BaseAPI):
                 return jsondata
             else:
                 _LOGGER.info("%s responded with error: %s:%s",PLANT_DETAIL, \
-                    jsondata['code'], jsondata['msg'])
-        else:
-            _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
-        return None
-
-    async def _get_station_from_list(self, plant_id: str) -> dict[str, str] | None:
-        """
-        Fetch Station from Station List
-        """
-
-        params = {}
-        result = await self._post_data_json(PLANT_LIST, params)
-
-        if result[SUCCESS] is True:
-            jsondata : dict[str, str] = result[CONTENT]
-            if jsondata['code'] == '0':
-                try:
-                    for record in jsondata['data']['page']['records']:
-                        if int(record.get('id')) == int(plant_id):
-                            return record
-                    _LOGGER.warning("Not able to find station %s", plant_id)
-                except TypeError:
-                    _LOGGER.debug("Response contains unexpected data: %s", jsondata)
-            else:
-                _LOGGER.info("%s responded with error: %s:%s",PLANT_LIST, \
                     jsondata['code'], jsondata['msg'])
         else:
             _LOGGER.info('Unable to fetch details for Station with ID: %s', plant_id)
