@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.4.4'
+VERSION = '0.5.0'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -66,12 +66,12 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_ACPOWER:                 ['pac', float, 3],
         INVERTER_ACPOWER_STR:             ['pacStr', str, None],
         INVERTER_ACFREQUENCY:             ['fac', float, 2],
-        INVERTER_ENERGY_TODAY:            ['eToday', float, 2], # Default
-        INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 2],
+        INVERTER_ENERGY_TODAY:            ['eToday', float, 3], # Default
+        INVERTER_ENERGY_THIS_MONTH:       ['eMonth', float, 3],
         INVERTER_ENERGY_THIS_MONTH_STR:   ['eMonthStr', str, None],
-        INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 2],
+        INVERTER_ENERGY_THIS_YEAR:        ['eYear', float, 3],
         INVERTER_ENERGY_THIS_YEAR_STR:    ['eYearStr', str, None],
-        INVERTER_ENERGY_TOTAL_LIFE:       ['eTotal', float, 2],
+        INVERTER_ENERGY_TOTAL_LIFE:       ['eTotal', float, 3],
         INVERTER_ENERGY_TOTAL_LIFE_STR:   ['eTotalStr', str, None],
         STRING_COUNT:                     ['dcInputtype', int, None],
         STRING1_VOLTAGE:                  ['uPv1', float, 2],
@@ -104,17 +104,17 @@ INVERTER_DATA: InverterDataType = {
         BAT_TOTAL_ENERGY_CHARGED_STR:     ['batteryTotalChargeEnergyStr', str, None],
         BAT_TOTAL_ENERGY_DISCHARGED:      ['batteryTotalDischargeEnergy', float, 3],
         BAT_TOTAL_ENERGY_DISCHARGED_STR:  ['batteryTotalDischargeEnergyStr', str, None],
-        BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 2],
-        BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 2],
+        BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 3],
+        BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 3],
         #GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2], #On Plant detail
         #GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None], #On Plant detail
         #GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2], #On Plant detail
         #GRID_DAILY_ENERGY_USED:           ['homeLoadTodayEnergy', float, 2], #On Plant detail
         #GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2], #On Plant detail
         #GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2], #On Plant detail
-        GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 2],
+        GRID_TOTAL_ENERGY_PURCHASED:      ['gridPurchasedTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_PURCHASED_STR:  ['gridPurchasedTotalEnergyStr', str, None],
-        GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 2],
+        GRID_TOTAL_ON_GRID_ENERGY:        ['gridSellTotalEnergy', float, 3],
         GRID_TOTAL_ON_GRID_ENERGY_STR:    ['gridSellTotalEnergyStr', str, None],
         GRID_TOTAL_POWER:                 ['psum', float, 3],
         GRID_TOTAL_POWER_STR:             ['psumStr', str, None],
@@ -130,16 +130,16 @@ INVERTER_DATA: InverterDataType = {
         INVERTER_LAT:                     ['latitude', float, 7],
         INVERTER_LON:                     ['longitude', float, 7],
         INVERTER_ADDRESS:                 ['cityStr', str, None],
-        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 2], #If override set
-        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedDayEnergy', float, 2],
+        INVERTER_ENERGY_TODAY:            ['dayEnergy', float, 3], #If override set
+        GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedDayEnergy', float, 3],
         GRID_DAILY_ENERGY_PURCHASED_STR:  ['gridPurchasedDayEnergyStr', str, None],
-        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 2],
+        GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 3],
         GRID_MONTHLY_ENERGY_PURCHASED_STR: ['gridPurchasedMonthEnergyStr', str, None],
-        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 2],
+        GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 3],
         GRID_YEARLY_ENERGY_PURCHASED_STR: ['gridPurchasedYearEnergyStr', str, None],
-        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellDayEnergy', float, 2],
+        GRID_DAILY_ON_GRID_ENERGY:        ['gridSellDayEnergy', float, 3],
         GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
-        GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 2],
+        GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 3],
         GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None]
     },
 }
