@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.4.3'
+VERSION = '0.4.4'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -461,9 +461,13 @@ class SoliscloudAPI(BaseAPI):
             # just making 0 voltage. So this is too simplistic.
             # mypy trips over self_data[STRING_COUNT] as it could be of type str, int or float
             # needs to be fixed at some point in time, but this works.
-            for i, stringlist in enumerate(STRING_LISTS):
-                if i > int(self._data[STRING_COUNT]):
-                    self._purge_if_unused(0, *stringlist)
+            try:
+                for i, stringlist in enumerate(STRING_LISTS):
+                    if i > int(self._data[STRING_COUNT]):
+                        self._purge_if_unused(0, *stringlist)
+            except KeyError:
+                # Ignore offline inverters
+                pass
 
     def _fix_units(self, num_key: str, units_key: str) -> None:
         """ Convert numeric values according to the units reported by the API. """
