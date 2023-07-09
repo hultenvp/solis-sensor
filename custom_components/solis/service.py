@@ -36,7 +36,7 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -161,8 +161,11 @@ class InverterService():
                     # messes up the energy dashboard. Return 0 while inverter is 
                     # still off.
                     is_am = datetime.now().hour < 12
-                    if getattr(data, INVERTER_STATE) == 2 and is_am:
-                        value = 0
+                    if getattr(data, INVERTER_STATE) == 2:
+                        if is_am:
+                            value = 0
+                        else:
+                            return
                     elif getattr(data, INVERTER_STATE) == 1 and is_am:
                         last_updated_state = None
                         try:
