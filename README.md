@@ -1,13 +1,13 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-# Solis sensor integration
+# SolisCloud sensor integration
 HomeAssistant sensor for SolisCloud portal. 
 Still questions after the readme? Read the [wiki](https://github.com/hultenvp/solis-sensor/wiki) or look at the [discussions page](https://github.com/hultenvp/solis-sensor/discussions)
 
 ## SolisCloud
->❗The SolisCloud API is known to be unstable and can fail to respond resulting in "no inverter found" issues. See [known limitations](#warning--known-limitations) section. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
+>❗The SolisCloud API is known to be unstable and can fail to respond resulting in "no inverter found" issues. See [troubleshooting](#warning--known-limitations) section. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
 
-[SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. It's unknown to me if the other brands are also supported.
+[SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. 
 
 The new portal requires a key-id, secret and username to function.
 You can obtain key and secret via SolisCloud.
@@ -20,12 +20,12 @@ You can obtain key and secret via SolisCloud.
 * Once confirmed, you get the API ID, secret and API URL
 
 ## Platform v2 (legacy, not maintained)
-Platform V2 backend wass used by Ginlong before shutdown in may 2023 and the same backend is also used for different PV inverter brand portals. The platform v2 support logs in to the platform and exposes the data retrieved as sensors.
+Platform V2 backend wass used by Ginlong before being decomissioned in may 2023. The same backend API is also used for different PV inverter brand portals. The platform v2 integration logs in to the platform and exposes the data retrieved as sensors.
 Keeping as legacy for:
 * Solarman (home.solarman.cn)
 * Sofar solar (home.solarman.cn)
 
-> Platform V2 backend wass used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Let me know if it works with for other inverter types as well and I'll add them to the list of confirmed portals.
+> Platform V2 backend wass used by Ginlong and MyEvolveCloud and the same backend is also used for different PV inverter brand portals. I've only tested it in context of Solis with the Ginlong platform. Since Ginlong now is decomissioned I have no further means to test and will not process change requests.
 
 ## HACS installation
 
@@ -55,17 +55,19 @@ custom_components
 │   └── workarounds.yaml
 ```
 ### :warning:  Troubleshooting
+SolisCloud is in production since 2021, but still suffers from instability. This can manifest itself as issues during setup, but also as regression/instabilities after service maintenance.
+Below are issues that were encountered in the past and some suggestions how to resolve/troubleshoot.
+
+#### No inverters found
+Repeated "No inverters found" errors that do not recover automatically within a few hours sometimes block a successful configuration. Check the following:
+* Check if the plant ID is present on SolisCloud. If missing then change the name of the installation by choosing "change information" on the top right of the overview page. After that a plantid is generated.
+* Try creating a new API key
 
 #### HTTP 408 Error
 Not a real limitation, but a feature of the API. It caused by differences of more than 15 minutes between your local time and server time. This can happen when you run HA in a VM. ***Update your local time.***
 
 #### Server timeouts
 Just wait, they'll pass. Sometimes minutes, sometimes longer. This can be frustrating however if it happens during configuration.
-
-#### No inverters found
-Repeated "No inverters found" errors that do not recover automatically within a few hours sometimes block a successful configuration. Check the following:
-* Check if the plant ID is present on SolisCloud. If missing then change the name of the installation and an ID is assigned.
-* Try creating a new API key
 
 #### The Chinese error message that translates into "Abnormal data"
 Make sure debug is ON and make confirm you get an error messsage with Chinese text: [custom_components.solis.soliscloud_api] {'Success': True, 'Message': 'OK', 'StatusCode': 200, 'Content': {'success': True, 'code': '1', 'msg': '数据异常 请联系管理员', 'data': None}}. 
@@ -99,7 +101,7 @@ The integration can be configured via the UI.
 
 If the plant id in the overview page (https://soliscloud.com/#/station/stationdetail_1?id=xxxxxxxxxxx) is empty then you will get "no inverter found errors. Change the name of the installation by choosing "change information" on the top right of the overview page. After that a plantid is generated.
 
-**Ginlong platform v2**   
+**Ginlong platform v2 (deprecated, left in for legacy support)**   
 * Provide username, password and plant id. If you want to add multiple plants just repeat "add integration" for each plant.
 
 # Energy dashboard
