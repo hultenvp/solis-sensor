@@ -285,13 +285,12 @@ class SoliscloudAPI(BaseAPI):
                 if payload is not None:
                     #_LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
-                    self._post_process()
                 #if payload2 is not None:
                 #    self._collect_station_list_data(payload2)
                 if payload_detail is not None:
                     self._collect_plant_data(payload_detail)
-                    self._post_process()
                 if self._data is not None and INVERTER_SERIAL in self._data:
+                    self._post_process()
                     return GinlongData(self._data)
                 _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
