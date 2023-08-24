@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.5.0'
+VERSION = '0.5.1'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -123,7 +123,9 @@ INVERTER_DATA: InverterDataType = {
         GRID_TOTAL_ENERGY_USED:           ['homeLoadTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
         SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
-        SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0]
+        SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0],
+        BYPASS_LOAD_POWER:                ['bypassLoadPower', float, 3],
+        BYPASS_LOAD_POWER_STR:            ['bypassLoadPowerStr', str, None],
     },
     PLANT_DETAIL: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
@@ -445,6 +447,7 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(GRID_MONTHLY_ENERGY_PURCHASED, GRID_MONTHLY_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_YEARLY_ENERGY_PURCHASED, GRID_YEARLY_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_DAILY_ENERGY_USED, GRID_DAILY_ENERGY_USED_STR)
+            self._fix_units(BYPASS_LOAD_POWER, BYPASS_LOAD_POWER_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
