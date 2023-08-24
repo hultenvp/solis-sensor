@@ -503,4 +503,12 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         SOC_DISCHARGE_SET
     ],
+    'bypassloadpower': [
+        'Backup Load Power',
+        POWER_WATT,
+        'mdi:battery-charging',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        BYPASS_LOAD_POWER
+    ],
 }
