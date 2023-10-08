@@ -54,6 +54,8 @@ custom_components
 │   ├── strings.json
 │   └── workarounds.yaml
 ```
+Now restart your Home Assistant Instance before continuing to the next step
+
 ### :warning:  Troubleshooting
 SolisCloud is in production since 2021, but still suffers from instability. This can manifest itself as issues during setup, but also as regression/instabilities after service maintenance.
 Below are issues that were encountered in the past and some suggestions how to resolve/troubleshoot.
