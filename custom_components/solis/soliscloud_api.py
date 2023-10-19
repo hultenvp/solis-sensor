@@ -118,14 +118,21 @@ INVERTER_DATA: InverterDataType = {
         GRID_TOTAL_ON_GRID_ENERGY_STR:    ['gridSellTotalEnergyStr', str, None],
         GRID_TOTAL_POWER:                 ['psum', float, 3],
         GRID_TOTAL_POWER_STR:             ['psumStr', str, None],
-        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
-        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         GRID_TOTAL_ENERGY_USED:           ['homeLoadTotalEnergy', float, 3],
         GRID_TOTAL_ENERGY_USED_STR:       ['homeLoadTotalEnergyStr', str, None],
+        GRID_PHASE1_POWER:                ['pA', float, 3],
+        GRID_PHASE2_POWER:                ['pB', float, 3],
+        GRID_PHASE3_POWER:                ['pC', float, 3],
+        GRID_APPARENT_PHASE1_POWER:       ['aLookedPower', float, 3],
+        GRID_APPARENT_PHASE2_POWER:       ['bLookedPower', float, 3],
+        GRID_APPARENT_PHASE3_POWER:       ['cLookedPower', float, 3],
+        GRID_REACTIVE_PHASE1_POWER:       ['aReactivePower', float, 3],
+        GRID_REACTIVE_PHASE2_POWER:       ['bReactivePower', float, 3],
+        GRID_REACTIVE_PHASE3_POWER:       ['cReactivePower', float, 3],
         SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
         SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0],
         BYPASS_LOAD_POWER:                ['bypassLoadPower', float, 3],
-        BYPASS_LOAD_POWER_STR:            ['bypassLoadPowerStr', str, None],
+        BYPASS_LOAD_POWER_STR:            ['bypassLoadPowerStr', str, None]
     },
     PLANT_DETAIL: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?
@@ -142,7 +149,9 @@ INVERTER_DATA: InverterDataType = {
         GRID_DAILY_ON_GRID_ENERGY:        ['gridSellDayEnergy', float, 3],
         GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
         GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 3],
-        GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None]
+        GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None],
+        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
+        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None]
     },
 }
 
