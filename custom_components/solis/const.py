@@ -14,6 +14,8 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
+    POWER_AMPERE,
+    POWER_VOLT,
     ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
@@ -510,5 +512,21 @@ SENSOR_TYPES = {
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
         BYPASS_LOAD_POWER
+    ],
+    'meterItemACurrent': [
+        'Meter item A current',
+        POWER_AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_CURRENT
+    ],
+    'meterItemAVoltage': [
+        'Meter item A volt',
+        POWER_VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_VOLTAGE
     ],
 }
