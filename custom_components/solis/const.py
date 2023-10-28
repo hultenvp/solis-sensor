@@ -529,4 +529,36 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         METER_ITEM_A_VOLTAGE
     ],
+    'meterItemBCurrent': [
+        'Meter item B current',
+        POWER_AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_B_CURRENT
+    ],
+    'meterItemBVoltage': [
+        'Meter item B volt',
+        POWER_VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_VOLTAGE
+    ],
+    'meterItemCCurrent': [
+        'Meter item C current',
+        POWER_AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_C_CURRENT
+    ],
+    'meterItemCVoltage': [
+        'Meter item C volt',
+        POWER_VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_C_VOLTAGE
+    ],
 }
