@@ -14,8 +14,6 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
-    POWER_AMPERE,
-    POWER_VOLT,
     ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
@@ -515,7 +513,7 @@ SENSOR_TYPES = {
     ],
     'meterItemACurrent': [
         'Meter item A current',
-        POWER_AMPERE,
+        ELECTRIC_CURRENT_AMPERE,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -523,7 +521,7 @@ SENSOR_TYPES = {
     ],
     'meterItemAVoltage': [
         'Meter item A volt',
-        POWER_VOLT,
+        ELECTRIC_POTENTIAL_VOLT,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -531,7 +529,7 @@ SENSOR_TYPES = {
     ],
     'meterItemBCurrent': [
         'Meter item B current',
-        POWER_AMPERE,
+        ELECTRIC_CURRENT_AMPERE,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -539,15 +537,15 @@ SENSOR_TYPES = {
     ],
     'meterItemBVoltage': [
         'Meter item B volt',
-        POWER_VOLT,
+        ELECTRIC_POTENTIAL_VOLT,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
-        METER_ITEM_A_VOLTAGE
+        METER_ITEM_B_VOLTAGE
     ],
     'meterItemCCurrent': [
         'Meter item C current',
-        POWER_AMPERE,
+        ELECTRIC_CURRENT_AMPERE,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
@@ -555,7 +553,7 @@ SENSOR_TYPES = {
     ],
     'meterItemCVoltage': [
         'Meter item C volt',
-        POWER_VOLT,
+        ELECTRIC_POTENTIAL_VOLT,
         'mdi:home-import-outline',
         DEVICE_CLASS_POWER,
         STATE_CLASS_MEASUREMENT,
