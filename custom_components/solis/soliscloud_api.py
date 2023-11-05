@@ -25,6 +25,7 @@ import yaml
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
 from .soliscloud_const import *
+from .solis_remotecontrol_const import *
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,6 +49,9 @@ VERB = "POST"
 INVERTER_DETAIL = '/v1/api/inverterDetail'
 PLANT_DETAIL = '/v1/api/stationDetail'
 PLANT_LIST = '/v1/api/userStationList'
+
+// Remote control API for a single device.
+REMOTE_CONTROL = '/v2/api/control'
 
 InverterDataType = dict[str, dict[str, list]]
 
@@ -153,6 +157,13 @@ INVERTER_DATA: InverterDataType = {
         GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
         GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None]
     },
+    REMOTE_CONTROL:{
+        INVERTER_SN:                      ['inverterSN', str, None],
+        INVERTER_ID:                      ['inverterId', str, None],
+        INSTRUCTION_ID:                   ['cid', float, 7],
+        INSTRUCTION_VALUE:                ['value', str, None],
+        NMI_CODE:                         ['nmiCode', str, None],
+    }
 }
 
 class SoliscloudConfig(PortalConfig):
@@ -233,6 +244,8 @@ class SoliscloudAPI(BaseAPI):
             try:
                 data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
                 self._plant_name = getattr(data, INVERTER_PLANT_NAME)
+
+                await self.fetch_remote_control_data(next(iter(self._inverter_list)))
             except AttributeError:
                 _LOGGER.info("Failed to acquire plant name, login failed")
                 self._is_online = False
@@ -303,7 +316,72 @@ class SoliscloudAPI(BaseAPI):
                     return GinlongData(self._data)
                 _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
+    
+    async def fetch_remote_control_data(self, inverter_serial: str) -> GinlongData | None:
+        """
+        Fetch remote control information
+        Collect available data from payload and store as GinlongData object
+        """
 
+        _LOGGER.debug("Fetching data for remote control serial: %s", inverter_serial)
+        self._data = {}
+        if self.is_online:
+            if self._inverter_list is not None and inverter_serial in self._inverter_list:
+                device_id = self._inverter_list[inverter_serial]
+                # Throttle http calls to avoid 502 error
+                await asyncio.sleep(1)
+                payload = await self._get_remote_property(device_id, inverter_serial, INSTRUCTION_BATTERYMODEL)
+                if payload is not None:
+                    _LOGGER.debug("%s", payload)
+ 
+                """
+                    self._collect_inverter_data(payload)
+                await asyncio.sleep(1)
+                payload_detail = await self._get_station_details(self.config.plant_id)
+                if payload is not None:
+                    #_LOGGER.debug("%s", payload)
+                    self._collect_inverter_data(payload)
+                #if payload2 is not None:
+                #    self._collect_station_list_data(payload2)
+                if payload_detail is not None:
+                    self._collect_plant_data(payload_detail)
+                if self._data is not None and INVERTER_SERIAL in self._data:
+                    self._post_process()
+                    return GinlongData(self._data)
+
+                """
+                _LOGGER.debug("Unexpected response from server: %s", payload)
+        return None
+
+
+    async def _get_remote_property(self,
+        device_id: str,
+        device_serial: str,
+        instruction_id: int
+    ) -> dict[str, Any] | None:
+        """
+        Retrieve remote control property of the specified instruction
+        """
+
+        # Get inverter details
+        params = {
+            'inverterSn': device_serial,
+            'inverterId': device_id,
+            'cid': instruction_id,
+            'value': ""        }
+
+        result = await self._post_data_json(REMOTE_CONTROL, params)
+
+        jsondata = None
+        if result[SUCCESS] is True:
+            jsondata = result[CONTENT]
+            if jsondata['code'] != '0':
+                _LOGGER.info("%s responded with error: %s:%s",INVERTER_DETAIL, \
+                    jsondata['code'], jsondata['msg'])
+                return None
+        else:
+            _LOGGER.info('Unable to fetch details for device with ID: %s', device_id)
+        return jsondata
 
     async def _get_inverter_details(self,
         device_id: str,
