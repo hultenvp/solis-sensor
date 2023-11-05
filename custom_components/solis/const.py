@@ -34,8 +34,8 @@ CONF_SECRET = 'portal_secret'
 CONF_KEY_ID = 'portal_key_id'
 CONF_PLANT_ID = 'portal_plant_id'
 
-DOMAIN = "solis"
-SENSOR_PREFIX = 'Solis'
+DOMAIN = "solisRemmote"
+SENSOR_PREFIX = 'solisRemmote'
 DEFAULT_DOMAIN = 'https://www.soliscloud.com:13333'
 
 # Supported sensor types:

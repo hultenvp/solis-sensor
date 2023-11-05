@@ -36,3 +36,10 @@ GRID_MONTHLY_ENERGY_PURCHASED_STR = 'monthlyEnergyPurchasedUnit'
 GRID_YEARLY_ENERGY_PURCHASED_STR = 'yearlyEnergyPurchasedUnit'
 GRID_DAILY_ENERGY_USED_STR = 'dailyEnergyUsedUnit'
 BYPASS_LOAD_POWER_STR = 'bypassLoadPowerUnit'
+
+# From remote control API
+INVERTER_SN = 'inverterSN'
+INVERTER_ID = 'inverterId'
+INSTRUCTION_ID = 'cid'
+INSTRUCTION_VALUE = 'value'
+NMI_CODE = 'nmiCode'

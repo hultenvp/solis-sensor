@@ -1,5 +1,5 @@
 {
-  "domain": "solisRemmote",
+  "domain": "solisRemote",
   "version": "0.0.1",
   "config_flow": true,
   "name": "Solis Inverter",
