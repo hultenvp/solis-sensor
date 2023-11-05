@@ -1,11 +1,11 @@
 {
   "domain": "solis",
-  "version": "3.5.0",
+  "version": "0.0.1",
   "config_flow": true,
   "name": "Solis Inverter",
   "iot_class": "cloud_push",
-  "documentation": "https://github.com/hultenvp/solis-sensor/",
-  "issue_tracker": "https://github.com/hultenvp/solis-sensor/issues",
+  "documentation": "https://github.com/bryanajwells/solis-sensor",
+  "issue_tracker": "https://github.com/bryanajwells/solis-sensor/issues",
   "dependencies": [],
-  "codeowners": ["@hultenvp"]
+  "codeowners": ["@bryanajwells"]
 }
