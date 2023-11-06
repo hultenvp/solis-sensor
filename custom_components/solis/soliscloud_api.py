@@ -50,7 +50,7 @@ INVERTER_DETAIL = '/v1/api/inverterDetail'
 PLANT_DETAIL = '/v1/api/stationDetail'
 PLANT_LIST = '/v1/api/userStationList'
 
-// Remote control API for a single device.
+# Remote control API for a single device.
 REMOTE_CONTROL = '/v2/api/control'
 
 InverterDataType = dict[str, dict[str, list]]
