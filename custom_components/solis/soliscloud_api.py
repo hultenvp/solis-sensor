@@ -132,7 +132,13 @@ INVERTER_DATA: InverterDataType = {
         SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
         SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0],
         BYPASS_LOAD_POWER:                ['bypassLoadPower', float, 3],
-        BYPASS_LOAD_POWER_STR:            ['bypassLoadPowerStr', str, None]
+        BYPASS_LOAD_POWER_STR:            ['bypassLoadPowerStr', str, None],
+        METER_ITEM_A_CURRENT:             ['iA', float, 3],
+        METER_ITEM_A_VOLTAGE:             ['uA', float, 3],
+        METER_ITEM_B_CURRENT:             ['iB', float, 3],
+        METER_ITEM_B_VOLTAGE:             ['uB', float, 3],
+        METER_ITEM_C_CURRENT:             ['iC', float, 3],
+        METER_ITEM_C_VOLTAGE:             ['uC', float, 3],
     },
     PLANT_DETAIL: {
         INVERTER_PLANT_NAME:              ['sno', str, None], #stationName no longer available?

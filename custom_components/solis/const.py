@@ -585,4 +585,52 @@ SENSOR_TYPES = {
         STATE_CLASS_MEASUREMENT,
         BYPASS_LOAD_POWER
     ],
+    'meterItemACurrent': [
+        'Meter item A current',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_CURRENT
+    ],
+    'meterItemAVoltage': [
+        'Meter item A volt',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_VOLTAGE
+    ],
+    'meterItemBCurrent': [
+        'Meter item B current',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_B_CURRENT
+    ],
+    'meterItemBVoltage': [
+        'Meter item B volt',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_B_VOLTAGE
+    ],
+    'meterItemCCurrent': [
+        'Meter item C current',
+        ELECTRIC_CURRENT_AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_C_CURRENT
+    ],
+    'meterItemCVoltage': [
+        'Meter item C volt',
+        ELECTRIC_POTENTIAL_VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_C_VOLTAGE
+    ],
 }
