@@ -7,7 +7,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from .ginlong_const import *
 
 # VERSION
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 
 STRING_COUNT = 'dcStringCount'
 STRING_LISTS = [
@@ -30,6 +30,8 @@ BAT_CURRENT_STR = 'batteryCurrentUnit'
 BAT_VOLTAGE_STR = 'batteryVoltageUnit'
 GRID_TOTAL_ENERGY_PURCHASED_STR = 'totalEnergyPurchasedUnit'
 GRID_DAILY_ON_GRID_ENERGY_STR = 'dailyOnGridEnergyUnit'
+GRID_MONTHLY_ON_GRID_ENERGY_STR = 'monthlyOnGridEnergyUnit'
+GRID_YEARLY_ON_GRID_ENERGY_STR = 'yearlyOnGridEnergyUnit'
 GRID_TOTAL_ON_GRID_ENERGY_STR = 'totalOnGridEnergyUnit'
 GRID_DAILY_ENERGY_PURCHASED_STR = 'dailyEnergyPurchasedUnit'
 GRID_MONTHLY_ENERGY_PURCHASED_STR = 'monthlyEnergyPurchasedUnit'
