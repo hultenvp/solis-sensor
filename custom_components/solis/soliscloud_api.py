@@ -29,7 +29,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -144,8 +144,12 @@ INVERTER_DATA: InverterDataType = {
         GRID_DAILY_ENERGY_PURCHASED_STR:  ['gridPurchasedDayEnergyStr', str, None],
         GRID_MONTHLY_ENERGY_PURCHASED:    ['gridPurchasedMonthEnergy', float, 3],
         GRID_MONTHLY_ENERGY_PURCHASED_STR: ['gridPurchasedMonthEnergyStr', str, None],
+        GRID_MONTHLY_ON_GRID_ENERGY:      ['gridSellMonthEnergy', float, 3],
+        GRID_MONTHLY_ON_GRID_ENERGY_STR:  ['gridSellMonthEnergyStr', str, None],
         GRID_YEARLY_ENERGY_PURCHASED:     ['gridPurchasedYearEnergy', float, 3],
         GRID_YEARLY_ENERGY_PURCHASED_STR: ['gridPurchasedYearEnergyStr', str, None],
+        GRID_YEARLY_ON_GRID_ENERGY:       ['gridSellYearEnergy', float, 3],
+        GRID_YEARLY_ON_GRID_ENERGY_STR:   ['gridSellYearEnergyStr', str, None],
         GRID_DAILY_ON_GRID_ENERGY:        ['gridSellDayEnergy', float, 3],
         GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
         GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 3],
@@ -450,6 +454,8 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(INVERTER_ENERGY_TOTAL_LIFE, INVERTER_ENERGY_TOTAL_LIFE_STR)
             self._fix_units(GRID_TOTAL_ENERGY_PURCHASED, GRID_TOTAL_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_DAILY_ON_GRID_ENERGY, GRID_DAILY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_MONTHLY_ON_GRID_ENERGY, GRID_MONTHLY_ON_GRID_ENERGY_STR)
+            self._fix_units(GRID_YEARLY_ON_GRID_ENERGY, GRID_YEARLY_ON_GRID_ENERGY_STR)
             self._fix_units(GRID_TOTAL_ON_GRID_ENERGY, GRID_TOTAL_ON_GRID_ENERGY_STR)
             self._fix_units(GRID_DAILY_ENERGY_PURCHASED, GRID_DAILY_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_MONTHLY_ENERGY_PURCHASED, GRID_MONTHLY_ENERGY_PURCHASED_STR)
