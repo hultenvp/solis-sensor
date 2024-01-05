@@ -7,7 +7,7 @@
 """
 
 # VERSION
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 INVERTER_SERIAL = 'serial'
 INVERTER_PLANT_ID = 'plantID'
@@ -65,8 +65,10 @@ GRID_DAILY_ENERGY_PURCHASED = 'dailyEnergyPurchased'
 GRID_DAILY_ENERGY_USED = 'dailyEnergyUsed'
 GRID_MONTHLY_ENERGY_PURCHASED = 'monthlyEnergyPurchased'
 GRID_MONTHLY_ENERGY_USED = 'monthlyEnergyUsed'
+GRID_MONTHLY_ON_GRID_ENERGY = 'monthlyOnGridEnergy'
 GRID_YEARLY_ENERGY_PURCHASED = 'yearlyEnergyPurchased'
 GRID_YEARLY_ENERGY_USED = 'yearlyEnergyUsed'
+GRID_YEARLY_ON_GRID_ENERGY = 'yearlyOnGridEnergy'
 GRID_TOTAL_ON_GRID_ENERGY = 'totalOnGridEnergy'
 GRID_TOTAL_CONSUMPTION_ENERGY = 'totalConsumptionEnergy'
 GRID_TOTAL_POWER = 'totalPower'
