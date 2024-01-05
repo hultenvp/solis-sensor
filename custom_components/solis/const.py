@@ -8,12 +8,14 @@ from homeassistant.components.sensor import (
 
 from homeassistant.const import (
     UnitOfPower,
+    UnitOfApparentPower,
     UnitOfEnergy,
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
     UnitOfTemperature,
+    UnitOfFrequency,
+    POWER_VOLT_AMPERE_REACTIVE,
     PERCENTAGE,
-    FREQUENCY_HERTZ,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
@@ -33,7 +35,7 @@ CONF_PLANT_ID = 'portal_plant_id'
 
 DOMAIN = "solis"
 SENSOR_PREFIX = 'Solis'
-DEFAULT_DOMAIN = 'https://m.ginlong.com'
+DEFAULT_DOMAIN = 'https://www.soliscloud.com:13333'
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
@@ -248,7 +250,7 @@ SENSOR_TYPES = {
     ],
     'acfrequency': [
         'AC Frequency',
-        FREQUENCY_HERTZ,
+        UnitOfFrequency.HERTZ,
         'mdi:sine-wave',
         None,
         STATE_CLASS_MEASUREMENT,
@@ -414,6 +416,14 @@ SENSOR_TYPES = {
         STATE_CLASS_TOTAL_INCREASING,
         GRID_MONTHLY_ENERGY_USED
     ],
+    'gridmontlyongridenergy': [
+        'Monthly On-grid Energy',
+        UnitOfEnergy.KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_MONTHLY_ON_GRID_ENERGY
+    ],
     'gridyearlyenergypurchased': [
         'Yearly Grid Energy Purchased',
         UnitOfEnergy.KILO_WATT_HOUR,
@@ -429,6 +439,14 @@ SENSOR_TYPES = {
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         GRID_YEARLY_ENERGY_USED
+    ],
+    'gridyearlyongridenergy': [
+        'Yearly On-grid Energy',
+        UnitOfEnergy.KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_YEARLY_ON_GRID_ENERGY
     ],
     'gridtotalongridenergy': [
         'Total On-grid Energy',
@@ -478,6 +496,78 @@ SENSOR_TYPES = {
         STATE_CLASS_TOTAL_INCREASING,
         GRID_TOTAL_ENERGY_USED
     ],
+    'gridphase1power': [
+        'Grid Phase1 Power',
+        UnitOfPower.WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_PHASE1_POWER
+    ],
+    'gridphase2power': [
+        'Grid Phase2 Power',
+        UnitOfPower.WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_PHASE2_POWER
+    ],
+    'gridphase3power': [
+        'Grid Phase3 Power',
+        UnitOfPower.WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_PHASE3_POWER
+    ],
+    'gridapparentphase1power': [
+        'Grid Phase1 Apparent Power',
+        UnitOfApparentPower.VOLT_AMPERE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_APPARENT_PHASE1_POWER
+    ],
+    'gridapparentphase2power': [
+        'Grid Phase2 Apparent Power',
+        UnitOfApparentPower.VOLT_AMPERE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_APPARENT_PHASE2_POWER
+    ],
+    'gridapparentphase3power': [
+        'Grid Phase3 Apparent Power',
+        UnitOfApparentPower.VOLT_AMPERE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_APPARENT_PHASE3_POWER
+    ],
+    'gridreactivephase1power': [
+        'Grid Phase1 Reactive Power',
+        POWER_VOLT_AMPERE_REACTIVE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_REACTIVE_PHASE1_POWER
+    ],
+    'gridreactivephase2power': [
+        'Grid Phase2 Reactive Power',
+        POWER_VOLT_AMPERE_REACTIVE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_REACTIVE_PHASE2_POWER
+    ],
+    'gridreactivephase3power': [
+        'Grid Phase3 Reactive Power',
+        POWER_VOLT_AMPERE_REACTIVE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_REACTIVE_PHASE3_POWER
+    ],
     'batstateofhealth': [
         'Battery State Of Health',
         PERCENTAGE,
@@ -501,5 +591,61 @@ SENSOR_TYPES = {
         DEVICE_CLASS_BATTERY,
         STATE_CLASS_MEASUREMENT,
         SOC_DISCHARGE_SET
+    ],
+    'bypassloadpower': [
+        'Backup Load Power',
+        UnitOfPower.WATT,
+        'mdi:battery-charging',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        BYPASS_LOAD_POWER
+    ],
+    'meterItemACurrent': [
+        'Meter item A current',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_CURRENT
+    ],
+    'meterItemAVoltage': [
+        'Meter item A volt',
+        UnitOfElectricPotential.VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_A_VOLTAGE
+    ],
+    'meterItemBCurrent': [
+        'Meter item B current',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_B_CURRENT
+    ],
+    'meterItemBVoltage': [
+        'Meter item B volt',
+        UnitOfElectricPotential.VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_B_VOLTAGE
+    ],
+    'meterItemCCurrent': [
+        'Meter item C current',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_CURRENT,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_C_CURRENT
+    ],
+    'meterItemCVoltage': [
+        'Meter item C volt',
+        UnitOfElectricPotential.VOLT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_VOLTAGE,
+        STATE_CLASS_MEASUREMENT,
+        METER_ITEM_C_VOLTAGE
     ],
 }

@@ -70,7 +70,6 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             plant_id = user_input.get(CONF_PLANT_ID)
             username = user_input.get(CONF_USERNAME)
             password = user_input.get(CONF_PASSWORD)
-            url.rstrip("/")
             if url[:8] != 'https://':
                 errors["base"] = "invalid_path"
             else:
@@ -139,7 +138,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if self._async_entry_exists(user_input.get(CONF_PLANT_ID)):
                 _str = f"The configuration for plant {user_input.get(CONF_PLANT_ID)} \
                     has already been imported, please remove from configuration.yaml"
-                _LOGGER.debug(_str)
+                _LOGGER.warning(_str)
                 return self.async_abort(reason="already_configured")
             url = user_input.get(CONF_PORTAL_DOMAIN)
             if url[:4] != 'http':

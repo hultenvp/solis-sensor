@@ -6,6 +6,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from __future__ import annotations
 
 import logging
+import time
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -20,18 +21,22 @@ from .ginlong_api import GinlongAPI, GinlongConfig
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .ginlong_const import (
     INVERTER_ENERGY_TODAY,
+    INVERTER_ACPOWER,
     INVERTER_SERIAL,
-    INVERTER_STATE
+    INVERTER_STATE,
+    INVERTER_TIMESTAMP_UPDATE
 )
 
 # REFRESH CONSTANTS
-SCHEDULE_OK = 2
+# Match up with the default SolisCloud API resolution of 5 minutes
+SCHEDULE_OK = 5
+# Attempt retries every 1 minute if we fail to talk to the API, though
 SCHEDULE_NOK = 1
 
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.0.1'
+VERSION = '1.0.3'
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
@@ -150,14 +155,18 @@ class InverterService():
         for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
-                if attribute == INVERTER_ENERGY_TODAY:
-                    # Energy_today is not reset at midnight, but in the morning at
-                    # sunrise when the inverter switches back on. This messes up the
-                    # energy dashboard. Return 0 while inverter is still off.
+                if attribute == INVERTER_ENERGY_TODAY or attribute == INVERTER_ACPOWER:
+                    # Energy_today and AC power are not reset at midnight, but in the 
+                    # morning at sunrise when the inverter switches back on. This 
+                    # messes up the energy dashboard. Return 0 while inverter is 
+                    # still off.
                     is_am = datetime.now().hour < 12
-                    if getattr(data, INVERTER_STATE) == 2 and is_am:
-                        value = 0
-                    elif getattr(data, INVERTER_STATE) == 1 and is_am:
+                    if getattr(data, INVERTER_STATE) == 2:
+                        if is_am:
+                            value = 0
+                        else:
+                            continue
+                    elif getattr(data, INVERTER_STATE) == 1:
                         last_updated_state = None
                         try:
                             last_updated_state = \
@@ -165,33 +174,47 @@ class InverterService():
                         except KeyError:
                             pass
                         if last_updated_state is not None:
-                            # Hybrid systems do not reset in the morning, but just after midnight.
-                            if last_updated_state.hour == 0 and last_updated_state.minute < 15:
-                                value = 0
-                            # Avoid race conditions when between state change in the morning and
-                            # energy today being reset by adding 5 min grace period and
-                            # skipping update
-                            elif last_updated_state + timedelta(minutes=5) > datetime.now():
-                                continue
+                            if is_am:
+                                # Hybrid systems do not reset in the morning, but just after midnight.
+                                if last_updated_state.hour == 0 and last_updated_state.minute < 15:
+                                    value = 0
+                                # Avoid race conditions when between state change in the morning and
+                                # energy today being reset by adding 5 min grace period and
+                                # skipping update
+                                elif last_updated_state + timedelta(minutes=5) > datetime.now():
+                                    continue
+                            else:
+                                if value == 0:
+                                    # SC sometimes produces zeros in the evening, ignore 
+                                    continue
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
-    async def async_update(self, *_) -> int:
+    async def async_update(self, *_) -> None:
         """Update the data from Ginlong portal."""
-        update = SCHEDULE_NOK
+        update = timedelta(minutes=SCHEDULE_NOK)
         # Login using username and password, but only every HRS_BETWEEN_LOGIN hours
         if await self._login():
             inverters = self._api.inverters
             if inverters is None:
-                return update
+                return
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)
                 if data is not None:
                     # And finally get the inverter details
-                    update = SCHEDULE_OK
+                    # default to updating after SCHEDULE_OK minutes;
+                    update = timedelta(minutes=SCHEDULE_OK)
+                    # ...but try to figure out a better next-update time based on when the API last received its data
+                    try:
+                        ts = getattr(data, INVERTER_TIMESTAMP_UPDATE)
+                        nxt = dt_util.utc_from_timestamp(ts) + update + timedelta(seconds=1)
+                        if nxt > dt_util.utcnow():
+                            update = nxt - dt_util.utcnow()
+                    except AttributeError:
+                        pass # no last_update found, so keep just using SCHEDULE_OK as a safe default
                     self._last_updated = datetime.now()
                     await self.update_devices(data)
                 else:
-                    update = SCHEDULE_NOK
+                    update = timedelta(minutes=SCHEDULE_NOK)
                     # Reset session and try to login again next time
                     await self._logout()
 
@@ -202,12 +225,10 @@ class InverterService():
                 # Time to login again
                 await self._logout()
 
-        return update
-
-    def schedule_update(self, minute: int = 1):
-        """ Schedule an update after minute minutes. """
-        _LOGGER.debug("Scheduling next update in %s minutes.", minute)
-        nxt = dt_util.utcnow() + timedelta(minutes=minute)
+    def schedule_update(self, td: timedelta) -> None:
+        """ Schedule an update after td time. """
+        nxt = dt_util.utcnow() + td
+        _LOGGER.debug("Scheduling next update in %s, at %s", str(td), nxt)
         async_track_point_in_utc_time(self._hass, self.async_update, nxt)
 
     def schedule_discovery(self, callback, cookie: dict[str, Any], seconds: int = 1):
