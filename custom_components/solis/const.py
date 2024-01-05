@@ -417,6 +417,14 @@ SENSOR_TYPES = {
         STATE_CLASS_TOTAL_INCREASING,
         GRID_MONTHLY_ENERGY_USED
     ],
+    'gridmontlyongridenergy': [
+        'Monthly On-grid Energy',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_MONTHLY_ON_GRID_ENERGY
+    ],
     'gridyearlyenergypurchased': [
         'Yearly Grid Energy Purchased',
         ENERGY_KILO_WATT_HOUR,
@@ -432,6 +440,14 @@ SENSOR_TYPES = {
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         GRID_YEARLY_ENERGY_USED
+    ],
+    'gridyearlyongridenergy': [
+        'Yearly On-grid Energy',
+        ENERGY_KILO_WATT_HOUR,
+        'mdi:transmission-tower',
+        DEVICE_CLASS_ENERGY,
+        STATE_CLASS_TOTAL_INCREASING,
+        GRID_YEARLY_ON_GRID_ENERGY
     ],
     'gridtotalongridenergy': [
         'Total On-grid Energy',
