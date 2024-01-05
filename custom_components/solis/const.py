@@ -14,6 +14,8 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
+    POWER_VOLT_AMPERE_REACTIVE,
+    POWER_VOLT_AMPERE,
     ELECTRIC_CURRENT_AMPERE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_ENERGY,
@@ -478,6 +480,78 @@ SENSOR_TYPES = {
         DEVICE_CLASS_ENERGY,
         STATE_CLASS_TOTAL_INCREASING,
         GRID_TOTAL_ENERGY_USED
+    ],
+    'gridphase1power': [
+        'Grid Phase1 Power',
+        POWER_WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_PHASE1_POWER
+    ],
+    'gridphase2power': [
+        'Grid Phase2 Power',
+        POWER_WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_PHASE2_POWER
+    ],
+    'gridphase3power': [
+        'Grid Phase3 Power',
+        POWER_WATT,
+        'mdi:home-import-outline',
+        DEVICE_CLASS_POWER,
+        STATE_CLASS_MEASUREMENT,
+        GRID_PHASE3_POWER
+    ],
+    'gridapparentphase1power': [
+        'Grid Phase1 Apparent Power',
+        POWER_VOLT_AMPERE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_APPARENT_PHASE1_POWER
+    ],
+    'gridapparentphase2power': [
+        'Grid Phase2 Apparent Power',
+        POWER_VOLT_AMPERE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_APPARENT_PHASE2_POWER
+    ],
+    'gridapparentphase3power': [
+        'Grid Phase3 Apparent Power',
+        POWER_VOLT_AMPERE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_APPARENT_PHASE3_POWER
+    ],
+    'gridreactivephase1power': [
+        'Grid Phase1 Reactive Power',
+        POWER_VOLT_AMPERE_REACTIVE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_REACTIVE_PHASE1_POWER
+    ],
+    'gridreactivephase2power': [
+        'Grid Phase2 Reactive Power',
+        POWER_VOLT_AMPERE_REACTIVE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_REACTIVE_PHASE2_POWER
+    ],
+    'gridreactivephase3power': [
+        'Grid Phase3 Reactive Power',
+        POWER_VOLT_AMPERE_REACTIVE,
+        'mdi:home-import-outline',
+        None,
+        STATE_CLASS_MEASUREMENT,
+        GRID_REACTIVE_PHASE3_POWER
     ],
     'batstateofhealth': [
         'Battery State Of Health',
