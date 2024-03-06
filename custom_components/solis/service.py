@@ -155,8 +155,12 @@ class InverterService():
         for attribute in data.keys():
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
-                if attribute == INVERTER_ENERGY_TODAY or attribute == INVERTER_ACPOWER:
-                    # Energy_today and AC power are not reset at midnight, but in the 
+
+                if attribute == INVERTER_ACPOWER and getattr(data, INVERTER_STATE) == 2:
+                    # Overriding stale AC Power value when inverter is offline
+                    value = 0
+                elif attribute == INVERTER_ENERGY_TODAY:
+                    # Energy_today is not reset at midnight, but in the 
                     # morning at sunrise when the inverter switches back on. This 
                     # messes up the energy dashboard. Return 0 while inverter is 
                     # still off.
