@@ -129,6 +129,8 @@ INVERTER_DATA: InverterDataType = {
         GRID_REACTIVE_PHASE1_POWER:       ['aReactivePower', float, 3],
         GRID_REACTIVE_PHASE2_POWER:       ['bReactivePower', float, 3],
         GRID_REACTIVE_PHASE3_POWER:       ['cReactivePower', float, 3],
+        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
+        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None],
         SOC_CHARGING_SET:                 ['socChargingSet', float, 0],
         SOC_DISCHARGE_SET:                ['socDischargeSet', float, 0],
         BYPASS_LOAD_POWER:                ['bypassLoadPower', float, 3],
@@ -160,8 +162,8 @@ INVERTER_DATA: InverterDataType = {
         GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellDayEnergyStr', str, None],
         GRID_DAILY_ENERGY_USED:           ['homeLoadEnergy', float, 3],
         GRID_DAILY_ENERGY_USED_STR:       ['homeLoadEnergyStr', str, None],
-        GRID_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
-        GRID_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None]
+        PLANT_TOTAL_CONSUMPTION_POWER:     ['familyLoadPower', float, 3],
+        PLANT_TOTAL_CONSUMPTION_POWER_STR: ['familyLoadPowerStr', str, None]
     },
 }
 
@@ -325,8 +327,6 @@ class SoliscloudAPI(BaseAPI):
 
         # Get inverter details
         params = {
-        #    'id': device_id,
-        #    'sn': device_serial
         }
 
         result = await self._post_data_json(INVERTER_DETAIL_LIST, params)
@@ -459,6 +459,7 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
             self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
             self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)
+            self._fix_units(PLANT_TOTAL_CONSUMPTION_POWER, PLANT_TOTAL_CONSUMPTION_POWER_STR)
             self._fix_units(GRID_TOTAL_ENERGY_USED, GRID_TOTAL_ENERGY_USED_STR)
             self._fix_units(INVERTER_ACPOWER, INVERTER_ACPOWER_STR)
             self._fix_units(INVERTER_ENERGY_THIS_MONTH, INVERTER_ENERGY_THIS_MONTH_STR)

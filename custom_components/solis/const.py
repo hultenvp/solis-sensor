@@ -562,6 +562,14 @@ SENSOR_TYPES = {
         SensorStateClass.MEASUREMENT,
         GRID_REACTIVE_PHASE3_POWER
     ],
+    'planttotalconsumptionpower': [
+        'Plant Total Consumption power',
+        UnitOfPower.WATT,
+        'mdi:home-import-outline',
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        PLANT_TOTAL_CONSUMPTION_POWER
+    ],
     'batstateofhealth': [
         'Battery State Of Health',
         PERCENTAGE,
