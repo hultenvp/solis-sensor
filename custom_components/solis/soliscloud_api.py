@@ -11,6 +11,7 @@ import hashlib
 import hmac
 import base64
 import asyncio
+import aiofiles
 from datetime import datetime
 from datetime import timezone
 from http import HTTPStatus
@@ -182,8 +183,8 @@ class SoliscloudConfig(PortalConfig):
         self._secret: bytes = portal_secret
         self._workarounds = {}
         try:
-            with open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
-                self._workarounds = yaml.safe_load(file)
+            async with aiofiles.open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
+                self._workarounds = await yaml.safe_load(file)
                 _LOGGER.debug("workarounds: %s", self._workarounds)
         except FileNotFoundError:
             pass
