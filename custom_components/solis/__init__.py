@@ -1,7 +1,9 @@
 """The Solis Inverter integration."""
 from datetime import datetime, timedelta, timezone
 import asyncio
+import aiofiles
 import logging
+import yaml
 import os
 
 import homeassistant.helpers.config_validation as cv
@@ -79,8 +81,15 @@ async def async_setup_entry(
     else:
         portal_key_id = config[CONF_KEY_ID]
         portal_secret: bytes = bytes(config[CONF_SECRET], 'utf-8')
+        try:
+            async with aiofiles.open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
+                contents = await file.read()
+            workarounds = yaml.safe_load(contents)
+        except FileNotFoundError:
+            workarounds = {}
+
         portal_config = SoliscloudConfig(
-            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
+            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid, workarounds)
 
     # Initialize the Ginlong data service.
     service: InverterService = InverterService(portal_config, hass)
