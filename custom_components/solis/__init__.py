@@ -1,19 +1,17 @@
 """The Solis Inverter integration."""
 from datetime import datetime, timedelta, timezone
 import asyncio
-import aiofiles
 import logging
-import yaml
 import os
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, SOURCE_IMPORT
 from homeassistant.const import Platform, ATTR_NAME, CONF_NAME
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
-from homeassistant.helpers.typing import ConfigType, HomeAssistantType, ServiceCallType
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
 from .const import (
@@ -36,7 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 
-async def async_setup(hass: HomeAssistantType, config: ConfigType):
+async def async_setup(hass: HomeAssistant, config: ConfigType):
     """Set up the Solis component from configuration.yaml."""
 
     if "sensor" not in config:
@@ -81,28 +79,15 @@ async def async_setup_entry(
     else:
         portal_key_id = config[CONF_KEY_ID]
         portal_secret: bytes = bytes(config[CONF_SECRET], 'utf-8')
-        try:
-            async with aiofiles.open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
-                contents = await file.read()
-            workarounds = yaml.safe_load(contents)
-        except FileNotFoundError:
-            workarounds = {}
-
         portal_config = SoliscloudConfig(
-            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid, workarounds)
+            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
 
     # Initialize the Ginlong data service.
     service: InverterService = InverterService(portal_config, hass)
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.
-    #hass.async_create_task(
-    #    hass.config_entries.async_forward_entry_setup(entry, component)
-    #    for component in PLATFORMS
-    #)
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):

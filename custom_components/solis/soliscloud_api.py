@@ -21,6 +21,7 @@ from typing import Any
 from aiohttp import ClientError, ClientSession
 import async_timeout
 import yaml
+import aiofiles
 
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
@@ -175,13 +176,21 @@ class SoliscloudConfig(PortalConfig):
         portal_username: str,
         portal_key_id: str,
         portal_secret: bytes,
-        portal_plantid: str,
-        workarounds: dict[str, Any]
+        portal_plantid: str
     ) -> None:
         super().__init__(portal_domain, portal_username, portal_plantid)
         self._key_id: str = portal_key_id
         self._secret: bytes = portal_secret
-        self._workarounds: dict[str, Any] = workarounds
+        self._workarounds = {}
+
+    async def load_workarounds(self):
+        try:
+            async with aiofiles.open('/config/custom_components/solis/workarounds.yaml', 'r') as file:
+                content = await file.read()
+                self._workarounds = yaml.safe_load(content)
+                _LOGGER.debug("workarounds: %s", self._workarounds)
+        except FileNotFoundError:
+            pass
 
     @property
     def key_id(self) -> str:
@@ -227,6 +236,9 @@ class SoliscloudAPI(BaseAPI):
         """See if we can build a list of inverters"""
         self._session = session
         self._inverter_list = None
+
+        # Load workarounds
+        await self._config.load_workarounds()
 
         # Request inverter list
         self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
