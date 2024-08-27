@@ -3,9 +3,12 @@
   "version": "3.5.2",
   "config_flow": true,
   "name": "Solis Inverter",
-  "iot_class": "cloud_push",
+  "iot_class": "cloud_polling",
   "documentation": "https://github.com/hultenvp/solis-sensor/",
   "issue_tracker": "https://github.com/hultenvp/solis-sensor/issues",
   "dependencies": [],
-  "codeowners": ["@hultenvp"]
+  "codeowners": ["@hultenvp"],
+  "requirements": [
+    "aiofiles>=23.1.0,<24.0.0"
+  ]
 }
