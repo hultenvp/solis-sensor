@@ -2,6 +2,6 @@
   "name": "SolisCloud portal integration",
   "content_in_root": false,
   "render_readme": false,
-  "homeassistant": "2021.9",
+  "homeassistant": "2024.9.0",
   "domains": ["sensor"]
 }
