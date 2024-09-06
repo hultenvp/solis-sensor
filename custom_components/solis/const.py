@@ -122,6 +122,38 @@ SENSOR_TYPES = {
         SensorStateClass.MEASUREMENT,
         STRING4_VOLTAGE
     ],
+    'dcinputvoltagepv5': [
+        'DC Voltage PV5',
+        UnitOfElectricPotential.VOLT,
+        'mdi:flash-outline',
+        SensorDeviceClass.VOLTAGE,
+        SensorStateClass.MEASUREMENT,
+        STRING5_VOLTAGE
+    ],
+    'dcinputvoltagepv6': [
+        'DC Voltage PV6',
+        UnitOfElectricPotential.VOLT,
+        'mdi:flash-outline',
+        SensorDeviceClass.VOLTAGE,
+        SensorStateClass.MEASUREMENT,
+        STRING6_VOLTAGE
+    ],
+    'dcinputvoltagepv7': [
+        'DC Voltage PV7',
+        UnitOfElectricPotential.VOLT,
+        'mdi:flash-outline',
+        SensorDeviceClass.VOLTAGE,
+        SensorStateClass.MEASUREMENT,
+        STRING7_VOLTAGE
+    ],
+    'dcinputvoltagepv8': [
+        'DC Voltage PV8',
+        UnitOfElectricPotential.VOLT,
+        'mdi:flash-outline',
+        SensorDeviceClass.VOLTAGE,
+        SensorStateClass.MEASUREMENT,
+        STRING8_VOLTAGE
+    ],
     'dcinputcurrentpv1': [
         'DC Current PV1',
         UnitOfElectricCurrent.AMPERE,
@@ -154,6 +186,38 @@ SENSOR_TYPES = {
         SensorStateClass.MEASUREMENT,
         STRING4_CURRENT
     ],
+    'dcinputcurrentpv5': [
+        'DC Current PV5',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:flash-outline',
+        SensorDeviceClass.CURRENT,
+        SensorStateClass.MEASUREMENT,
+        STRING5_CURRENT
+    ],
+    'dcinputcurrentpv6': [
+        'DC Current PV6',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:flash-outline',
+        SensorDeviceClass.CURRENT,
+        SensorStateClass.MEASUREMENT,
+        STRING6_CURRENT
+    ],
+    'dcinputcurrentpv7': [
+        'DC Current PV7',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:flash-outline',
+        SensorDeviceClass.CURRENT,
+        SensorStateClass.MEASUREMENT,
+        STRING7_CURRENT
+    ],
+    'dcinputcurrentpv8': [
+        'DC Current PV8',
+        UnitOfElectricCurrent.AMPERE,
+        'mdi:flash-outline',
+        SensorDeviceClass.CURRENT,
+        SensorStateClass.MEASUREMENT,
+        STRING8_CURRENT
+    ],
     'dcinputpowerpv1': [
         'DC Power PV1',
         UnitOfPower.WATT,
@@ -185,6 +249,38 @@ SENSOR_TYPES = {
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
         STRING4_POWER
+    ],
+    'dcinputpowerpv5': [
+        'DC Power PV5',
+        UnitOfPower.WATT,
+        'mdi:solar-power',
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        STRING5_POWER
+    ],
+    'dcinputpowerpv6': [
+        'DC Power PV6',
+        UnitOfPower.WATT,
+        'mdi:solar-power',
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        STRING6_POWER
+    ],
+    'dcinputpowerpv7': [
+        'DC Power PV7',
+        UnitOfPower.WATT,
+        'mdi:solar-power',
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        STRING7_POWER
+    ],
+    'dcinputpowerpv8': [
+        'DC Power PV8',
+        UnitOfPower.WATT,
+        'mdi:solar-power',
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        STRING8_POWER
     ],
     'acoutputvoltage1': [
         'AC Voltage R',

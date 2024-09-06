@@ -30,7 +30,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.5.2'
+VERSION = '0.5.3'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -79,14 +79,26 @@ INVERTER_DATA: InverterDataType = {
         STRING2_VOLTAGE:                  ['uPv2', float, 2],
         STRING3_VOLTAGE:                  ['uPv3', float, 2],
         STRING4_VOLTAGE:                  ['uPv4', float, 2],
+        STRING5_VOLTAGE:                  ['uPv5', float, 2],
+        STRING6_VOLTAGE:                  ['uPv6', float, 2],
+        STRING7_VOLTAGE:                  ['uPv7', float, 2],
+        STRING8_VOLTAGE:                  ['uPv8', float, 2],
         STRING1_CURRENT:                  ['iPv1', float, 2],
         STRING2_CURRENT:                  ['iPv2', float, 2],
         STRING3_CURRENT:                  ['iPv3', float, 2],
         STRING4_CURRENT:                  ['iPv4', float, 2],
-        STRING1_POWER:                    ['pow1', float, 2], # Undocumented
-        STRING2_POWER:                    ['pow2', float, 2], # Undocumented
-        STRING3_POWER:                    ['pow3', float, 2], # Undocumented
-        STRING4_POWER:                    ['pow4', float, 2], # Undocumented
+        STRING5_CURRENT:                  ['iPv5', float, 2],
+        STRING6_CURRENT:                  ['iPv6', float, 2],
+        STRING7_CURRENT:                  ['iPv7', float, 2],
+        STRING8_CURRENT:                  ['iPv8', float, 2],
+        STRING1_POWER:                    ['pow1', float, 2],
+        STRING2_POWER:                    ['pow2', float, 2],
+        STRING3_POWER:                    ['pow3', float, 2],
+        STRING4_POWER:                    ['pow4', float, 2],
+        STRING5_POWER:                    ['pow5', float, 2],
+        STRING6_POWER:                    ['pow6', float, 2],
+        STRING7_POWER:                    ['pow7', float, 2],
+        STRING8_POWER:                    ['pow8', float, 2],
         PHASE1_VOLTAGE:                   ['uAc1', float, 2],
         PHASE2_VOLTAGE:                   ['uAc2', float, 2],
         PHASE3_VOLTAGE:                   ['uAc3', float, 2],
