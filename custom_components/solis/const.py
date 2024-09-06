@@ -14,7 +14,7 @@ from homeassistant.const import (
     UnitOfElectricPotential,
     UnitOfTemperature,
     UnitOfFrequency,
-    POWER_VOLT_AMPERE_REACTIVE,
+    UnitOfReactivePower,
     PERCENTAGE)
 
 from .ginlong_const import *
@@ -636,7 +636,7 @@ SENSOR_TYPES = {
     ],
     'gridreactivephase1power': [
         'Grid Phase1 Reactive Power',
-        POWER_VOLT_AMPERE_REACTIVE,
+        UnitOfReactivePower.VOLT_AMPERE_REACTIVE,
         'mdi:home-import-outline',
         None,
         SensorStateClass.MEASUREMENT,
@@ -644,7 +644,7 @@ SENSOR_TYPES = {
     ],
     'gridreactivephase2power': [
         'Grid Phase2 Reactive Power',
-        POWER_VOLT_AMPERE_REACTIVE,
+        UnitOfReactivePower.VOLT_AMPERE_REACTIVE,
         'mdi:home-import-outline',
         None,
         SensorStateClass.MEASUREMENT,
@@ -652,7 +652,7 @@ SENSOR_TYPES = {
     ],
     'gridreactivephase3power': [
         'Grid Phase3 Reactive Power',
-        POWER_VOLT_AMPERE_REACTIVE,
+        UnitOfReactivePower.VOLT_AMPERE_REACTIVE,
         'mdi:home-import-outline',
         None,
         SensorStateClass.MEASUREMENT,
