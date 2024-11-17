@@ -30,7 +30,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.5.3'
+VERSION = '0.5.4'
 
 # API NAME
 API_NAME = 'SolisCloud'
@@ -386,7 +386,7 @@ class SoliscloudAPI(BaseAPI):
             precision = attributes[dictkey][2]
             if key is not None:
                 value = None
-                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                if dictkey != INVERTER_ENERGY_TODAY or collect_energy_today:
                     value = self._get_value(payload, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
@@ -431,7 +431,7 @@ class SoliscloudAPI(BaseAPI):
             precision = attributes[dictkey][2]
             if key is not None:
                 value = None
-                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                if dictkey != INVERTER_ENERGY_TODAY or collect_energy_today:
                     value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
@@ -455,7 +455,7 @@ class SoliscloudAPI(BaseAPI):
             precision = attributes[dictkey][2]
             if key is not None:
                 value = None
-                if key != INVERTER_ENERGY_TODAY or collect_energy_today:
+                if dictkey != INVERTER_ENERGY_TODAY or collect_energy_today:
                     value = self._get_value(jsondata, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
