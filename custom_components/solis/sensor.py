@@ -176,7 +176,7 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
 
     def do_update(self, value: Any, last_updated: datetime) -> bool:
         """ Update the sensor."""
-        if self.hass and self._attr_native_value != value:
+        if self.hass:
             self._attr_native_value = value
             self._attributes[LAST_UPDATED] = last_updated
             self.async_write_ha_state()
