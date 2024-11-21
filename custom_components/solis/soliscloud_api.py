@@ -51,6 +51,7 @@ VERB = "POST"
 INVERTER_DETAIL_LIST = "/v1/api/inverterDetailList"
 PLANT_DETAIL = "/v1/api/stationDetail"
 PLANT_LIST = "/v1/api/userStationList"
+AUTHENTICATE = "/v2/api/login"
 
 InverterDataType = dict[str, dict[str, list]]
 
@@ -239,6 +240,7 @@ class SoliscloudAPI(BaseAPI):
         self._is_online: bool = False
         self._data: dict[str, str | int | float] = {}
         self._inverter_list: dict[str, str] | None = None
+        self._token = ""
 
     @property
     def api_name(self) -> str:
@@ -278,6 +280,16 @@ class SoliscloudAPI(BaseAPI):
             except AttributeError:
                 _LOGGER.info("Failed to acquire plant name, login failed")
                 self._is_online = False
+            try:
+                token = await self._fetch_token(self.config.username, self.config._password)
+                self._token = token
+                if token == "":
+                    _LOGGER.info("Failed to acquire CSRF token")
+                else:
+                    _LOGGER.debug("CSRF token acquired")
+            except:
+                _LOGGER.info("Failed to acquire CSRF token")
+
         return self.is_online
 
     async def logout(self) -> None:
@@ -324,7 +336,6 @@ class SoliscloudAPI(BaseAPI):
         Fetch data for given inverter.
         Collect available data from payload and store as GinlongData object
         """
-
         _LOGGER.debug("Fetching data for serial: %s", inverter_serial)
         self._data = {}
         if self.is_online:
@@ -650,3 +661,24 @@ class SoliscloudAPI(BaseAPI):
             if resp is not None:
                 await resp.release()
             return result
+
+    async def _fetch_token(self, username: str, password: str) -> str:
+        """
+        Fetch Station Details
+        """
+
+        params = {
+            "username": username,
+            "password": hashlib.md5(password.encode("utf-8")).hexdigest(),
+        }
+        result = await self._post_data_json(AUTHENTICATE, params)
+
+        if result[SUCCESS] is True:
+            jsondata: dict[str, str] = result[CONTENT]
+            if "csrfToken" in jsondata:
+                return jsondata["csrfToken"]
+            else:
+                _LOGGER.info(f"({AUTHENTICATE:s} responded with error: {jsondata}")
+        else:
+            _LOGGER.info("Unable to fetch authenticate with username and password")
+        return ""

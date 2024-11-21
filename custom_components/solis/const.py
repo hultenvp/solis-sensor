@@ -1,6 +1,7 @@
 """Constants
 For more information: https://github.com/hultenvp/solis-sensor/
 """
+
 from homeassistant.components.sensor import (
     SensorStateClass,
     SensorDeviceClass,
@@ -15,735 +16,715 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfFrequency,
     UnitOfReactivePower,
-    PERCENTAGE)
+    PERCENTAGE,
+)
 
 from .ginlong_const import *
 
-CONF_PORTAL_DOMAIN = 'portal_domain'
-CONF_PORTAL_VERSION = 'portal_version'
-CONF_USERNAME = 'portal_username'
-CONF_PASSWORD = 'portal_password'
-CONF_SECRET = 'portal_secret'
-CONF_KEY_ID = 'portal_key_id'
-CONF_PLANT_ID = 'portal_plant_id'
+CONF_PORTAL_DOMAIN = "portal_domain"
+CONF_PORTAL_VERSION = "portal_version"
+CONF_USERNAME = "portal_username"
+CONF_PASSWORD = "portal_password"
+CONF_SECRET = "portal_secret"
+CONF_KEY_ID = "portal_key_id"
+CONF_PLANT_ID = "portal_plant_id"
 
 DOMAIN = "solis"
-SENSOR_PREFIX = 'Solis'
-DEFAULT_DOMAIN = 'https://www.soliscloud.com:13333'
+SENSOR_PREFIX = "Solis"
+DEFAULT_DOMAIN = "https://www.soliscloud.com:13333"
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
 SENSOR_TYPES = {
-    'inverterpowerstate': [
-        'Power State',
+    "inverterpowerstate": ["Power State", None, "mdi:power", None, SensorStateClass.MEASUREMENT, INVERTER_POWER_STATE],
+    "inverterstate": ["State", None, "mdi:state-machine", None, SensorStateClass.MEASUREMENT, INVERTER_STATE],
+    "timestamponline": [
+        "Timestamp Inverter Online",
         None,
-        'mdi:power',
-        None,
-        SensorStateClass.MEASUREMENT,
-        INVERTER_POWER_STATE
-    ],
-    'inverterstate': [
-        'State',
-        None,
-        'mdi:state-machine',
+        "mdi:calendar-clock",
         None,
         SensorStateClass.MEASUREMENT,
-        INVERTER_STATE
+        INVERTER_TIMESTAMP_ONLINE,
     ],
-    'timestamponline': [
-        'Timestamp Inverter Online',
+    "timestampmeasurement": [
+        "Timestamp Measurements Received",
         None,
-        'mdi:calendar-clock',
+        "mdi:calendar-clock",
         None,
         SensorStateClass.MEASUREMENT,
-        INVERTER_TIMESTAMP_ONLINE
+        INVERTER_TIMESTAMP_UPDATE,
     ],
-    'timestampmeasurement': [
-        'Timestamp Measurements Received',
-        None,
-        'mdi:calendar-clock',
-        None,
-        SensorStateClass.MEASUREMENT,
-        INVERTER_TIMESTAMP_UPDATE
-    ],
-    'status': [
-        'Status',
-        None,
-        'mdi:solar-power',
-        None,
-        None,
-        'status'
-    ],
-    'temperature': [
-        'Temperature',
+    "status": ["Status", None, "mdi:solar-power", None, None, "status"],
+    "temperature": [
+        "Temperature",
         UnitOfTemperature.CELSIUS,
-        'mdi:thermometer',
+        "mdi:thermometer",
         SensorDeviceClass.TEMPERATURE,
         SensorStateClass.MEASUREMENT,
-        INVERTER_TEMPERATURE
+        INVERTER_TEMPERATURE,
     ],
-    'radiatortemperature1': [
-        'Radiator temperature 1', # Solarman only
+    "radiatortemperature1": [
+        "Radiator temperature 1",  # Solarman only
         UnitOfTemperature.CELSIUS,
-        'mdi:thermometer',
+        "mdi:thermometer",
         SensorDeviceClass.TEMPERATURE,
         SensorStateClass.MEASUREMENT,
-        RADIATOR1_TEMP
+        RADIATOR1_TEMP,
     ],
-    'dcinputvoltagepv1': [
-        'DC Voltage PV1',
+    "dcinputvoltagepv1": [
+        "DC Voltage PV1",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING1_VOLTAGE
+        STRING1_VOLTAGE,
     ],
-    'dcinputvoltagepv2': [
-        'DC Voltage PV2',
+    "dcinputvoltagepv2": [
+        "DC Voltage PV2",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING2_VOLTAGE
+        STRING2_VOLTAGE,
     ],
-    'dcinputvoltagepv3': [
-        'DC Voltage PV3',
+    "dcinputvoltagepv3": [
+        "DC Voltage PV3",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING3_VOLTAGE
+        STRING3_VOLTAGE,
     ],
-    'dcinputvoltagepv4': [
-        'DC Voltage PV4',
+    "dcinputvoltagepv4": [
+        "DC Voltage PV4",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING4_VOLTAGE
+        STRING4_VOLTAGE,
     ],
-    'dcinputvoltagepv5': [
-        'DC Voltage PV5',
+    "dcinputvoltagepv5": [
+        "DC Voltage PV5",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING5_VOLTAGE
+        STRING5_VOLTAGE,
     ],
-    'dcinputvoltagepv6': [
-        'DC Voltage PV6',
+    "dcinputvoltagepv6": [
+        "DC Voltage PV6",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING6_VOLTAGE
+        STRING6_VOLTAGE,
     ],
-    'dcinputvoltagepv7': [
-        'DC Voltage PV7',
+    "dcinputvoltagepv7": [
+        "DC Voltage PV7",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING7_VOLTAGE
+        STRING7_VOLTAGE,
     ],
-    'dcinputvoltagepv8': [
-        'DC Voltage PV8',
+    "dcinputvoltagepv8": [
+        "DC Voltage PV8",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        STRING8_VOLTAGE
+        STRING8_VOLTAGE,
     ],
-    'dcinputcurrentpv1': [
-        'DC Current PV1',
+    "dcinputcurrentpv1": [
+        "DC Current PV1",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING1_CURRENT
+        STRING1_CURRENT,
     ],
-    'dcinputcurrentpv2': [
-        'DC Current PV2',
+    "dcinputcurrentpv2": [
+        "DC Current PV2",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING2_CURRENT
+        STRING2_CURRENT,
     ],
-    'dcinputcurrentpv3': [
-        'DC Current PV3',
+    "dcinputcurrentpv3": [
+        "DC Current PV3",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING3_CURRENT
+        STRING3_CURRENT,
     ],
-    'dcinputcurrentpv4': [
-        'DC Current PV4',
+    "dcinputcurrentpv4": [
+        "DC Current PV4",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING4_CURRENT
+        STRING4_CURRENT,
     ],
-    'dcinputcurrentpv5': [
-        'DC Current PV5',
+    "dcinputcurrentpv5": [
+        "DC Current PV5",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING5_CURRENT
+        STRING5_CURRENT,
     ],
-    'dcinputcurrentpv6': [
-        'DC Current PV6',
+    "dcinputcurrentpv6": [
+        "DC Current PV6",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING6_CURRENT
+        STRING6_CURRENT,
     ],
-    'dcinputcurrentpv7': [
-        'DC Current PV7',
+    "dcinputcurrentpv7": [
+        "DC Current PV7",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING7_CURRENT
+        STRING7_CURRENT,
     ],
-    'dcinputcurrentpv8': [
-        'DC Current PV8',
+    "dcinputcurrentpv8": [
+        "DC Current PV8",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        STRING8_CURRENT
+        STRING8_CURRENT,
     ],
-    'dcinputpowerpv1': [
-        'DC Power PV1',
+    "dcinputpowerpv1": [
+        "DC Power PV1",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING1_POWER
+        STRING1_POWER,
     ],
-    'dcinputpowerpv2': [
-        'DC Power PV2',
+    "dcinputpowerpv2": [
+        "DC Power PV2",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING2_POWER
+        STRING2_POWER,
     ],
-    'dcinputpowerpv3': [
-        'DC Power PV3',
+    "dcinputpowerpv3": [
+        "DC Power PV3",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING3_POWER
+        STRING3_POWER,
     ],
-    'dcinputpowerpv4': [
-        'DC Power PV4',
+    "dcinputpowerpv4": [
+        "DC Power PV4",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING4_POWER
+        STRING4_POWER,
     ],
-    'dcinputpowerpv5': [
-        'DC Power PV5',
+    "dcinputpowerpv5": [
+        "DC Power PV5",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING5_POWER
+        STRING5_POWER,
     ],
-    'dcinputpowerpv6': [
-        'DC Power PV6',
+    "dcinputpowerpv6": [
+        "DC Power PV6",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING6_POWER
+        STRING6_POWER,
     ],
-    'dcinputpowerpv7': [
-        'DC Power PV7',
+    "dcinputpowerpv7": [
+        "DC Power PV7",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING7_POWER
+        STRING7_POWER,
     ],
-    'dcinputpowerpv8': [
-        'DC Power PV8',
+    "dcinputpowerpv8": [
+        "DC Power PV8",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        STRING8_POWER
+        STRING8_POWER,
     ],
-    'acoutputvoltage1': [
-        'AC Voltage R',
+    "acoutputvoltage1": [
+        "AC Voltage R",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        PHASE1_VOLTAGE
+        PHASE1_VOLTAGE,
     ],
-    'acoutputvoltage2': [
-        'AC Voltage S',
+    "acoutputvoltage2": [
+        "AC Voltage S",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        PHASE2_VOLTAGE
+        PHASE2_VOLTAGE,
     ],
-    'acoutputvoltage3': [
-        'AC Voltage T',
+    "acoutputvoltage3": [
+        "AC Voltage T",
         UnitOfElectricPotential.VOLT,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        PHASE3_VOLTAGE
+        PHASE3_VOLTAGE,
     ],
-    'acoutputcurrent1': [
-        'AC Current R',
+    "acoutputcurrent1": [
+        "AC Current R",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        PHASE1_CURRENT
+        PHASE1_CURRENT,
     ],
-    'acoutputcurrent2': [
-        'AC Current S',
+    "acoutputcurrent2": [
+        "AC Current S",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        PHASE2_CURRENT
+        PHASE2_CURRENT,
     ],
-    'acoutputcurrent3': [
-        'AC Current T',
+    "acoutputcurrent3": [
+        "AC Current T",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        PHASE3_CURRENT
+        PHASE3_CURRENT,
     ],
-    'actualpower': [
-        'AC Output Total Power',
+    "actualpower": [
+        "AC Output Total Power",
         UnitOfPower.WATT,
-        'mdi:solar-power',
+        "mdi:solar-power",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        INVERTER_ACPOWER
+        INVERTER_ACPOWER,
     ],
-    'acfrequency': [
-        'AC Frequency',
+    "acfrequency": [
+        "AC Frequency",
         UnitOfFrequency.HERTZ,
-        'mdi:sine-wave',
+        "mdi:sine-wave",
         None,
         SensorStateClass.MEASUREMENT,
-        INVERTER_ACFREQUENCY
+        INVERTER_ACFREQUENCY,
     ],
-    'energylastmonth': [
-        'Energy Last Month',
+    "energylastmonth": [
+        "Energy Last Month",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        INVERTER_ENERGY_LAST_MONTH
+        INVERTER_ENERGY_LAST_MONTH,
     ],
-    'energytoday': [
-        'Energy Today',
+    "energytoday": [
+        "Energy Today",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        INVERTER_ENERGY_TODAY
+        INVERTER_ENERGY_TODAY,
     ],
-    'energythismonth': [
-        'Energy This Month',
+    "energythismonth": [
+        "Energy This Month",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        INVERTER_ENERGY_THIS_MONTH
+        INVERTER_ENERGY_THIS_MONTH,
     ],
-    'energythisyear': [
-        'Energy This Year',
+    "energythisyear": [
+        "Energy This Year",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        INVERTER_ENERGY_THIS_YEAR
+        INVERTER_ENERGY_THIS_YEAR,
     ],
-    'energytotal': [
-        'Energy Total',
+    "energytotal": [
+        "Energy Total",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:flash-outline',
+        "mdi:flash-outline",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        INVERTER_ENERGY_TOTAL_LIFE
+        INVERTER_ENERGY_TOTAL_LIFE,
     ],
-    'batpack1capacityremaining': [
-        'Battery pack 1 remaining battery capacity', # Solarman only
+    "batpack1capacityremaining": [
+        "Battery pack 1 remaining battery capacity",  # Solarman only
         PERCENTAGE,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.BATTERY,
         SensorStateClass.MEASUREMENT,
-        BAT1_REMAINING_CAPACITY
+        BAT1_REMAINING_CAPACITY,
     ],
-    'batpower': [
-        'Battery Power',
+    "batpower": [
+        "Battery Power",
         UnitOfPower.WATT,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        BAT_POWER
+        BAT_POWER,
     ],
-    'batvoltage': [
-        'Battery Voltage',
+    "batvoltage": [
+        "Battery Voltage",
         UnitOfElectricPotential.VOLT,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        BAT_VOLTAGE
+        BAT_VOLTAGE,
     ],
-    'batstatus': [ # Key: ['label', unit, icon, device class, state class, api_attribute_name]
-        'Battery Status',
+    "batstatus": [  # Key: ['label', unit, icon, device class, state class, api_attribute_name]
+        "Battery Status",
         None,
-        'mdi:battery',
+        "mdi:battery",
         None,
         None,
-        BAT_STATUS
+        BAT_STATUS,
     ],
-    'batcurrent': [
-        'Battery Current',
+    "batcurrent": [
+        "Battery Current",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        BAT_CURRENT
+        BAT_CURRENT,
     ],
-    'batcapacityremaining': [
-        'Remaining Battery Capacity',
+    "batcapacityremaining": [
+        "Remaining Battery Capacity",
         PERCENTAGE,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.BATTERY,
         SensorStateClass.MEASUREMENT,
-        BAT_REMAINING_CAPACITY
+        BAT_REMAINING_CAPACITY,
     ],
-    'battotalenergycharged': [
-        'Total Energy Charged',
+    "battotalenergycharged": [
+        "Total Energy Charged",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:battery-plus',
+        "mdi:battery-plus",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        BAT_TOTAL_ENERGY_CHARGED
+        BAT_TOTAL_ENERGY_CHARGED,
     ],
-    'battotalenergydischarged': [
-        'Total Energy Discharged',
+    "battotalenergydischarged": [
+        "Total Energy Discharged",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:battery-minus',
+        "mdi:battery-minus",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        BAT_TOTAL_ENERGY_DISCHARGED
+        BAT_TOTAL_ENERGY_DISCHARGED,
     ],
-    'batdailyenergycharged': [
-        'Daily Energy Charged',
+    "batdailyenergycharged": [
+        "Daily Energy Charged",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:battery-plus',
+        "mdi:battery-plus",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        BAT_DAILY_ENERGY_CHARGED
+        BAT_DAILY_ENERGY_CHARGED,
     ],
-    'batdailyenergydischarged': [
-        'Daily Energy Discharged',
+    "batdailyenergydischarged": [
+        "Daily Energy Discharged",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:battery-minus',
+        "mdi:battery-minus",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        BAT_DAILY_ENERGY_DISCHARGED
+        BAT_DAILY_ENERGY_DISCHARGED,
     ],
-    'griddailyongridenergy': [
-        'Daily On-grid Energy',
+    "griddailyongridenergy": [
+        "Daily On-grid Energy",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_DAILY_ON_GRID_ENERGY
+        GRID_DAILY_ON_GRID_ENERGY,
     ],
-    'griddailyenergypurchased': [
-        'Daily Grid Energy Purchased',
+    "griddailyenergypurchased": [
+        "Daily Grid Energy Purchased",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_DAILY_ENERGY_PURCHASED
+        GRID_DAILY_ENERGY_PURCHASED,
     ],
-    'griddailyenergyused': [
-        'Daily Grid Energy Used',
+    "griddailyenergyused": [
+        "Daily Grid Energy Used",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_DAILY_ENERGY_USED
+        GRID_DAILY_ENERGY_USED,
     ],
-    'gridmonthlyenergypurchased': [
-        'Monthly Grid Energy Purchased',
+    "gridmonthlyenergypurchased": [
+        "Monthly Grid Energy Purchased",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_MONTHLY_ENERGY_PURCHASED
+        GRID_MONTHLY_ENERGY_PURCHASED,
     ],
-    'gridmonthlyenergyused': [
-        'Monthly Grid Energy Used',
+    "gridmonthlyenergyused": [
+        "Monthly Grid Energy Used",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_MONTHLY_ENERGY_USED
+        GRID_MONTHLY_ENERGY_USED,
     ],
-    'gridmontlyongridenergy': [
-        'Monthly On-grid Energy',
+    "gridmontlyongridenergy": [
+        "Monthly On-grid Energy",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_MONTHLY_ON_GRID_ENERGY
+        GRID_MONTHLY_ON_GRID_ENERGY,
     ],
-    'gridyearlyenergypurchased': [
-        'Yearly Grid Energy Purchased',
+    "gridyearlyenergypurchased": [
+        "Yearly Grid Energy Purchased",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_YEARLY_ENERGY_PURCHASED
+        GRID_YEARLY_ENERGY_PURCHASED,
     ],
-    'gridyearlyenergyused': [
-        'Yearly Grid Energy Used',
+    "gridyearlyenergyused": [
+        "Yearly Grid Energy Used",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_YEARLY_ENERGY_USED
+        GRID_YEARLY_ENERGY_USED,
     ],
-    'gridyearlyongridenergy': [
-        'Yearly On-grid Energy',
+    "gridyearlyongridenergy": [
+        "Yearly On-grid Energy",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_YEARLY_ON_GRID_ENERGY
+        GRID_YEARLY_ON_GRID_ENERGY,
     ],
-    'gridtotalongridenergy': [
-        'Total On-grid Energy',
+    "gridtotalongridenergy": [
+        "Total On-grid Energy",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_TOTAL_ON_GRID_ENERGY
+        GRID_TOTAL_ON_GRID_ENERGY,
     ],
-    'gridtotalconsumptionenergy':[
-        'Total Consumption Energy',
+    "gridtotalconsumptionenergy": [
+        "Total Consumption Energy",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_TOTAL_CONSUMPTION_ENERGY
+        GRID_TOTAL_CONSUMPTION_ENERGY,
     ],
-    'gridpowergridtotalpower': [
-        'Power Grid total power',
+    "gridpowergridtotalpower": [
+        "Power Grid total power",
         UnitOfPower.WATT,
-        'mdi:home-export-outline',
+        "mdi:home-export-outline",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        GRID_TOTAL_POWER
+        GRID_TOTAL_POWER,
     ],
-    'gridtotalconsumptionpower': [
-        'Total Consumption power',
+    "gridtotalconsumptionpower": [
+        "Total Consumption power",
         UnitOfPower.WATT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        GRID_TOTAL_CONSUMPTION_POWER
+        GRID_TOTAL_CONSUMPTION_POWER,
     ],
-    'gridtotalenergypurchased': [
-        'Total Energy Purchased',
+    "gridtotalenergypurchased": [
+        "Total Energy Purchased",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_TOTAL_ENERGY_PURCHASED
+        GRID_TOTAL_ENERGY_PURCHASED,
     ],
-    'gridtotalenergyused': [
-        'Total Energy Used',
+    "gridtotalenergyused": [
+        "Total Energy Used",
         UnitOfEnergy.KILO_WATT_HOUR,
-        'mdi:transmission-tower',
+        "mdi:transmission-tower",
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
-        GRID_TOTAL_ENERGY_USED
+        GRID_TOTAL_ENERGY_USED,
     ],
-    'gridphase1power': [
-        'Grid Phase1 Power',
+    "gridphase1power": [
+        "Grid Phase1 Power",
         UnitOfPower.WATT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        GRID_PHASE1_POWER
+        GRID_PHASE1_POWER,
     ],
-    'gridphase2power': [
-        'Grid Phase2 Power',
+    "gridphase2power": [
+        "Grid Phase2 Power",
         UnitOfPower.WATT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        GRID_PHASE2_POWER
+        GRID_PHASE2_POWER,
     ],
-    'gridphase3power': [
-        'Grid Phase3 Power',
+    "gridphase3power": [
+        "Grid Phase3 Power",
         UnitOfPower.WATT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        GRID_PHASE3_POWER
+        GRID_PHASE3_POWER,
     ],
-    'gridapparentphase1power': [
-        'Grid Phase1 Apparent Power',
+    "gridapparentphase1power": [
+        "Grid Phase1 Apparent Power",
         UnitOfApparentPower.VOLT_AMPERE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         None,
         SensorStateClass.MEASUREMENT,
-        GRID_APPARENT_PHASE1_POWER
+        GRID_APPARENT_PHASE1_POWER,
     ],
-    'gridapparentphase2power': [
-        'Grid Phase2 Apparent Power',
+    "gridapparentphase2power": [
+        "Grid Phase2 Apparent Power",
         UnitOfApparentPower.VOLT_AMPERE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         None,
         SensorStateClass.MEASUREMENT,
-        GRID_APPARENT_PHASE2_POWER
+        GRID_APPARENT_PHASE2_POWER,
     ],
-    'gridapparentphase3power': [
-        'Grid Phase3 Apparent Power',
+    "gridapparentphase3power": [
+        "Grid Phase3 Apparent Power",
         UnitOfApparentPower.VOLT_AMPERE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         None,
         SensorStateClass.MEASUREMENT,
-        GRID_APPARENT_PHASE3_POWER
+        GRID_APPARENT_PHASE3_POWER,
     ],
-    'gridreactivephase1power': [
-        'Grid Phase1 Reactive Power',
+    "gridreactivephase1power": [
+        "Grid Phase1 Reactive Power",
         UnitOfReactivePower.VOLT_AMPERE_REACTIVE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         None,
         SensorStateClass.MEASUREMENT,
-        GRID_REACTIVE_PHASE1_POWER
+        GRID_REACTIVE_PHASE1_POWER,
     ],
-    'gridreactivephase2power': [
-        'Grid Phase2 Reactive Power',
+    "gridreactivephase2power": [
+        "Grid Phase2 Reactive Power",
         UnitOfReactivePower.VOLT_AMPERE_REACTIVE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         None,
         SensorStateClass.MEASUREMENT,
-        GRID_REACTIVE_PHASE2_POWER
+        GRID_REACTIVE_PHASE2_POWER,
     ],
-    'gridreactivephase3power': [
-        'Grid Phase3 Reactive Power',
+    "gridreactivephase3power": [
+        "Grid Phase3 Reactive Power",
         UnitOfReactivePower.VOLT_AMPERE_REACTIVE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         None,
         SensorStateClass.MEASUREMENT,
-        GRID_REACTIVE_PHASE3_POWER
+        GRID_REACTIVE_PHASE3_POWER,
     ],
-    'planttotalconsumptionpower': [
-        'Plant Total Consumption power',
+    "planttotalconsumptionpower": [
+        "Plant Total Consumption power",
         UnitOfPower.WATT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        PLANT_TOTAL_CONSUMPTION_POWER
+        PLANT_TOTAL_CONSUMPTION_POWER,
     ],
-    'batstateofhealth': [
-        'Battery State Of Health',
+    "batstateofhealth": [
+        "Battery State Of Health",
         PERCENTAGE,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.BATTERY,
         SensorStateClass.MEASUREMENT,
-        BAT_STATE_OF_HEALTH
+        BAT_STATE_OF_HEALTH,
     ],
-    'socChargingSet': [
-        'Force Charge SOC',
+    "socChargingSet": [
+        "Force Charge SOC",
         PERCENTAGE,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.BATTERY,
         SensorStateClass.MEASUREMENT,
-        SOC_CHARGING_SET
+        SOC_CHARGING_SET,
     ],
-    'socDischargeSet': [
-        'Force Discharge SOC',
+    "socDischargeSet": [
+        "Force Discharge SOC",
         PERCENTAGE,
-        'mdi:battery',
+        "mdi:battery",
         SensorDeviceClass.BATTERY,
         SensorStateClass.MEASUREMENT,
-        SOC_DISCHARGE_SET
+        SOC_DISCHARGE_SET,
     ],
-    'bypassloadpower': [
-        'Backup Load Power',
+    "bypassloadpower": [
+        "Backup Load Power",
         UnitOfPower.WATT,
-        'mdi:battery-charging',
+        "mdi:battery-charging",
         SensorDeviceClass.POWER,
         SensorStateClass.MEASUREMENT,
-        BYPASS_LOAD_POWER
+        BYPASS_LOAD_POWER,
     ],
-    'meterItemACurrent': [
-        'Meter item A current',
+    "meterItemACurrent": [
+        "Meter item A current",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        METER_ITEM_A_CURRENT
+        METER_ITEM_A_CURRENT,
     ],
-    'meterItemAVoltage': [
-        'Meter item A volt',
+    "meterItemAVoltage": [
+        "Meter item A volt",
         UnitOfElectricPotential.VOLT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        METER_ITEM_A_VOLTAGE
+        METER_ITEM_A_VOLTAGE,
     ],
-    'meterItemBCurrent': [
-        'Meter item B current',
+    "meterItemBCurrent": [
+        "Meter item B current",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        METER_ITEM_B_CURRENT
+        METER_ITEM_B_CURRENT,
     ],
-    'meterItemBVoltage': [
-        'Meter item B volt',
+    "meterItemBVoltage": [
+        "Meter item B volt",
         UnitOfElectricPotential.VOLT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        METER_ITEM_B_VOLTAGE
+        METER_ITEM_B_VOLTAGE,
     ],
-    'meterItemCCurrent': [
-        'Meter item C current',
+    "meterItemCCurrent": [
+        "Meter item C current",
         UnitOfElectricCurrent.AMPERE,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.CURRENT,
         SensorStateClass.MEASUREMENT,
-        METER_ITEM_C_CURRENT
+        METER_ITEM_C_CURRENT,
     ],
-    'meterItemCVoltage': [
-        'Meter item C volt',
+    "meterItemCVoltage": [
+        "Meter item C volt",
         UnitOfElectricPotential.VOLT,
-        'mdi:home-import-outline',
+        "mdi:home-import-outline",
         SensorDeviceClass.VOLTAGE,
         SensorStateClass.MEASUREMENT,
-        METER_ITEM_C_VOLTAGE
+        METER_ITEM_C_VOLTAGE,
     ],
 }

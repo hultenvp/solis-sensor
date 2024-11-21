@@ -69,6 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     portal_plantid = config[CONF_PLANT_ID]
     portal_username = config[CONF_USERNAME]
     portal_version = config[CONF_PORTAL_VERSION]
+    portal_password = config[CONF_PASSWORD]
 
     portal_config: PortalConfig | None = None
     if portal_version == "ginlong_v2":
