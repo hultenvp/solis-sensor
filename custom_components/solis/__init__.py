@@ -1,4 +1,5 @@
 """The Solis Inverter integration."""
+
 from datetime import datetime, timedelta, timezone
 import asyncio
 import logging
@@ -57,9 +58,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
     return True
 
 
-async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry
-) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up platform from a ConfigEntry."""
 
     hass.data.setdefault(DOMAIN, {})
@@ -74,13 +73,13 @@ async def async_setup_entry(
     portal_config: PortalConfig | None = None
     if portal_version == "ginlong_v2":
         portal_password = config[CONF_PASSWORD]
-        portal_config = GinlongConfig(
-            portal_domain, portal_username, portal_password, portal_plantid)
+        portal_config = GinlongConfig(portal_domain, portal_username, portal_password, portal_plantid)
     else:
         portal_key_id = config[CONF_KEY_ID]
-        portal_secret: bytes = bytes(config[CONF_SECRET], 'utf-8')
+        portal_secret: bytes = bytes(config[CONF_SECRET], "utf-8")
         portal_config = SoliscloudConfig(
-            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid)
+            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid, portal_password
+        )
 
     # Initialize the Ginlong data service.
     service: InverterService = InverterService(portal_config, hass)
@@ -90,15 +89,13 @@ async def async_setup_entry(
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
 
     unload_ok = all(
         await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, component)
-                for component in PLATFORMS
-            ]
+            *[hass.config_entries.async_forward_entry_unload(entry, component) for component in PLATFORMS]
         )
     )
 
