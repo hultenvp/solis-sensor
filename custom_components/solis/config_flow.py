@@ -113,7 +113,7 @@ class SolisConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 if username and key_id and secret and plant_id:
                     self._data.update(user_input)
-                    config = SoliscloudConfig(url, username, key_id, secret, plant_id)
+                    config = SoliscloudConfig(url, username, key_id, secret, plant_id, password)
                     api = SoliscloudAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
