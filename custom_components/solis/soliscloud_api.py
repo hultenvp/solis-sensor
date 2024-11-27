@@ -29,6 +29,7 @@ from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
 from .soliscloud_const import *
 
+
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
@@ -52,6 +53,12 @@ INVERTER_DETAIL_LIST = "/v1/api/inverterDetailList"
 PLANT_DETAIL = "/v1/api/stationDetail"
 PLANT_LIST = "/v1/api/userStationList"
 AUTHENTICATE = "/v2/api/login"
+CONTROL = "/v2/api/control"
+AT_READ = "/v2/api/atRead"
+
+from .control_const import SELECT_TYPES, NUMBER_TYPES
+
+all_controls = [cid for cid in SELECT_TYPES | NUMBER_TYPES]
 
 InverterDataType = dict[str, dict[str, list]]
 
@@ -338,6 +345,7 @@ class SoliscloudAPI(BaseAPI):
         """
         _LOGGER.debug("Fetching data for serial: %s", inverter_serial)
         self._data = {}
+        control_data = {}
         if self.is_online:
             if self._inverter_list is not None and inverter_serial in self._inverter_list:
                 device_id = self._inverter_list[inverter_serial]
@@ -351,11 +359,22 @@ class SoliscloudAPI(BaseAPI):
                     self._collect_inverter_data(payload)
                 # if payload2 is not None:
                 #    self._collect_station_list_data(payload2)
+                if self._token != "":
+                    _LOGGER.debug(f"Fetching control data for SN:{inverter_serial}")
+                    control_data = await self.get_control_data(inverter_serial, all_controls)
+
                 if payload_detail is not None:
                     self._collect_plant_data(payload_detail)
                 if self._data is not None and INVERTER_SERIAL in self._data:
                     self._post_process()
-                    return GinlongData(self._data)
+                    # This is the sensor data that is currently being retrieved
+                    _LOGGER.debug(">>> Sensor Data:")
+                    _LOGGER.debug(self._data)
+                    # We need to get the control data into the same format
+                    _LOGGER.debug(">>> Control Data:")
+                    _LOGGER.debug(control_data)
+
+                    return GinlongData(self._data | control_data)
                 _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
 
@@ -407,6 +426,25 @@ class SoliscloudAPI(BaseAPI):
                     value = self._get_value(payload, key, type_, precision)
                 if value is not None:
                     self._data[dictkey] = value
+
+    async def get_control_data(self, device_serial: str, controls: list) -> dict[str, Any] | None:
+        control_data = {}
+        for cid in controls:
+            params = {"inverterSn": str(device_serial), "cid": str(cid)}
+            result = await self._post_data_json(AT_READ, params, csrf=True)
+            if result[SUCCESS] is True:
+                jsondata = result[CONTENT]
+                if jsondata["code"] == "0":
+                    _LOGGER.debug(f"    cid: {str(cid):5s} - OK")
+                    control_data[str(cid)] = jsondata["data"]["msg"]
+                else:
+                    _LOGGER.info(
+                        f"    cid: {str(cid):5s} - {AT_READ} responded with error: {jsondata['code']}:{jsondata['msg']}"
+                    )
+            else:
+                _LOGGER.info(f"  cid: {str(cid):5s} - {AT_READ} responded with error: {result[MESSAGE]}")
+
+        return control_data
 
     async def _get_station_details(self, plant_id: str) -> dict[str, str] | None:
         """
@@ -634,10 +672,16 @@ class SoliscloudAPI(BaseAPI):
         }
         return header
 
-    async def _post_data_json(self, canonicalized_resource: str, params: dict[str, Any]) -> dict[str, Any]:
+    async def _post_data_json(
+        self, canonicalized_resource: str, params: dict[str, Any], csrf: bool = False
+    ) -> dict[str, Any]:
         """Http-post data to specified domain/canonicalized_resource."""
 
         header: dict[str, str] = self._prepare_header(params, canonicalized_resource)
+        if csrf and self._token != "":
+            header["token"] = self._token
+
+        # _LOGGER.debug(f"header: {header}")
         result: dict[str, Any] = {SUCCESS: False, MESSAGE: None, STATUS_CODE: None}
         resp = None
         if self._session is None:

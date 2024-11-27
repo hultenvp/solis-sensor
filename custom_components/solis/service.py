@@ -3,6 +3,7 @@ Works for m.ginlong.com. Should also work for the myevolvecloud.com portal (not 
 
 For more information: https://github.com/hultenvp/solis-sensor/
 """
+
 from __future__ import annotations
 
 import logging
@@ -24,8 +25,12 @@ from .ginlong_const import (
     INVERTER_ACPOWER,
     INVERTER_SERIAL,
     INVERTER_STATE,
-    INVERTER_TIMESTAMP_UPDATE
+    INVERTER_TIMESTAMP_UPDATE,
 )
+
+from .control_const import SELECT_TYPES, NUMBER_TYPES
+
+all_controls = [cid for cid in SELECT_TYPES | NUMBER_TYPES]
 
 # REFRESH CONSTANTS
 # Match up with the default SolisCloud API resolution of 5 minutes
@@ -36,23 +41,26 @@ SCHEDULE_NOK = 1
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '1.0.3'
+VERSION = "1.0.3"
 
 # Don't login every time
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
 
-#Autodiscover
+# Autodiscover
 RETRY_DELAY_SECONDS = 60
 MAX_RETRY_DELAY_SECONDS = 900
 
 # Status constants
-ONLINE = 'Online'
-OFFLINE = 'Offline'
+ONLINE = "Online"
+OFFLINE = "Offline"
+
 
 class ServiceSubscriber(ABC):
     """Subscriber base class."""
+
     def __init__(self) -> None:
         self._measured: datetime | None = None
+        self._entity_type: str = ""
 
     @final
     def data_updated(self, value: Any, last_updated: datetime) -> None:
@@ -60,6 +68,10 @@ class ServiceSubscriber(ABC):
         if self._measured != last_updated:
             if self.do_update(value, last_updated):
                 self._measured = last_updated
+
+    @property
+    def entity_type(self):
+        return self._entity_type
 
     @property
     def measured(self) -> datetime | None:
@@ -70,7 +82,8 @@ class ServiceSubscriber(ABC):
     def do_update(self, value: Any, last_updated: datetime) -> bool:
         """Implement actual update of attribute."""
 
-class InverterService():
+
+class InverterService:
     """Serves all plantId's and inverters on a Ginlong account"""
 
     def __init__(self, portal_config: PortalConfig, hass: HomeAssistant) -> None:
@@ -81,21 +94,38 @@ class InverterService():
         self._discovery_callback = None
         self._discovery_cookie: dict[str, Any] = {}
         self._retry_delay_seconds = 0
+        self._controllable: bool = False
+        self._controls: dict[str, Any] = {}
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
         elif isinstance(portal_config, SoliscloudConfig):
             self._api = SoliscloudAPI(portal_config)
         else:
             _LOGGER.error("Failed to initialize service, incompatible config")
+
     @property
     def api_name(self) -> str:
         """Return name of the API."""
         return self._api.api_name
 
+    @property
+    def has_controls(self) -> bool:
+        return self._controllable & (len(self._controls) > 0)
+
+    @property
+    def controllable(self) -> bool:
+        return self._controllable
+
+    @property
+    def controls(self) -> dict:
+        return self._controls
+
     async def _login(self) -> bool:
         if not self._api.is_online:
             if await self._api.login(async_get_clientsession(self._hass)):
                 self._logintime = datetime.now()
+                if isinstance(self._api, SoliscloudAPI):
+                    self._controllable = self._api._token != ""
         return self._api.is_online
 
     async def _logout(self) -> None:
@@ -103,21 +133,28 @@ class InverterService():
         self._logintime = None
 
     async def async_discover(self, *_) -> None:
-        """ Try to discover and retry if needed."""
+        """Try to discover and retry if needed."""
         capabilities: dict[str, list[str]] = {}
         capabilities = await self._do_discover()
+
         if capabilities:
+            # _LOGGER.debug(f"capabilities: {capabilities}")
+            controls = {}
+            if self.controllable:
+                for inverter_sn in capabilities:
+                    controls[inverter_sn] = await self._api.get_control_data(inverter_sn, controls=all_controls)
+                    controls[inverter_sn] = [cid for cid in controls[inverter_sn] if cid in all_controls]
+
+            self._controls = controls
+
             if self._discovery_callback and self._discovery_cookie:
                 self._discovery_callback(capabilities, self._discovery_cookie)
             self._retry_delay_seconds = 0
         else:
-            self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, \
-                self._retry_delay_seconds + RETRY_DELAY_SECONDS)
-            _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", \
-                self._retry_delay_seconds)
+            self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, self._retry_delay_seconds + RETRY_DELAY_SECONDS)
+            _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", self._retry_delay_seconds)
             await self._logout()
-            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, \
-                self._retry_delay_seconds)
+            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, self._retry_delay_seconds)
 
     async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
@@ -133,19 +170,15 @@ class InverterService():
                     capabilities[inverter_serial] = data.keys()
         return capabilities
 
-
-
-    def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str
-    ) -> None:
-        """ Subscribe to changes in 'attribute' from inverter 'serial'."""
-        _LOGGER.info("Subscribing sensor to attribute %s for inverter %s",
-            attribute, serial)
+    def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str) -> None:
+        """Subscribe to changes in 'attribute' from inverter 'serial'."""
+        _LOGGER.info(f"Subscribing {subscriber.entity_type} to attribute {attribute:s} for inverter {serial:s}")
         if serial not in self._subscriptions:
             self._subscriptions[serial] = {}
         self._subscriptions[serial][attribute] = subscriber
 
     async def update_devices(self, data: GinlongData) -> None:
-        """ Update all registered sensors. """
+        """Update all registered sensors."""
         try:
             serial = getattr(data, INVERTER_SERIAL)
         except AttributeError:
@@ -153,6 +186,7 @@ class InverterService():
         if serial not in self._subscriptions:
             return
         for attribute in data.keys():
+            _LOGGER.debug(f"Checking if we need to update {attribute} for {serial}")
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
 
@@ -160,9 +194,9 @@ class InverterService():
                     # Overriding stale AC Power value when inverter is offline
                     value = 0
                 elif attribute == INVERTER_ENERGY_TODAY:
-                    # Energy_today is not reset at midnight, but in the 
-                    # morning at sunrise when the inverter switches back on. This 
-                    # messes up the energy dashboard. Return 0 while inverter is 
+                    # Energy_today is not reset at midnight, but in the
+                    # morning at sunrise when the inverter switches back on. This
+                    # messes up the energy dashboard. Return 0 while inverter is
                     # still off.
                     is_am = datetime.now().hour < 12
                     if getattr(data, INVERTER_STATE) == 2:
@@ -173,8 +207,7 @@ class InverterService():
                     elif getattr(data, INVERTER_STATE) == 1:
                         last_updated_state = None
                         try:
-                            last_updated_state = \
-                                self._subscriptions[serial][INVERTER_STATE].measured
+                            last_updated_state = self._subscriptions[serial][INVERTER_STATE].measured
                         except KeyError:
                             pass
                         if last_updated_state is not None:
@@ -189,7 +222,7 @@ class InverterService():
                                     continue
                             else:
                                 if value == 0:
-                                    # SC sometimes produces zeros in the evening, ignore 
+                                    # SC sometimes produces zeros in the evening, ignore
                                     continue
                 (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
 
@@ -203,6 +236,8 @@ class InverterService():
                 return
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)
+                _LOGGER.debug(">>> Data returned from fetch_inverter_data:")
+                _LOGGER.debug(f">>> {data}")
                 if data is not None:
                     # And finally get the inverter details
                     # default to updating after SCHEDULE_OK minutes;
@@ -214,7 +249,7 @@ class InverterService():
                         if nxt > dt_util.utcnow():
                             update = nxt - dt_util.utcnow()
                     except AttributeError:
-                        pass # no last_update found, so keep just using SCHEDULE_OK as a safe default
+                        pass  # no last_update found, so keep just using SCHEDULE_OK as a safe default
                     self._last_updated = datetime.now()
                     await self.update_devices(data)
                 else:
@@ -230,13 +265,13 @@ class InverterService():
                 await self._logout()
 
     def schedule_update(self, td: timedelta) -> None:
-        """ Schedule an update after td time. """
+        """Schedule an update after td time."""
         nxt = dt_util.utcnow() + td
         _LOGGER.debug("Scheduling next update in %s, at %s", str(td), nxt)
         async_track_point_in_utc_time(self._hass, self.async_update, nxt)
 
     def schedule_discovery(self, callback, cookie: dict[str, Any], seconds: int = 1):
-        """ Schedule a discovery after seconds seconds. """
+        """Schedule a discovery after seconds seconds."""
         _LOGGER.debug("Scheduling discovery in %s seconds.", seconds)
         self._discovery_callback = callback
         self._discovery_cookie = cookie
@@ -244,15 +279,15 @@ class InverterService():
         async_track_point_in_utc_time(self._hass, self.async_discover, nxt)
 
     async def shutdown(self):
-        """ Shutdown the service """
+        """Shutdown the service"""
         await self._logout()
 
     @property
     def status(self):
-        """ Return status of service."""
+        """Return status of service."""
         return ONLINE if self._api.is_online else OFFLINE
 
     @property
     def last_updated(self):
-        """ Return when service last checked for updates."""
+        """Return when service last checked for updates."""
         return self._last_updated

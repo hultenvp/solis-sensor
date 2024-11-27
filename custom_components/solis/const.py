@@ -19,7 +19,24 @@ from homeassistant.const import (
     PERCENTAGE,
 )
 
+from typing import Any
+
 from .ginlong_const import *
+
+
+VERSION = "3.7.1"
+
+# ATTRIBUTES
+LAST_UPDATED = "Last updated"
+SERIAL = "Inverter serial"
+API_NAME = "API Name"
+
+EMPTY_ATTR: dict[str, Any] = {
+    LAST_UPDATED: None,
+    SERIAL: None,
+    API_NAME: None,
+}
+
 
 CONF_PORTAL_DOMAIN = "portal_domain"
 CONF_PORTAL_VERSION = "portal_version"
