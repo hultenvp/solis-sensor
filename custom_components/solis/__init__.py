@@ -36,6 +36,8 @@ PLATFORMS = [
     Platform.SENSOR,
     Platform.SELECT,
     Platform.NUMBER,
+    Platform.TIME,
+    Platform.BUTTON,
 ]
 
 

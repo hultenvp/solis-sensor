@@ -28,15 +28,14 @@ from .ginlong_const import (
     INVERTER_TIMESTAMP_UPDATE,
 )
 
-from .control_const import SELECT_TYPES, NUMBER_TYPES
-
-all_controls = [cid for cid in SELECT_TYPES | NUMBER_TYPES]
 
 # REFRESH CONSTANTS
 # Match up with the default SolisCloud API resolution of 5 minutes
-SCHEDULE_OK = 5
+SCHEDULE_OK = 300
 # Attempt retries every 1 minute if we fail to talk to the API, though
-SCHEDULE_NOK = 1
+SCHEDULE_NOK = 60
+# If we have controls then update more frequently because they can be changed externtally
+SCHEDULE_CONTROLS = 30
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -109,6 +108,14 @@ class InverterService:
         return self._api.api_name
 
     @property
+    def subscriptions(self) -> dict[str, dict[str, ServiceSubscriber]]:
+        return self._subscriptions
+
+    @property
+    def api(self):
+        return self._api
+
+    @property
     def has_controls(self) -> bool:
         return self._controllable & (len(self._controls) > 0)
 
@@ -138,14 +145,14 @@ class InverterService:
         capabilities = await self._do_discover()
 
         if capabilities:
-            # _LOGGER.debug(f"capabilities: {capabilities}")
             controls = {}
             if self.controllable:
                 for inverter_sn in capabilities:
-                    controls[inverter_sn] = await self._api.get_control_data(inverter_sn, controls=all_controls)
-                    controls[inverter_sn] = [cid for cid in controls[inverter_sn] if cid in all_controls]
+                    controls[inverter_sn] = await self._api.get_control_data(inverter_sn)
+                    # controls[inverter_sn] = [cid for cid in controls[inverter_sn] if cid in controls_by_hmi]
 
             self._controls = controls
+            _LOGGER.debug(f"controls: {controls}")
 
             if self._discovery_callback and self._discovery_cookie:
                 self._discovery_callback(capabilities, self._discovery_cookie)
@@ -172,10 +179,16 @@ class InverterService:
 
     def subscribe(self, subscriber: ServiceSubscriber, serial: str, attribute: str) -> None:
         """Subscribe to changes in 'attribute' from inverter 'serial'."""
-        _LOGGER.info(f"Subscribing {subscriber.entity_type} to attribute {attribute:s} for inverter {serial:s}")
+        if subscriber.entity_type != "sensor":
+            _LOGGER.info(f"Subscribing {subscriber.entity_type} to attribute {attribute:s} for inverter {serial:s}")
         if serial not in self._subscriptions:
             self._subscriptions[serial] = {}
-        self._subscriptions[serial][attribute] = subscriber
+
+        # Multiple controls can be subscribed to one attribute so make this a list
+        if attribute not in self._subscriptions[serial]:
+            self._subscriptions[serial][attribute] = [subscriber]
+        else:
+            self._subscriptions[serial][attribute].append(subscriber)
 
     async def update_devices(self, data: GinlongData) -> None:
         """Update all registered sensors."""
@@ -186,7 +199,6 @@ class InverterService:
         if serial not in self._subscriptions:
             return
         for attribute in data.keys():
-            _LOGGER.debug(f"Checking if we need to update {attribute} for {serial}")
             if attribute in self._subscriptions[serial]:
                 value = getattr(data, attribute)
 
@@ -207,7 +219,7 @@ class InverterService:
                     elif getattr(data, INVERTER_STATE) == 1:
                         last_updated_state = None
                         try:
-                            last_updated_state = self._subscriptions[serial][INVERTER_STATE].measured
+                            last_updated_state = self._subscriptions[serial][INVERTER_STATE][0].measured
                         except KeyError:
                             pass
                         if last_updated_state is not None:
@@ -224,11 +236,12 @@ class InverterService:
                                 if value == 0:
                                     # SC sometimes produces zeros in the evening, ignore
                                     continue
-                (self._subscriptions[serial][attribute]).data_updated(value, self.last_updated)
+                for subscriber in self._subscriptions[serial][attribute]:
+                    subscriber.data_updated(value, self.last_updated)
 
     async def async_update(self, *_) -> None:
         """Update the data from Ginlong portal."""
-        update = timedelta(minutes=SCHEDULE_NOK)
+        update = timedelta(seconds=SCHEDULE_NOK)
         # Login using username and password, but only every HRS_BETWEEN_LOGIN hours
         if await self._login():
             inverters = self._api.inverters
@@ -236,12 +249,14 @@ class InverterService:
                 return
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)
-                _LOGGER.debug(">>> Data returned from fetch_inverter_data:")
-                _LOGGER.debug(f">>> {data}")
+
                 if data is not None:
                     # And finally get the inverter details
-                    # default to updating after SCHEDULE_OK minutes;
-                    update = timedelta(minutes=SCHEDULE_OK)
+                    # default to updating after SCHEDULE_OK seconds;
+                    if self.controllable:
+                        update = timedelta(seconds=SCHEDULE_CONTROLS)
+                    else:
+                        update = timedelta(seconds=SCHEDULE_OK)
                     # ...but try to figure out a better next-update time based on when the API last received its data
                     try:
                         ts = getattr(data, INVERTER_TIMESTAMP_UPDATE)
@@ -253,7 +268,7 @@ class InverterService:
                     self._last_updated = datetime.now()
                     await self.update_devices(data)
                 else:
-                    update = timedelta(minutes=SCHEDULE_NOK)
+                    update = timedelta(seconds=SCHEDULE_NOK)
                     # Reset session and try to login again next time
                     await self._logout()
 

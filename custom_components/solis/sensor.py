@@ -94,7 +94,7 @@ def create_sensors(
     hass_sensors = []
     for inverter_sn in sensors:
         for sensor_type in sensors[inverter_sn]:
-            _LOGGER.debug("Creating %s (%s)", sensor_type, inverter_sn)
+            # _LOGGER.debug("Creating %s (%s)", sensor_type, inverter_sn)
             hass_sensors.append(SolisSensor(inverter_service, inverter_name, inverter_sn, sensor_type))
     return hass_sensors
 

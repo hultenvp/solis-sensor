@@ -1,6 +1,6 @@
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.number import NumberEntity
+from homeassistant.components.button import ButtonEntity
 
 
 import asyncio
@@ -9,11 +9,10 @@ from datetime import datetime
 
 from .const import (
     DOMAIN,
-    LAST_UPDATED,
 )
 
 from .service import ServiceSubscriber, InverterService
-from .control_const import SolisBaseControlEntity, RETRIES, RETRY_WAIT, ALL_CONTROLS, SolisNumberEntityDescription
+from .control_const import SolisBaseControlEntity, RETRIES, RETRY_WAIT, ALL_CONTROLS, SolisButtonEntityDescription
 
 _LOGGER = logging.getLogger(__name__)
 RETRIES = 100
@@ -27,7 +26,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     _LOGGER.debug(f"Domain: {DOMAIN}")
     service = hass.data[DOMAIN][config_entry.entry_id]
 
-    _LOGGER.info(f"Waiting for discovery of Number entities for plant {plant_id}")
+    _LOGGER.info(f"Waiting for discovery of Button entities for plant {plant_id}")
     await asyncio.sleep(8)
     attempts = 0
     while (attempts < RETRIES) and (not service.has_controls):
@@ -49,11 +48,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
             hmi_fb00 = service.api._hmi_fb00[inverter_sn]
             _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_fb00}")
             for cid in service.controls[inverter_sn]:
+                _LOGGER.debug(f">>> {cid:4s}")
                 for index, entity in enumerate(ALL_CONTROLS[hmi_fb00][cid]):
-                    if isinstance(entity, SolisNumberEntityDescription):
-                        _LOGGER.debug(f"Adding number entity {entity.name} for inverter Sn {inverter_sn} cid {cid}")
+                    _LOGGER.debug(f">>>      {index} {entity.name} {isinstance(entity, SolisButtonEntityDescription)}")
+                    if isinstance(entity, SolisButtonEntityDescription):
+                        _LOGGER.debug(f"Adding Button entity {entity.name} for inverter Sn {inverter_sn} cid {cid}")
                         entities.append(
-                            SolisNumberEntity(
+                            SolisButtonEntity(
                                 service,
                                 config_entry.data["name"],
                                 inverter_sn,
@@ -64,10 +65,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
                         )
 
         if len(entities) > 0:
-            _LOGGER.debug(f"Creating {len(entities)} number entities")
+            _LOGGER.debug(f"Creating {len(entities)} Button entities")
             async_add_entities(entities)
         else:
-            _LOGGER.debug(f"No number controls found for Plant ID {plant_id}")
+            _LOGGER.debug(f"No Button controls found for Plant ID {plant_id}")
 
     else:
         _LOGGER.debug(f"No controls found for Plant ID {plant_id}")
@@ -75,37 +76,21 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     return True
 
 
-class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity):
-    def __init__(self, service: InverterService, config_name, inverter_sn, cid, number_info, index):
-        super().__init__(service, config_name, inverter_sn, cid, number_info)
-        self._attr_native_value = 0
-        self._attr_native_max_value = number_info.native_max_value
-        self._attr_native_min_value = number_info.native_min_value
-        self._attr_native_step = number_info.native_step
-        self._attr_native_unit_of_measurement = number_info.native_unit_of_measurement
-        self._icon = number_info.icon
-        self._splitter = number_info.splitter
+class SolisButtonEntity(SolisBaseControlEntity, ServiceSubscriber, ButtonEntity):
+    def __init__(self, service: InverterService, config_name, inverter_sn, cid, button_info, index):
+        super().__init__(service, config_name, inverter_sn, cid, button_info)
         self._index = index
+        self._joiner = button_info.joiner
+        self._entities = service.subscriptions.get(inverter_sn, {}).get(cid, [])
         # Subscribe to the service with the cid as the index
-        service.subscribe(self, inverter_sn, str(cid))
+        # service.subscribe(self, inverter_sn, str(cid))
 
     def do_update(self, value, last_updated):
         # When the data from the API changes this method will be called with value as the new value
         # return super().do_update(value, last_updated)
-        _LOGGER.debug(f"Update state for {self._name}")
+        pass
 
-        value = self.split(value)
-
-        if self.hass and self._attr_native_value != value:
-            self._attr_native_value = value
-            self._attributes[LAST_UPDATED] = last_updated
-            self.async_write_ha_state()
-            return True
-        return False
-
-    async def async_set_native_value(self, value: float) -> None:
-        _LOGGER.debug(f"async_set_native_value for {self._name}")
-        self._attr_native_value = value
-        self._attributes[LAST_UPDATED] = datetime.now()
-        self.async_write_ha_state()
-        await self.write_control_data(str(value))
+    async def async_press(self) -> None:
+        """Handle the button press."""
+        for entity in self._entities:
+            _LOGGER.debug(f"{entity.name:s} {entity.state} {entity.index}")

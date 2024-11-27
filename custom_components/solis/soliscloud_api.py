@@ -29,6 +29,7 @@ from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
 from .soliscloud_const import *
 
+from time import sleep
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,6 +45,8 @@ CONTENT = "Content"
 STATUS_CODE = "StatusCode"
 MESSAGE = "Message"
 
+CONTROL_DELAY = 0.1
+
 # VALUE_RECORD = '_from_record'
 # VALUE_ELEMENT = ''
 
@@ -56,9 +59,8 @@ AUTHENTICATE = "/v2/api/login"
 CONTROL = "/v2/api/control"
 AT_READ = "/v2/api/atRead"
 
-from .control_const import SELECT_TYPES, NUMBER_TYPES
+from .control_const import HMI_CID, ALL_CONTROLS
 
-all_controls = [cid for cid in SELECT_TYPES | NUMBER_TYPES]
 
 InverterDataType = dict[str, dict[str, list]]
 
@@ -248,6 +250,7 @@ class SoliscloudAPI(BaseAPI):
         self._data: dict[str, str | int | float] = {}
         self._inverter_list: dict[str, str] | None = None
         self._token = ""
+        self._hmi_fb00 = {}
 
     @property
     def api_name(self) -> str:
@@ -361,20 +364,15 @@ class SoliscloudAPI(BaseAPI):
                 #    self._collect_station_list_data(payload2)
                 if self._token != "":
                     _LOGGER.debug(f"Fetching control data for SN:{inverter_serial}")
-                    control_data = await self.get_control_data(inverter_serial, all_controls)
+                    control_data = await self.get_control_data(inverter_serial)
 
                 if payload_detail is not None:
                     self._collect_plant_data(payload_detail)
+
                 if self._data is not None and INVERTER_SERIAL in self._data:
                     self._post_process()
-                    # This is the sensor data that is currently being retrieved
-                    _LOGGER.debug(">>> Sensor Data:")
-                    _LOGGER.debug(self._data)
-                    # We need to get the control data into the same format
-                    _LOGGER.debug(">>> Control Data:")
-                    _LOGGER.debug(control_data)
-
                     return GinlongData(self._data | control_data)
+
                 _LOGGER.debug("Unexpected response from server: %s", payload)
         return None
 
@@ -427,22 +425,50 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
-    async def get_control_data(self, device_serial: str, controls: list) -> dict[str, Any] | None:
+    async def get_control_data(self, device_serial: str) -> dict[str, Any] | None:
         control_data = {}
-        for cid in controls:
-            params = {"inverterSn": str(device_serial), "cid": str(cid)}
+
+        if device_serial not in self._hmi_fb00:
+            _LOGGER.debug(f"No firmware version found for Inverter SN {device_serial}")
+            params = {
+                "inverterSn": str(device_serial),
+                "cid": HMI_CID,
+            }
             result = await self._post_data_json(AT_READ, params, csrf=True)
             if result[SUCCESS] is True:
                 jsondata = result[CONTENT]
                 if jsondata["code"] == "0":
-                    _LOGGER.debug(f"    cid: {str(cid):5s} - OK")
-                    control_data[str(cid)] = jsondata["data"]["msg"]
+                    try:
+                        hmi_flag = jsondata.get("data", {}).get("msg", "")
+                        self._hmi_fb00[device_serial] = hex(int(hmi_flag)) == "0xaa55"
+                        if self._hmi_fb00[device_serial]:
+                            _LOGGER.debug(f"HMI firmware version >=4B00 for Inverter SN {device_serial} ")
+                        else:
+                            _LOGGER.debug(f"HMI firmware version <4B00 for Inverter SN {device_serial} ")
+
+                    except:
+                        _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
                 else:
-                    _LOGGER.info(
-                        f"    cid: {str(cid):5s} - {AT_READ} responded with error: {jsondata['code']}:{jsondata['msg']}"
-                    )
+                    _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
             else:
-                _LOGGER.info(f"  cid: {str(cid):5s} - {AT_READ} responded with error: {result[MESSAGE]}")
+                _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
+
+        if device_serial in self._hmi_fb00:
+            controls = ALL_CONTROLS[self._hmi_fb00[device_serial]]
+            for cid in controls:
+                params = {"inverterSn": str(device_serial), "cid": str(cid)}
+                result = await self._post_data_json(AT_READ, params, csrf=True)
+                if result[SUCCESS] is True:
+                    jsondata = result[CONTENT]
+                    if jsondata["code"] == "0":
+                        _LOGGER.debug(f"    cid: {str(cid):5s} - {jsondata.get('data',{}).get('msg','')}")
+                        control_data[str(cid)] = jsondata.get("data", {}).get("msg", "")
+                    else:
+                        _LOGGER.info(
+                            f"    cid: {str(cid):5s} - {AT_READ} responded with error: {jsondata['code']}:{jsondata['msg']}"
+                        )
+                else:
+                    _LOGGER.info(f"  cid: {str(cid):5s} - {AT_READ} responded with error: {result[MESSAGE]}")
 
         return control_data
 
@@ -726,3 +752,24 @@ class SoliscloudAPI(BaseAPI):
         else:
             _LOGGER.info("Unable to fetch authenticate with username and password")
         return ""
+
+    async def write_control_data(self, device_serial: str, cid: str, value: str):
+        _LOGGER.debug(f">>> Writing value {value} for cid {cid} to inverter {device_serial}")
+
+        params = {"inverterSn": str(device_serial), "cid": str(cid), "value": value}
+        result = await self._post_data_json(CONTROL, params, csrf=True)
+
+        if result[SUCCESS] is True:
+            jsondata = result[CONTENT]
+            if jsondata["code"] == "0":
+                _LOGGER.debug(f"Set code returned OK. Reading code back.")
+                await asyncio.sleep(CONTROL_DELAY)
+                control_data = await self.get_control_data(device_serial, [cid])
+                _LOGGER.debug(f"Data read back: {control_data.get(str(cid), None)}")
+
+            else:
+                _LOGGER.info(
+                    f"cid: {str(cid):5s} - {CONTROL} responded with error: {jsondata['code']}:{jsondata.get('msg',None)}"
+                )
+        else:
+            _LOGGER.info(f"  cid: {str(cid):5s} - {CONTROL} responded with error: {result[MESSAGE]}")
