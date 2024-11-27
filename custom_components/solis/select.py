@@ -69,8 +69,14 @@ class SolisSelectEntity(SolisBaseControlEntity, ServiceSubscriber, SelectEntity)
     def do_update(self, value, last_updated):
         # When the data from the API chnages this method will be called with value as the new value
         # return super().do_update(value, last_updated)
-        if self.hass and self._attr_current_option != value:
-            self._attr_current_option = value
+        _LOGGER.debug(f">>> Update for {self.name}")
+        _LOGGER.debug(f">>> Current option: {self._attr_current_option}")
+        _LOGGER.debug(f">>> Value: {value}")
+        _LOGGER.debug(f">>> Lookup: {self._option_dict.get(value,None)}")
+        _LOGGER.debug(f">>> {LAST_UPDATED}: {last_updated}")
+
+        if self.hass and self._attr_current_option != self._option_dict.get(value, self._attr_current_option):
+            self._attr_current_option = self._option_dict.get(value, self._attr_current_option)
             self._attributes[LAST_UPDATED] = last_updated
             self.async_write_ha_state()
             return True
