@@ -99,27 +99,37 @@ class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
         # return super().do_update(value, last_updated)
         _LOGGER.debug(f"Update state for {self._name}")
         _LOGGER.debug(f">>> Initial value: {value}")
-        value = self.split(value).split(":")
-        _LOGGER.debug(f">>> Split value: {value}")
-        value = datetime(
-            year=YEAR,
-            month=MONTH,
-            day=DAY,
-            hour=int(value[0]),
-            minute=int(value[1]),
-        ).time()
-        _LOGGER.debug(f">>> Datetime value: {value}")
+        values = self.split(value).split(":")
+        _LOGGER.debug(f">>> Split value: {values}")
+        time_value = None
+        try:
+            time_value = datetime(
+                year=YEAR,
+                month=MONTH,
+                day=DAY,
+                hour=int(values[0]),
+                minute=int(values[1]),
+            ).time()
+            _LOGGER.debug(f">>> Datetime value: {time_value}")
+        except:
+            _LOGGER.debug("Unable to convert {value} to time")
 
-        if self.hass and self._attr_native_value != value:
-            self._attr_native_value = value
+        if time_value is None:
+            return False
+        elif self.hass and self._attr_native_value != time_value:
+            self._attr_native_value = time_value
             self._attributes[LAST_UPDATED] = last_updated
             self.async_write_ha_state()
             return True
         return False
 
-    async def async_set_native_value(self, value: float) -> None:
-        _LOGGER.debug(f"async_set_native_value for {self._name}")
+    @property
+    def to_string(self):
+        return self._attr_native_value.strftime('%H,%M')
+
+    async def async_set_value(self, value: float) -> None:
+        _LOGGER.debug(f"async_set_value to {value} for {self._name}")
         self._attr_native_value = value
         self._attributes[LAST_UPDATED] = datetime.now()
         self.async_write_ha_state()
-        # await self.write_control_data(str(value))
+        #await self.write_control_data(str(value))

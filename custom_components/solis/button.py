@@ -93,4 +93,7 @@ class SolisButtonEntity(SolisBaseControlEntity, ServiceSubscriber, ButtonEntity)
     async def async_press(self) -> None:
         """Handle the button press."""
         for entity in self._entities:
-            _LOGGER.debug(f"{entity.name:s} {entity.state} {entity.index}")
+            _LOGGER.debug(f"{entity.name:s} {entity.to_string:s} {entity.index}")
+        value = self. _joiner.join([entity.to_string for entity in self._entities])
+        _LOGGER.debug(f"{self._cid} {value}")
+        await self.write_control_data(value)

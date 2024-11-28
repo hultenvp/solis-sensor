@@ -103,6 +103,9 @@ class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity)
             return True
         return False
 
+    def to_string(self):
+        return str(self._attr_native_value)
+
     async def async_set_native_value(self, value: float) -> None:
         _LOGGER.debug(f"async_set_native_value for {self._name}")
         self._attr_native_value = value

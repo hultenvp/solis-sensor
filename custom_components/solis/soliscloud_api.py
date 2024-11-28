@@ -425,7 +425,7 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
-    async def get_control_data(self, device_serial: str) -> dict[str, Any] | None:
+    async def get_control_data(self, device_serial: str, cid="") -> dict[str, Any] | None:
         control_data = {}
 
         if device_serial not in self._hmi_fb00:
@@ -454,7 +454,10 @@ class SoliscloudAPI(BaseAPI):
                 _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
 
         if device_serial in self._hmi_fb00:
-            controls = ALL_CONTROLS[self._hmi_fb00[device_serial]]
+            if cid == "":
+                controls = ALL_CONTROLS[self._hmi_fb00[device_serial]]
+            else:
+                controls=[cid]
             for cid in controls:
                 params = {"inverterSn": str(device_serial), "cid": str(cid)}
                 result = await self._post_data_json(AT_READ, params, csrf=True)
@@ -764,7 +767,7 @@ class SoliscloudAPI(BaseAPI):
             if jsondata["code"] == "0":
                 _LOGGER.debug(f"Set code returned OK. Reading code back.")
                 await asyncio.sleep(CONTROL_DELAY)
-                control_data = await self.get_control_data(device_serial, [cid])
+                control_data = await self.get_control_data(device_serial, cid=str(cid))
                 _LOGGER.debug(f"Data read back: {control_data.get(str(cid), None)}")
 
             else:
