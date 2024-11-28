@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     _LOGGER.debug(f"Domain: {DOMAIN}")
     service = hass.data[DOMAIN][config_entry.entry_id]
 
-    _LOGGER.info(f"Waiting for discovery of Timer entities for plant {plant_id}")
+    _LOGGER.info(f"Waiting for discovery of controls for plant {plant_id}")
     await asyncio.sleep(8)
     attempts = 0
     while (attempts < RETRIES) and (not service.has_controls):
@@ -41,30 +41,19 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     if service.has_controls:
         entities = []
         _LOGGER.debug(f"Plant ID {plant_id} has controls:")
-        _LOGGER.debug(service.controls)
         for inverter_sn in service.controls:
-            _LOGGER.debug(f"Waiting for inverter {inverter_sn} HMI status")
-            attempts = 0
-            while service.api._hmi_fb00[inverter_sn] is None:
-                _LOGGER.debug(f"    Attempt {attempts} failed")
-                await asyncio.sleep(RETRY_WAIT)
-                attempts += 1
-            hmi_fb00 = service.api._hmi_fb00[inverter_sn]
-            _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_fb00}")
-            for cid in service.controls[inverter_sn]:
-                for index, entity in enumerate(ALL_CONTROLS[hmi_fb00][cid]):
-                    if isinstance(entity, SolisTimeEntityDescription):
-                        _LOGGER.debug(f"Adding time entity {entity.name} for inverter Sn {inverter_sn} cid {cid}")
-                        entities.append(
-                            SolisTimeEntity(
-                                service,
-                                config_entry.data["name"],
-                                inverter_sn,
-                                cid,
-                                entity,
-                                index,
-                            )
-                        )
+            for cid, index, entity, button, initial_value in service.controls[inverter_sn]["time"]:
+                entities.append(
+                    SolisTimeEntity(
+                        service,
+                        config_entry.data["name"],
+                        inverter_sn,
+                        cid,
+                        entity,
+                        index,
+                        initial_value,
+                    )
+                )
 
         if len(entities) > 0:
             _LOGGER.debug(f"Creating {len(entities)} time entities")
@@ -79,7 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
 
 class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
-    def __init__(self, service: InverterService, config_name, inverter_sn, cid, time_info, index):
+    def __init__(self, service: InverterService, config_name, inverter_sn, cid, time_info, index, initial_value):
         super().__init__(service, config_name, inverter_sn, cid, time_info)
         self._attr_native_value = datetime(
             year=YEAR,
@@ -92,6 +81,8 @@ class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
         self._splitter = time_info.splitter
         self._index = index
         # Subscribe to the service with the cid as the index
+        if initial_value is not None:
+            self.do_update(initial_value, datetime.now())
         service.subscribe(self, inverter_sn, str(cid))
 
     def do_update(self, value, last_updated):
@@ -125,11 +116,11 @@ class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
 
     @property
     def to_string(self):
-        return self._attr_native_value.strftime('%H,%M')
+        return self._attr_native_value.strftime("%-H,%-M")
 
     async def async_set_value(self, value: float) -> None:
         _LOGGER.debug(f"async_set_value to {value} for {self._name}")
         self._attr_native_value = value
         self._attributes[LAST_UPDATED] = datetime.now()
         self.async_write_ha_state()
-        #await self.write_control_data(str(value))
+        # await self.write_control_data(str(value))

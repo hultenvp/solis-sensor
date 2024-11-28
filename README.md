@@ -5,7 +5,9 @@ As you might have noticed I'm having trouble to spend enough time on maintaining
 
 # Control Beta Test
 
-This repo includes a beta version of device control using the same API as the SolisCloud app. This opeartes slighty differently depending on your HMI firmware version. This should be detected automatically:
+This repo includes a beta version of device control using the same API as the SolisCloud app. This opeartes slighty differently depending on your HMI firmware version. This should be detected automatically.
+
+Please report any issues via https://github.com/fboundy/solis-sensor/issues
 
 ## Version 4A00 and Earlier
 

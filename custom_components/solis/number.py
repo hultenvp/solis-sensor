@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     _LOGGER.debug(f"Domain: {DOMAIN}")
     service = hass.data[DOMAIN][config_entry.entry_id]
 
-    _LOGGER.info(f"Waiting for discovery of Number entities for plant {plant_id}")
+    _LOGGER.info(f"Waiting for discovery of controls for plant {plant_id}")
     await asyncio.sleep(8)
     attempts = 0
     while (attempts < RETRIES) and (not service.has_controls):
@@ -38,30 +38,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     if service.has_controls:
         entities = []
         _LOGGER.debug(f"Plant ID {plant_id} has controls:")
-        _LOGGER.debug(service.controls)
         for inverter_sn in service.controls:
-            _LOGGER.debug(f"Waiting for inverter {inverter_sn} HMI status")
-            attempts = 0
-            while service.api._hmi_fb00[inverter_sn] is None:
-                _LOGGER.debug(f"    Attempt {attempts} failed")
-                await asyncio.sleep(RETRY_WAIT)
-                attempts += 1
-            hmi_fb00 = service.api._hmi_fb00[inverter_sn]
-            _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_fb00}")
-            for cid in service.controls[inverter_sn]:
-                for index, entity in enumerate(ALL_CONTROLS[hmi_fb00][cid]):
-                    if isinstance(entity, SolisNumberEntityDescription):
-                        _LOGGER.debug(f"Adding number entity {entity.name} for inverter Sn {inverter_sn} cid {cid}")
-                        entities.append(
-                            SolisNumberEntity(
-                                service,
-                                config_entry.data["name"],
-                                inverter_sn,
-                                cid,
-                                entity,
-                                index,
-                            )
-                        )
+            for cid, index, entity, button, initial_value in service.controls[inverter_sn]["number"]:
+                entities.append(
+                    SolisNumberEntity(
+                        service,
+                        config_entry.data["name"],
+                        inverter_sn,
+                        cid,
+                        entity,
+                        index,
+                        button,
+                        initial_value,
+                    )
+                )
 
         if len(entities) > 0:
             _LOGGER.debug(f"Creating {len(entities)} number entities")
@@ -76,7 +66,17 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
 
 class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity):
-    def __init__(self, service: InverterService, config_name, inverter_sn, cid, number_info, index):
+    def __init__(
+        self,
+        service: InverterService,
+        config_name,
+        inverter_sn: str,
+        cid: str,
+        number_info,
+        index: int,
+        button: bool,
+        initial_value,
+    ):
         super().__init__(service, config_name, inverter_sn, cid, number_info)
         self._attr_native_value = 0
         self._attr_native_max_value = number_info.native_max_value
@@ -86,6 +86,9 @@ class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity)
         self._icon = number_info.icon
         self._splitter = number_info.splitter
         self._index = index
+        self._button = button
+        if initial_value is not None:
+            self.do_update(initial_value, datetime.now())
         # Subscribe to the service with the cid as the index
         service.subscribe(self, inverter_sn, str(cid))
 
@@ -103,12 +106,21 @@ class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity)
             return True
         return False
 
+    @property
     def to_string(self):
-        return str(self._attr_native_value)
+        if self._attr_native_step >= 1:
+            return f"{int(self._attr_native_value):d}"
+        elif self._attr_native_step >= 0.1:
+            return f"{self._attr_native_value:0.1f}"
+        elif self._attr_native_step >= 0.01:
+            return f"{self._attr_native_value:0.2f}"
+        else:
+            return f"{self._attr_native_value:f}"
 
     async def async_set_native_value(self, value: float) -> None:
         _LOGGER.debug(f"async_set_native_value for {self._name}")
         self._attr_native_value = value
         self._attributes[LAST_UPDATED] = datetime.now()
         self.async_write_ha_state()
-        await self.write_control_data(str(value))
+        if not self._button:
+            await self.write_control_data(str(value))

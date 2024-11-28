@@ -28,6 +28,7 @@ from .ginlong_const import (
     INVERTER_TIMESTAMP_UPDATE,
 )
 
+from .control_const import HMI_CID, ALL_CONTROLS, CONTROL_TYPES
 
 # REFRESH CONSTANTS
 # Match up with the default SolisCloud API resolution of 5 minutes
@@ -92,9 +93,10 @@ class InverterService:
         self._hass: HomeAssistant = hass
         self._discovery_callback = None
         self._discovery_cookie: dict[str, Any] = {}
+        self._discovery_complete: bool = False
         self._retry_delay_seconds = 0
         self._controllable: bool = False
-        self._controls: dict[str, Any] = {}
+        self._controls: dict[str, dict[str, list[tuple]]] = {}
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
         elif isinstance(portal_config, SoliscloudConfig):
@@ -127,6 +129,10 @@ class InverterService:
     def controls(self) -> dict:
         return self._controls
 
+    @property
+    def discovery_complete(self) -> bool:
+        return self._discovery_complete
+
     async def _login(self) -> bool:
         if not self._api.is_online:
             if await self._api.login(async_get_clientsession(self._hass)):
@@ -145,23 +151,43 @@ class InverterService:
         capabilities = await self._do_discover()
 
         if capabilities:
-            controls = {}
             if self.controllable:
-                for inverter_sn in capabilities:
-                    controls[inverter_sn] = await self._api.get_control_data(inverter_sn)
-                    # controls[inverter_sn] = [cid for cid in controls[inverter_sn] if cid in controls_by_hmi]
-
-            self._controls = controls
-            _LOGGER.debug(f"controls: {controls}")
+                inverter_serials = list(capabilities.keys())
+                await self._discover_controls(inverter_serials)
 
             if self._discovery_callback and self._discovery_cookie:
                 self._discovery_callback(capabilities, self._discovery_cookie)
             self._retry_delay_seconds = 0
+            self._dicovery_complete = True
         else:
             self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, self._retry_delay_seconds + RETRY_DELAY_SECONDS)
             _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", self._retry_delay_seconds)
             await self._logout()
             self.schedule_discovery(self._discovery_callback, self._discovery_cookie, self._retry_delay_seconds)
+
+    async def _discover_controls(self, inverter_serials: list[str]):
+        _LOGGER.debug(f"Starting controls discovery")
+        controls = {}
+        control_lookup = {CONTROL_TYPES[platform]: platform for platform in CONTROL_TYPES}
+        for inverter_sn in inverter_serials:
+            controls[inverter_sn] = {platform: [] for platform in CONTROL_TYPES}
+            await self._api.get_control_data(inverter_sn, HMI_CID)
+            hmi_flag = self._api.hmi_fb00(inverter_sn)
+            _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_flag}")
+            control_desciptions = ALL_CONTROLS[hmi_flag]
+            for cid in control_desciptions:
+                button = len(control_desciptions[cid]) > 1
+                initial_value = await self._api.get_control_data(inverter_sn, cid)
+                initial_value = initial_value.get(cid, None)
+                for index, entity_description in enumerate(control_desciptions[cid]):
+                    entity_type = control_lookup[type(entity_description)]
+                    controls[inverter_sn][entity_type].append((cid, index, entity_description, button, initial_value))
+                    _LOGGER.debug(
+                        f"Adding {entity_type:s} entity {entity_description.name:s} for inverter Sn {inverter_sn:s} cid {cid:s} with index {index:d}"
+                    )
+
+        self._controls = controls
+        _LOGGER.debug(f"Controls discovery complete")
 
     async def _do_discover(self) -> dict[str, list[str]]:
         """Discover for all inverters the attributes it supports"""
@@ -172,7 +198,7 @@ class InverterService:
             if inverters is None:
                 return capabilities
             for inverter_serial in inverters:
-                data = await self._api.fetch_inverter_data(inverter_serial)
+                data = await self._api.fetch_inverter_data(inverter_serial, controls=False)
                 if data is not None:
                     capabilities[inverter_serial] = data.keys()
         return capabilities

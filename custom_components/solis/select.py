@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     # _LOGGER.debug(f"config_entry.data: {config_entry.data}")
     service = hass.data[DOMAIN][config_entry.entry_id]
 
-    _LOGGER.info(f"Waiting for discovery of Select entities for plant {plant_id}")
+    _LOGGER.info(f"Waiting for discovery of controls for plant {plant_id}")
     await asyncio.sleep(8)
     attempts = 0
     while (attempts < RETRIES) and (not service.has_controls):
@@ -37,29 +37,18 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
         entities = []
         _LOGGER.debug(f"Plant ID {plant_id} has controls:")
         for inverter_sn in service.controls:
-            _LOGGER.debug(f"Waiting for inverter {inverter_sn} HMI status")
-            attempts = 0
-            while service.api._hmi_fb00[inverter_sn] is None:
-                _LOGGER.debug(f"    Attempt {attempts} failed")
-                await asyncio.sleep(RETRY_WAIT)
-                attempts += 1
-            hmi_fb00 = service.api._hmi_fb00[inverter_sn]
-            _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_fb00}")
-
-            for cid in service.controls[inverter_sn]:
-                for index, entity in enumerate(ALL_CONTROLS[hmi_fb00][cid]):
-                    if isinstance(entity, SolisSelectEntityDescription):
-                        _LOGGER.debug(f"Adding select entity {entity.name} for inverter Sn {inverter_sn} cid {cid}")
-                        entities.append(
-                            SolisSelectEntity(
-                                service,
-                                config_entry.data["name"],
-                                inverter_sn,
-                                cid,
-                                entity,
-                                index,
-                            )
-                        )
+            for cid, index, entity, button, initial_value in service.controls[inverter_sn]["select"]:
+                entities.append(
+                    SolisSelectEntity(
+                        service,
+                        config_entry.data["name"],
+                        inverter_sn,
+                        cid,
+                        entity,
+                        index,
+                        initial_value,
+                    )
+                )
 
         if len(entities) > 0:
             _LOGGER.debug(f"Creating {len(entities)} sensor entities")
@@ -74,7 +63,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
 
 class SolisSelectEntity(SolisBaseControlEntity, ServiceSubscriber, SelectEntity):
-    def __init__(self, service: InverterService, config_name, inverter_sn, cid, select_info, index):
+    def __init__(
+        self,
+        service: InverterService,
+        config_name,
+        inverter_sn,
+        cid,
+        select_info,
+        index,
+        initial_value,
+    ):
         super().__init__(service, config_name, inverter_sn, cid, select_info)
         self._option_dict = select_info.option_dict
         self._reverse_dict = {self._option_dict[k]: str(k) for k in self._option_dict}
@@ -82,6 +80,8 @@ class SolisSelectEntity(SolisBaseControlEntity, ServiceSubscriber, SelectEntity)
         self._attr_options = list(select_info.option_dict.values())
         self._attr_current_option = None
         self._index = index
+        if initial_value is not None:
+            self.do_update(initial_value, datetime.now())
         # Subscribe to the service with the cid as the index
         service.subscribe(self, inverter_sn, cid)
 

@@ -46,6 +46,7 @@ STATUS_CODE = "StatusCode"
 MESSAGE = "Message"
 
 CONTROL_DELAY = 0.1
+CONTROL_RETRIES = 5
 
 # VALUE_RECORD = '_from_record'
 # VALUE_ELEMENT = ''
@@ -262,6 +263,9 @@ class SoliscloudAPI(BaseAPI):
         """Config this for this API instance."""
         return self._config
 
+    def hmi_fb00(self, inverter_sn):
+        return self._hmi_fb00.get(inverter_sn, None)
+
     @property
     def is_online(self) -> bool:
         """Returns if we are logged in."""
@@ -341,7 +345,7 @@ class SoliscloudAPI(BaseAPI):
             )
         return device_ids
 
-    async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
+    async def fetch_inverter_data(self, inverter_serial: str, controls=True) -> GinlongData | None:
         """
         Fetch data for given inverter.
         Collect available data from payload and store as GinlongData object
@@ -362,7 +366,7 @@ class SoliscloudAPI(BaseAPI):
                     self._collect_inverter_data(payload)
                 # if payload2 is not None:
                 #    self._collect_station_list_data(payload2)
-                if self._token != "":
+                if (self._token != "") and controls:
                     _LOGGER.debug(f"Fetching control data for SN:{inverter_serial}")
                     control_data = await self.get_control_data(inverter_serial)
 
@@ -457,21 +461,28 @@ class SoliscloudAPI(BaseAPI):
             if cid == "":
                 controls = ALL_CONTROLS[self._hmi_fb00[device_serial]]
             else:
-                controls=[cid]
+                controls = [cid]
             for cid in controls:
                 params = {"inverterSn": str(device_serial), "cid": str(cid)}
-                result = await self._post_data_json(AT_READ, params, csrf=True)
-                if result[SUCCESS] is True:
-                    jsondata = result[CONTENT]
-                    if jsondata["code"] == "0":
-                        _LOGGER.debug(f"    cid: {str(cid):5s} - {jsondata.get('data',{}).get('msg','')}")
-                        control_data[str(cid)] = jsondata.get("data", {}).get("msg", "")
+                attempts = 0
+                valid = False
+                while (attempts < CONTROL_RETRIES) and not valid:
+                    attempts += 1
+                    result = await self._post_data_json(AT_READ, params, csrf=True)
+                    if result[SUCCESS] is True:
+                        jsondata = result[CONTENT]
+                        if jsondata["code"] == "0":
+                            _LOGGER.debug(f"    cid: {str(cid):5s} - {jsondata.get('data',{}).get('msg','')}")
+                            control_data[str(cid)] = jsondata.get("data", {}).get("msg", "")
+                            valid = True
+                        else:
+                            error = f"    cid: {str(cid):5s} - {AT_READ} responded with error: {jsondata['code']}:{jsondata['msg']}"
+
                     else:
-                        _LOGGER.info(
-                            f"    cid: {str(cid):5s} - {AT_READ} responded with error: {jsondata['code']}:{jsondata['msg']}"
-                        )
-                else:
-                    _LOGGER.info(f"  cid: {str(cid):5s} - {AT_READ} responded with error: {result[MESSAGE]}")
+                        error = f"  cid: {str(cid):5s} - {AT_READ} responded with error: {result[MESSAGE]}"
+
+                if not valid:
+                    _LOGGER.info(error)
 
         return control_data
 
@@ -765,11 +776,16 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
             if jsondata["code"] == "0":
-                _LOGGER.debug(f"Set code returned OK. Reading code back.")
-                await asyncio.sleep(CONTROL_DELAY)
-                control_data = await self.get_control_data(device_serial, cid=str(cid))
-                _LOGGER.debug(f"Data read back: {control_data.get(str(cid), None)}")
-
+                jsondata = jsondata["data"][0]
+                if jsondata["code"] == "0":
+                    _LOGGER.debug(f"Set code returned OK. Reading code back.")
+                    await asyncio.sleep(CONTROL_DELAY)
+                    control_data = await self.get_control_data(device_serial, cid=str(cid))
+                    _LOGGER.debug(f"Data read back: {control_data.get(str(cid), None)}")
+                else:
+                    _LOGGER.info(
+                        f"cid: {str(cid):5s} - {CONTROL} responded with error: {jsondata['code']}:{jsondata.get('msg',None)}"
+                    )
             else:
                 _LOGGER.info(
                     f"cid: {str(cid):5s} - {CONTROL} responded with error: {jsondata['code']}:{jsondata.get('msg',None)}"

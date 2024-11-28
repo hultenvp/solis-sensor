@@ -40,6 +40,13 @@ PLATFORMS = [
     Platform.BUTTON,
 ]
 
+CONTROL_PLATFORMS = [
+    Platform.SELECT,
+    Platform.NUMBER,
+    Platform.TIME,
+    Platform.BUTTON,
+]
+
 
 async def async_setup(hass: HomeAssistant, config: ConfigType):
     """Set up the Solis component from configuration.yaml."""
@@ -93,7 +100,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
+    # while not service.discovery_complete:
+    #     asyncio.sleep(1)
+    _LOGGER.debug("Sensor setup complete")
+    await hass.config_entries.async_forward_entry_setups(entry, CONTROL_PLATFORMS)
     return True
 
 

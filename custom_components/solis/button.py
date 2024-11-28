@@ -26,7 +26,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     _LOGGER.debug(f"Domain: {DOMAIN}")
     service = hass.data[DOMAIN][config_entry.entry_id]
 
-    _LOGGER.info(f"Waiting for discovery of Button entities for plant {plant_id}")
+    _LOGGER.info(f"Waiting for discovery of controls for plant {plant_id}")
     await asyncio.sleep(8)
     attempts = 0
     while (attempts < RETRIES) and (not service.has_controls):
@@ -37,32 +37,18 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     if service.has_controls:
         entities = []
         _LOGGER.debug(f"Plant ID {plant_id} has controls:")
-        _LOGGER.debug(service.controls)
         for inverter_sn in service.controls:
-            _LOGGER.debug(f"Waiting for inverter {inverter_sn} HMI status")
-            attempts = 0
-            while service.api._hmi_fb00[inverter_sn] is None:
-                _LOGGER.debug(f"    Attempt {attempts} failed")
-                await asyncio.sleep(RETRY_WAIT)
-                attempts += 1
-            hmi_fb00 = service.api._hmi_fb00[inverter_sn]
-            _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_fb00}")
-            for cid in service.controls[inverter_sn]:
-                _LOGGER.debug(f">>> {cid:4s}")
-                for index, entity in enumerate(ALL_CONTROLS[hmi_fb00][cid]):
-                    _LOGGER.debug(f">>>      {index} {entity.name} {isinstance(entity, SolisButtonEntityDescription)}")
-                    if isinstance(entity, SolisButtonEntityDescription):
-                        _LOGGER.debug(f"Adding Button entity {entity.name} for inverter Sn {inverter_sn} cid {cid}")
-                        entities.append(
-                            SolisButtonEntity(
-                                service,
-                                config_entry.data["name"],
-                                inverter_sn,
-                                cid,
-                                entity,
-                                index,
-                            )
-                        )
+            for cid, index, entity, button, intial_value in service.controls[inverter_sn]["button"]:
+                entities.append(
+                    SolisButtonEntity(
+                        service,
+                        config_entry.data["name"],
+                        inverter_sn,
+                        cid,
+                        entity,
+                        index,
+                    )
+                )
 
         if len(entities) > 0:
             _LOGGER.debug(f"Creating {len(entities)} Button entities")
@@ -94,6 +80,8 @@ class SolisButtonEntity(SolisBaseControlEntity, ServiceSubscriber, ButtonEntity)
         """Handle the button press."""
         for entity in self._entities:
             _LOGGER.debug(f"{entity.name:s} {entity.to_string:s} {entity.index}")
-        value = self. _joiner.join([entity.to_string for entity in self._entities])
+        # Sort the entities by their index
+        items = sorted({entity.index: entity.to_string for entity in self._entities}.items())
+        value = self._joiner.join([x[1] for x in items])
         _LOGGER.debug(f"{self._cid} {value}")
         await self.write_control_data(value)
