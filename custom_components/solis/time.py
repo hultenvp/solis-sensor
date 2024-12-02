@@ -43,6 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
         _LOGGER.debug(f"Plant ID {plant_id} has controls:")
         for inverter_sn in service.controls:
             for cid, index, entity, button, initial_value in service.controls[inverter_sn]["time"]:
+                # service.set_active_times(inverter_sn, cid, index, (None, None)
                 entities.append(
                     SolisTimeEntity(
                         service,
@@ -80,6 +81,7 @@ class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
         self._icon = time_info.icon
         self._splitter = time_info.splitter
         self._index = index
+        # self._active_times = service.active_times[inverter_sn]
         # Subscribe to the service with the cid as the index
         if initial_value is not None:
             self.do_update(initial_value, datetime.now())
@@ -104,6 +106,8 @@ class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
             _LOGGER.debug(f">>> Datetime value: {time_value}")
         except:
             _LOGGER.debug("Unable to convert {value} to time")
+
+        # Check if this time overlaps with any others
 
         if time_value is None:
             return False

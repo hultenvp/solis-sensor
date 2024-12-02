@@ -97,6 +97,7 @@ class InverterService:
         self._retry_delay_seconds = 0
         self._controllable: bool = False
         self._controls: dict[str, dict[str, list[tuple]]] = {}
+        # self._active_times: dict[str, dict] = {}
         if isinstance(portal_config, GinlongConfig):
             self._api: BaseAPI = GinlongAPI(portal_config)
         elif isinstance(portal_config, SoliscloudConfig):
@@ -132,6 +133,15 @@ class InverterService:
     @property
     def discovery_complete(self) -> bool:
         return self._discovery_complete
+
+    # def set_active_times(self, inverter_sn, cid, index, times: tuple):
+    #     if inverter_sn not in self._active_times:
+    #         self._active_times[inverter_sn]={}
+
+    #     if cid not in self._active_times[inverter_sn]:
+    #         self._active_times[inverter_sn][cid]={}
+
+    #     self._active_times[inverter_sn][cid][id]= times
 
     async def _login(self) -> bool:
         if not self._api.is_online:
