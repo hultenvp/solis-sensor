@@ -1,8 +1,5 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-# ❗Request for maintainers
-As you might have noticed I'm having trouble to spend enough time on maintaining this integration. For the continuity of this integration it would be great if it could be maintained and further developed by a small team of volunteers. Are you interested and do you have coding experience? [Drop me a line](https://github.com/hultenvp/solis-sensor/discussions/376).
-
 # SolisCloud sensor integration
 HomeAssistant sensor for SolisCloud portal. 
 Still questions after the readme? Read the [wiki](https://github.com/hultenvp/solis-sensor/wiki) or look at the [discussions page](https://github.com/hultenvp/solis-sensor/discussions)
