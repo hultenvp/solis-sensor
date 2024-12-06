@@ -28,6 +28,7 @@
                 "data": {
                     "portal_username": "Portal username or email address",
                     "portal_key_id": "API Key ID provided by SolisCloud",
+                    "portal_password": "Portal password",
                     "portal_secret": "API Secret provided by SolisCloud",
                     "portal_plant_id": "Station ID as found on portal website"
                 },
