@@ -119,6 +119,10 @@ INVERTER_DATA: InverterDataType = {
         BAT_TOTAL_ENERGY_DISCHARGED_STR:  ['batteryTotalDischargeEnergyStr', str, None],
         BAT_DAILY_ENERGY_CHARGED:         ['batteryTodayChargeEnergy', float, 3],
         BAT_DAILY_ENERGY_DISCHARGED:      ['batteryTodayDischargeEnergy', float, 3],
+        BAT_MONTHLY_ENERGY_CHARGED:       ['batteryMonthChargeEnergy', float, 3],
+        BAT_MONTHLY_ENERGY_DISCHARGED:    ['batteryMonthDischargeEnergy', float, 3],
+        BAT_YEARLY_ENERGY_CHARGED:        ['batteryYearChargeEnergy', float, 3],
+        BAT_YEARLY_ENERGY_DISCHARGED:     ['batteryYearDischargeEnergy', float, 3],
         #GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2], #On Plant detail
         #GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None], #On Plant detail
         #GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2], #On Plant detail
