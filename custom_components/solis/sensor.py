@@ -6,7 +6,7 @@ For more information: https://github.com/hultenvp/solis-sensor/
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from typing import Any
 import voluptuous as vol
@@ -43,7 +43,7 @@ from .service import (ServiceSubscriber, InverterService)
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '3.2.0'
+VERSION = '3.7.2'
 
 # ATTRIBUTES
 LAST_UPDATED = 'Last updated'
@@ -148,7 +148,7 @@ def on_discovered(capabilities, cookie):
     hass_sensors = create_sensors(discovered_sensors, cookie['service'], cookie['name'])
     cookie['async_add_entities'](hass_sensors)
     # schedule the first update in 1 minute from now:
-    cookie['service'].schedule_update(1)
+    cookie['service'].schedule_update(timedelta(minutes=1))
 
 class SolisSensor(ServiceSubscriber, SensorEntity):
     """ Representation of a Solis sensor. """
@@ -161,7 +161,7 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         ):
         # Initialize the sensor.
         self._measured: datetime | None = None
-        self._attributes = EMPTY_ATTR
+        self._attributes = dict(EMPTY_ATTR)
         self._attributes[SERIAL] = inverter_sn
         self._attributes[API_NAME] = ginlong_service.api_name
         # Properties

@@ -11,7 +11,7 @@ from homeassistant.const import Platform, ATTR_NAME, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
-from homeassistant.helpers.typing import ConfigType, HomeAssistantType, ServiceCallType
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
 from .const import (
@@ -34,7 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 
-async def async_setup(hass: HomeAssistantType, config: ConfigType):
+async def async_setup(hass: HomeAssistant, config: ConfigType):
     """Set up the Solis component from configuration.yaml."""
 
     if "sensor" not in config:
@@ -87,13 +87,7 @@ async def async_setup_entry(
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.
-    #hass.async_create_task(
-    #    hass.config_entries.async_forward_entry_setup(entry, component)
-    #    for component in PLATFORMS
-    #)
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):

@@ -24,7 +24,7 @@ class PortalConfig(ABC):
         portal_username: str,
         portal_plant_id: str
     ) -> None:
-        self._domain: str = portal_domain
+        self._domain: str = portal_domain.rstrip("/")
         self._username: str = portal_username
         self._plant_id: str = portal_plant_id
 
