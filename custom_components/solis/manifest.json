@@ -9,6 +9,6 @@
   "dependencies": [],
   "codeowners": ["@hultenvp"],
   "requirements": [
-    "aiofiles>=23.1.0,<24.0.0"
+    "aiofiles>=23.1.0"
   ]
 }

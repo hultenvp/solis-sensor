@@ -72,6 +72,7 @@ SENSOR_TYPES = {
         INVERTER_TIMESTAMP_UPDATE,
     ],
     "status": ["Status", None, "mdi:solar-power", None, None, "status"],
+    "hmiversionall": ["hmiVersionAll", None, "mdi:solar-power", None, None, "hmi_version"],
     "temperature": [
         "Temperature",
         UnitOfTemperature.CELSIUS,

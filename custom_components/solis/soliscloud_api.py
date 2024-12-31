@@ -29,7 +29,6 @@ from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
 from .soliscloud_const import *
 
-from time import sleep
 
 _LOGGER = logging.getLogger(__name__)
 
