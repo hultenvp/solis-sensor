@@ -33,7 +33,7 @@ from .soliscloud_const import *
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = "0.5.4"
+VERSION = "0.5.5"
 
 # API NAME
 API_NAME = "SolisCloud"
@@ -125,12 +125,22 @@ INVERTER_DATA: InverterDataType = {
         BAT_CURRENT_STR: ["storageBatteryCurrentStr", str, None],
         BAT_VOLTAGE: ["storageBatteryVoltage", float, 2],
         BAT_VOLTAGE_STR: ["storageBatteryVoltageStr", str, None],
+        BAT_DAILY_ENERGY_CHARGED: ["batteryTodayChargeEnergy", float, 3],
+        BAT_DAILY_ENERGY_CHARGED_STR: ["batteryTodayChargeEnergyStr", str, None],
+        BAT_DAILY_ENERGY_DISCHARGED: ["batteryTodayDischargeEnergy", float, 3],
+        BAT_DAILY_ENERGY_DISCHARGED_STR: ["batteryTodayDischargeEnergyStr", str, None],
+        BAT_MONTHLY_ENERGY_CHARGED: ["batteryMonthChargeEnergy", float, 3],
+        BAT_MONTHLY_ENERGY_CHARGED_STR: ["batteryMonthChargeEnergyStr", str, None],
+        BAT_MONTHLY_ENERGY_DISCHARGED: ["batteryMonthDischargeEnergy", float, 3],
+        BAT_MONTHLY_ENERGY_DISCHARGED_STR: ["batteryMonthDischargeEnergyStr", str, None],
+        BAT_YEARLY_ENERGY_CHARGED: ["batteryYearChargeEnergy", float, 3],
+        BAT_YEARLY_ENERGY_CHARGED_STR: ["batteryYearChargeEnergyStr", str, None],
+        BAT_YEARLY_ENERGY_DISCHARGED: ["batteryYearDischargeEnergy", float, 3],
+        BAT_YEARLY_ENERGY_DISCHARGED_STR: ["batteryYearDischargeEnergyStr", str, None],
         BAT_TOTAL_ENERGY_CHARGED: ["batteryTotalChargeEnergy", float, 3],
         BAT_TOTAL_ENERGY_CHARGED_STR: ["batteryTotalChargeEnergyStr", str, None],
         BAT_TOTAL_ENERGY_DISCHARGED: ["batteryTotalDischargeEnergy", float, 3],
         BAT_TOTAL_ENERGY_DISCHARGED_STR: ["batteryTotalDischargeEnergyStr", str, None],
-        BAT_DAILY_ENERGY_CHARGED: ["batteryTodayChargeEnergy", float, 3],
-        BAT_DAILY_ENERGY_DISCHARGED: ["batteryTodayDischargeEnergy", float, 3],
         # GRID_DAILY_ON_GRID_ENERGY:        ['gridSellTodayEnergy', float, 2], #On Plant detail
         # GRID_DAILY_ON_GRID_ENERGY_STR:    ['gridSellTodayEnergyStr', str, None], #On Plant detail
         # GRID_DAILY_ENERGY_PURCHASED:      ['gridPurchasedTodayEnergy', float, 2], #On Plant detail
@@ -563,6 +573,12 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(BAT_POWER, BAT_POWER_STR)
             self._fix_units(BAT_CURRENT, BAT_CURRENT_STR)
             self._fix_units(BAT_VOLTAGE, BAT_VOLTAGE_STR)
+            self._fix_units(BAT_DAILY_ENERGY_CHARGED, BAT_DAILY_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_DAILY_ENERGY_DISCHARGED, BAT_DAILY_ENERGY_DISCHARGED_STR)
+            self._fix_units(BAT_MONTHLY_ENERGY_CHARGED, BAT_MONTHLY_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_MONTHLY_ENERGY_DISCHARGED, BAT_MONTHLY_ENERGY_DISCHARGED_STR)
+            self._fix_units(BAT_YEARLY_ENERGY_CHARGED, BAT_YEARLY_ENERGY_CHARGED_STR)
+            self._fix_units(BAT_YEARLY_ENERGY_DISCHARGED, BAT_YEARLY_ENERGY_DISCHARGED_STR)
             self._fix_units(BAT_TOTAL_ENERGY_CHARGED, BAT_TOTAL_ENERGY_CHARGED_STR)
             self._fix_units(BAT_TOTAL_ENERGY_DISCHARGED, BAT_TOTAL_ENERGY_DISCHARGED_STR)
             self._fix_units(GRID_TOTAL_CONSUMPTION_POWER, GRID_TOTAL_CONSUMPTION_POWER_STR)

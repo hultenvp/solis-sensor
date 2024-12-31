@@ -9,7 +9,7 @@ from .ginlong_const import *
 
 
 # VERSION
-VERSION = "0.1.6"
+VERSION = "0.1.7"
 
 STRING_COUNT = "dcStringCount"
 STRING_LISTS = [
@@ -30,6 +30,12 @@ INVERTER_ENERGY_THIS_MONTH_STR = "energyThisMonthUnit"
 INVERTER_ENERGY_THIS_YEAR_STR = "energyThisYearUnit"
 INVERTER_ENERGY_TOTAL_LIFE_STR = "energyTotalLifeUnit"
 BAT_POWER_STR = "batteryPowerUnit"
+BAT_DAILY_ENERGY_CHARGED_STR = "batteryTodayChargeEnergyUnit"
+BAT_DAILY_ENERGY_DISCHARGED_STR = "batteryTodayDischargeEnergyUnit"
+BAT_MONTHLY_ENERGY_CHARGED_STR = "batteryMonthChargeEnergyUnit"
+BAT_MONTHLY_ENERGY_DISCHARGED_STR = "batteryMonthDischargeEnergyUnit"
+BAT_YEARLY_ENERGY_CHARGED_STR = "batteryYearChargeEnergyUnit"
+BAT_YEARLY_ENERGY_DISCHARGED_STR = "batteryYearDischargeEnergyUnit"
 BAT_TOTAL_ENERGY_CHARGED_STR = "batteryTotalChargeEnergyUnit"
 BAT_TOTAL_ENERGY_DISCHARGED_STR = "batteryTotalDischargeEnergyUnit"
 BAT_CURRENT_STR = "batteryCurrentUnit"
@@ -45,4 +51,3 @@ GRID_YEARLY_ENERGY_PURCHASED_STR = "yearlyEnergyPurchasedUnit"
 GRID_DAILY_ENERGY_USED_STR = "dailyEnergyUsedUnit"
 BYPASS_LOAD_POWER_STR = "bypassLoadPowerUnit"
 PLANT_TOTAL_CONSUMPTION_POWER_STR = "plantTotalConsumptionPowerUnit"
-HMI_VERSION = "hmiVersionAll"

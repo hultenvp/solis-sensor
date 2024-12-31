@@ -46,6 +46,20 @@ from .service import ServiceSubscriber, InverterService
 
 _LOGGER = logging.getLogger(__name__)
 
+# VERSION
+VERSION = "3.8.1"
+
+# ATTRIBUTES
+LAST_UPDATED = "Last updated"
+SERIAL = "Inverter serial"
+API_NAME = "API Name"
+
+EMPTY_ATTR: dict[str, Any] = {
+    LAST_UPDATED: None,
+    SERIAL: None,
+    API_NAME: None,
+}
+
 
 def _check_config_schema(config: ConfigType):
     # Check input configuration.
