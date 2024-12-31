@@ -1,12 +1,14 @@
 """Ginlong base classes
 For more information: https://github.com/hultenvp/solis-sensor/
 """
+
 from __future__ import annotations
 
 import logging
 
 from abc import ABC, abstractmethod
-#from typing import final
+
+# from typing import final
 from aiohttp import ClientSession
 
 from .ginlong_const import INVERTER_STATE
@@ -14,42 +16,39 @@ from .ginlong_const import INVERTER_STATE
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = '0.1.1'
+VERSION = "0.1.1"
+
 
 class PortalConfig(ABC):
-    """ Portal configuration data """
+    """Portal configuration data"""
 
-    def __init__(self,
-        portal_domain: str,
-        portal_username: str,
-        portal_plant_id: str
-    ) -> None:
+    def __init__(self, portal_domain: str, portal_username: str, portal_plant_id: str) -> None:
         self._domain: str = portal_domain.rstrip("/")
         self._username: str = portal_username
         self._plant_id: str = portal_plant_id
 
     @property
     def domain(self) -> str:
-        """ Configured portal domain name."""
+        """Configured portal domain name."""
         return self._domain
 
     @property
     def username(self) -> str:
-        """ Username."""
+        """Username."""
         return self._username
 
     @property
     def plant_id(self) -> str:
-        """ Configured plant ID."""
+        """Configured plant ID."""
         return self._plant_id
 
-class GinlongData():
-    """ Representing data measurement for one inverter from Ginlong API """
+
+class GinlongData:
+    """Representing data measurement for one inverter from Ginlong API"""
 
     def __init__(self, data: dict[str, str | int | float]) -> None:
-        """ Initialize the data object """
+        """Initialize the data object"""
         self._data = dict(data)
-
 
     def get_inverter_data(self) -> dict[str, str | int | float]:
         """Return all available measurements in a dict."""
@@ -72,8 +71,13 @@ class GinlongData():
             _LOGGER.debug("AttributeError, %s does not exist", name)
             raise AttributeError(name) from key_error
 
+    def __str__(self):
+        return "\n".join([f"{key:s}: {str(self._data[key]):s}" for key in self._data])
+
+
 class BaseAPI(ABC):
-    """ API Base class."""
+    """API Base class."""
+
     def __init__(self, config: PortalConfig) -> None:
         self._config: PortalConfig = config
         self._session: ClientSession | None = None
@@ -82,45 +86,45 @@ class BaseAPI(ABC):
 
     @property
     def config(self) -> PortalConfig:
-        """ Config this for this API instance."""
+        """Config this for this API instance."""
         return self._config
 
     @property
     def inverters(self) -> dict[str, str] | None:
-        """ Return the list of inverters for plant ID when logged in."""
+        """Return the list of inverters for plant ID when logged in."""
         return self._inverter_list
 
     @property
     def plant_name(self) -> str | None:
-        """ Return plant name for this API instance."""
+        """Return plant name for this API instance."""
         return self._plant_name
 
     @property
     def plant_id(self) -> str | None:
-        """ Return plant ID for this API instance."""
+        """Return plant ID for this API instance."""
         return self._config.plant_id
 
     @property
     @abstractmethod
     def api_name(self) -> str:
-        """ Return name of the API."""
+        """Return name of the API."""
 
     @property
     @abstractmethod
     def is_online(self) -> bool:
-        """ Returns if we are logged in."""
+        """Returns if we are logged in."""
 
     @abstractmethod
     async def login(self, session: ClientSession) -> bool:
-        """ Login to service."""
+        """Login to service."""
 
     @abstractmethod
     async def logout(self) -> None:
-        """ Close session."""
+        """Close session."""
 
     @abstractmethod
     async def fetch_inverter_list(self, plant_id: str) -> dict[str, str]:
-        """ Retrieve inverter list from service."""
+        """Retrieve inverter list from service."""
 
     @abstractmethod
     async def fetch_inverter_data(self, inverter_serial: str) -> GinlongData | None:
