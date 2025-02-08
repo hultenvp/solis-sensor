@@ -1,35 +1,28 @@
 """The Solis Inverter integration."""
 
-from datetime import datetime, timedelta, timezone
 import asyncio
 import logging
 import os
+from datetime import datetime, timedelta, timezone
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.config_entries import ConfigEntry, SOURCE_IMPORT
-from homeassistant.const import Platform, ATTR_NAME, CONF_NAME
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import ATTR_NAME, CONF_NAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
+from homeassistant.helpers.issue_registry import (IssueSeverity,
+                                                  async_create_issue)
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
-from .const import (
-    DOMAIN,
-    CONF_PORTAL_DOMAIN,
-    CONF_PORTAL_VERSION,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_SECRET,
-    CONF_KEY_ID,
-    CONF_PLANT_ID,
-    CONF_CONTROL,
-)
-from .ginlong_base import PortalConfig
+from .const import (CONF_CONTROL, CONF_KEY_ID, CONF_PASSWORD, CONF_PLANT_ID,
+                    CONF_PORTAL_DOMAIN, CONF_PORTAL_VERSION, CONF_SECRET,
+                    CONF_USERNAME, DOMAIN)
 from .ginlong_api import GinlongConfig
-from .soliscloud_api import SoliscloudConfig
+from .ginlong_base import PortalConfig
 from .service import InverterService
+from .soliscloud_api import SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
 

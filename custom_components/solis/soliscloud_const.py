@@ -7,7 +7,6 @@ For more information: https://github.com/hultenvp/solis-sensor/
 
 from .ginlong_const import *
 
-
 # VERSION
 VERSION = "0.1.7"
 

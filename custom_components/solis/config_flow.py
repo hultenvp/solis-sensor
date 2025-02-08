@@ -1,35 +1,23 @@
 """Config flow for Solis integration."""
 
 import logging
-
-import voluptuous as vol
 from typing import Any
 
-from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
-from homeassistant.data_entry_flow import FlowResult
+import voluptuous as vol
 from homeassistant import data_entry_flow
-from homeassistant.helpers.selector import selector
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
+from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
-from homeassistant.const import (
-    CONF_NAME,
-)
-from .const import (
-    DOMAIN,
-    CONF_PORTAL_DOMAIN,
-    CONF_PORTAL_VERSION,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_CONTROL,
-    CONF_SECRET,
-    CONF_KEY_ID,
-    CONF_PLANT_ID,
-    SENSOR_PREFIX,
-    DEFAULT_DOMAIN,
-)
-from .ginlong_api import GinlongConfig, GinlongAPI
-from .soliscloud_api import SoliscloudConfig, SoliscloudAPI
+from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import selector
+
+from .const import (CONF_CONTROL, CONF_KEY_ID, CONF_PASSWORD, CONF_PLANT_ID,
+                    CONF_PORTAL_DOMAIN, CONF_PORTAL_VERSION, CONF_SECRET,
+                    CONF_USERNAME, DEFAULT_DOMAIN, DOMAIN, SENSOR_PREFIX)
+from .ginlong_api import GinlongAPI, GinlongConfig
+from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,9 +28,7 @@ SOLISCLOUD = "soliscloud"
 class SolisOptionsFlowHandler(OptionsFlow):
     """Handle options."""
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """
         Handle a flow initialized by the user.
 
@@ -55,19 +41,19 @@ class SolisOptionsFlowHandler(OptionsFlow):
         errors = {}
 
         if user_input is not None:
-                updated_config = {}
-                for key in self.config_entry.data.keys():
-                    updated_config[key] = self.config_entry.data[key]
-                updated_config[CONF_CONTROL] = False
-                for key in (CONF_CONTROL, CONF_PASSWORD):
-                    if key in user_input:
-                        updated_config[key] = user_input[key]
+            updated_config = {}
+            for key in self.config_entry.data.keys():
+                updated_config[key] = self.config_entry.data[key]
+            updated_config[CONF_CONTROL] = False
+            for key in (CONF_CONTROL, CONF_PASSWORD):
+                if key in user_input:
+                    updated_config[key] = user_input[key]
 
-                self.hass.config_entries.async_update_entry(
-                    self.config_entry,
-                    data=updated_config,
-                    title=user_input.get(CONF_NAME),
-                )
+            self.hass.config_entries.async_update_entry(
+                self.config_entry,
+                data=updated_config,
+                title=user_input.get(CONF_NAME),
+            )
         data_schema = {
             vol.Required(CONF_CONTROL, default=False): bool,
             vol.Optional(CONF_PASSWORD, default=""): cv.string,
@@ -101,7 +87,6 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             The created config flow.
         """
         return SolisOptionsFlowHandler()
-
 
     async def async_step_user(self, user_input=None):
         """Select server url and API version."""
@@ -201,7 +186,7 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
                 ),
                 # Whether or not the section is initially collapsed (default = False)
                 {"collapsed": False},
-            )
+            ),
         }
 
         return self.async_show_form(step_id="credentials_secret", data_schema=vol.Schema(data_schema), errors=errors)

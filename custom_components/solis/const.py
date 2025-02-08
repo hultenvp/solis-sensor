@@ -2,27 +2,16 @@
 For more information: https://github.com/hultenvp/solis-sensor/
 """
 
-from homeassistant.components.sensor import (
-    SensorStateClass,
-    SensorDeviceClass,
-)
-
-from homeassistant.const import (
-    UnitOfPower,
-    UnitOfApparentPower,
-    UnitOfEnergy,
-    UnitOfElectricCurrent,
-    UnitOfElectricPotential,
-    UnitOfTemperature,
-    UnitOfFrequency,
-    UnitOfReactivePower,
-    PERCENTAGE,
-)
-
 from typing import Any
 
-from .ginlong_const import *
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.const import (PERCENTAGE, UnitOfApparentPower,
+                                 UnitOfElectricCurrent,
+                                 UnitOfElectricPotential, UnitOfEnergy,
+                                 UnitOfFrequency, UnitOfPower,
+                                 UnitOfReactivePower, UnitOfTemperature)
 
+from .ginlong_const import *
 
 VERSION = "3.7.1"
 

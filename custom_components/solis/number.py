@@ -1,19 +1,16 @@
-from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.number import NumberEntity
-
-
 import asyncio
 import logging
 from datetime import datetime
 
-from .const import (
-    DOMAIN,
-    LAST_UPDATED,
-)
+from homeassistant.components.number import NumberEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 
-from .service import ServiceSubscriber, InverterService
-from .control_const import SolisBaseControlEntity, RETRIES, RETRY_WAIT, ALL_CONTROLS, SolisNumberEntityDescription
+from .const import DOMAIN, LAST_UPDATED
+from .control_const import (ALL_CONTROLS, RETRIES, RETRY_WAIT,
+                            SolisBaseControlEntity,
+                            SolisNumberEntityDescription)
+from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
 RETRIES = 100
