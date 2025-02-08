@@ -1,21 +1,17 @@
-from homeassistant.components.select import SelectEntityDescription
-from homeassistant.components.number import NumberEntityDescription
-from homeassistant.components.number import NumberDeviceClass
-from homeassistant.components.time import TimeEntityDescription
-from homeassistant.components.button import ButtonEntityDescription
-from homeassistant.const import PERCENTAGE, UnitOfElectricCurrent
-from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.helpers.entity import DeviceInfo
+import logging
 from dataclasses import dataclass
 from datetime import datetime
-import logging
 
-from .const import (
-    DOMAIN,
-    SERIAL,
-    API_NAME,
-    EMPTY_ATTR,
-)
+from homeassistant.components.button import ButtonEntityDescription
+from homeassistant.components.number import (NumberDeviceClass,
+                                             NumberEntityDescription)
+from homeassistant.components.select import SelectEntityDescription
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.time import TimeEntityDescription
+from homeassistant.const import PERCENTAGE, UnitOfElectricCurrent
+from homeassistant.helpers.entity import DeviceInfo
+
+from .const import API_NAME, DOMAIN, EMPTY_ATTR, SERIAL
 
 RETRIES = 1000
 RETRY_WAIT = 10

@@ -8,27 +8,22 @@ from __future__ import annotations
 
 import logging
 import time
-
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Any, final
+
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
 
-from .ginlong_base import PortalConfig, BaseAPI, GinlongData
+from .control_const import ALL_CONTROLS, CONTROL_TYPES, HMI_CID
 from .ginlong_api import GinlongAPI, GinlongConfig
+from .ginlong_base import BaseAPI, GinlongData, PortalConfig
+from .ginlong_const import (INVERTER_ACPOWER, INVERTER_ENERGY_TODAY,
+                            INVERTER_SERIAL, INVERTER_STATE,
+                            INVERTER_TIMESTAMP_UPDATE)
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
-from .ginlong_const import (
-    INVERTER_ENERGY_TODAY,
-    INVERTER_ACPOWER,
-    INVERTER_SERIAL,
-    INVERTER_STATE,
-    INVERTER_TIMESTAMP_UPDATE,
-)
-
-from .control_const import HMI_CID, ALL_CONTROLS, CONTROL_TYPES
 
 # REFRESH CONSTANTS
 # Match up with the default SolisCloud API resolution of 5 minutes

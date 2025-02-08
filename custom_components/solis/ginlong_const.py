@@ -1,9 +1,9 @@
 """
-  Access to the Ginlong platform 2.0 API for PV monitoring.
-  Works for all Ginlong brands using the Ginlong Platform 2.0 portal API
-  Solis, Solarman, Sofar Solar and possibly MyEvolveCloud
+Access to the Ginlong platform 2.0 API for PV monitoring.
+Works for all Ginlong brands using the Ginlong Platform 2.0 portal API
+Solis, Solarman, Sofar Solar and possibly MyEvolveCloud
 
-  For more information: https://github.com/hultenvp/solis-sensor/
+For more information: https://github.com/hultenvp/solis-sensor/
 """
 
 # VERSION

@@ -7,42 +7,25 @@ For more information: https://github.com/hultenvp/solis-sensor/
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from typing import Any
-import voluptuous as vol
 
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.components.sensor import (
-    PLATFORM_SCHEMA,
-    SensorEntity,
-)
-from homeassistant.const import CONF_NAME
-
-from homeassistant.config_entries import ConfigEntry, SOURCE_IMPORT
 import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import CONF_NAME
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from .const import (
-    DOMAIN,
-    CONF_PORTAL_DOMAIN,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_SECRET,
-    CONF_KEY_ID,
-    CONF_PLANT_ID,
-    SENSOR_PREFIX,
-    DEFAULT_DOMAIN,
-    SENSOR_TYPES,
-    VERSION,
-    LAST_UPDATED,
-    SERIAL,
-    API_NAME,
-    EMPTY_ATTR,
-)
 
-from .service import ServiceSubscriber, InverterService
+from .const import (API_NAME, CONF_KEY_ID, CONF_PASSWORD, CONF_PLANT_ID,
+                    CONF_PORTAL_DOMAIN, CONF_SECRET, CONF_USERNAME,
+                    DEFAULT_DOMAIN, DOMAIN, EMPTY_ATTR, LAST_UPDATED,
+                    SENSOR_PREFIX, SENSOR_TYPES, SERIAL, VERSION)
+from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
 
