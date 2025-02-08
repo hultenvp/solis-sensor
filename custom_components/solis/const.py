@@ -45,6 +45,7 @@ CONF_PASSWORD = "portal_password"
 CONF_SECRET = "portal_secret"
 CONF_KEY_ID = "portal_key_id"
 CONF_PLANT_ID = "portal_plant_id"
+CONF_CONTROL = "portal_control_api"
 
 DOMAIN = "solis"
 SENSOR_PREFIX = "Solis"
