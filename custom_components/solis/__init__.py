@@ -24,6 +24,7 @@ from .const import (
     CONF_SECRET,
     CONF_KEY_ID,
     CONF_PLANT_ID,
+    CONF_CONTROL,
 )
 from .ginlong_base import PortalConfig
 from .ginlong_api import GinlongConfig
@@ -82,7 +83,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     portal_plantid = config[CONF_PLANT_ID]
     portal_username = config[CONF_USERNAME]
     portal_version = config[CONF_PORTAL_VERSION]
-    portal_password = config[CONF_PASSWORD]
+    portal_control = False
+    portal_password = None
+    try:
+        portal_control = config[CONF_CONTROL]
+        if portal_control:
+            portal_password = config[CONF_PASSWORD]
+    except KeyError:
+        pass
 
     portal_config: PortalConfig | None = None
     if portal_version == "ginlong_v2":
@@ -104,16 +112,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # while not service.discovery_complete:
     #     asyncio.sleep(1)
     _LOGGER.debug("Sensor setup complete")
-    await hass.config_entries.async_forward_entry_setups(entry, CONTROL_PLATFORMS)
+    if portal_control:
+        await hass.config_entries.async_forward_entry_setups(entry, CONTROL_PLATFORMS)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
 
+    platforms = [Platform.SENSOR]
+    try:
+        if entry.data[CONF_CONTROL]:
+            platforms = PLATFORMS
+    except KeyError:
+        pass
     unload_ok = all(
         await asyncio.gather(
-            *[hass.config_entries.async_forward_entry_unload(entry, component) for component in PLATFORMS]
+            *[hass.config_entries.async_forward_entry_unload(entry, component) for component in platforms]
         )
     )
 
