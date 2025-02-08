@@ -7,28 +7,26 @@ For more information: https://github.com/hultenvp/solis-sensor/
 
 from __future__ import annotations
 
+import asyncio
+import base64
 import hashlib
-
 # from hashlib import sha1
 import hmac
-import base64
-import asyncio
-from datetime import datetime
-from datetime import timezone
-from http import HTTPStatus
 import json
 import logging
 import math
+from datetime import datetime, timezone
+from http import HTTPStatus
 from typing import Any
-from aiohttp import ClientError, ClientSession
+
+import aiofiles
 import async_timeout
 import yaml
-import aiofiles
+from aiohttp import ClientError, ClientSession
 
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import *
 from .soliscloud_const import *
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,8 +57,7 @@ AUTHENTICATE = "/v2/api/login"
 CONTROL = "/v2/api/control"
 AT_READ = "/v2/api/atRead"
 
-from .control_const import HMI_CID, ALL_CONTROLS
-
+from .control_const import ALL_CONTROLS, HMI_CID
 
 InverterDataType = dict[str, dict[str, list]]
 
@@ -395,10 +392,7 @@ class SoliscloudAPI(BaseAPI):
         """
 
         # Get inverter details
-        params = {
-            'id': device_id,
-            'sn': device_serial
-        }
+        params = {"id": device_id, "sn": device_serial}
 
         result = await self._post_data_json(INVERTER_DETAIL, params)
 
@@ -414,7 +408,7 @@ class SoliscloudAPI(BaseAPI):
 
     def _collect_inverter_data(self, payload: dict[str, Any]) -> None:
         """Fetch dynamic properties"""
-        jsondata = payload['data']
+        jsondata = payload["data"]
         attributes = INVERTER_DATA[INVERTER_DETAIL]
         collect_energy_today = True
         try:
