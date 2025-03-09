@@ -306,9 +306,9 @@ ALL_CONTROLS = {
                     "33": "Self-Use Mode - Grid Charging",
                     "41": "Self-Use Mode - Battery Awaken, Grid Charging",
                     "49": "Self-Use Mode - Backup/Reserve, Grid Charging",
-                    "64": "Feed-In Mode",
-                    "80": "Feed-In Mode - Backup/Reserve",
-                    "112": "Feed-In Mode - Backup/Reserve, Grid Charging",
+                    "64": "Feed-In Priority Mode",
+                    "80": "Feed-In Priority Mode - Backup/Reserve",
+                    "112": "Feed-In Priority Mode - Backup/Reserve, Grid Charging",
                 },
                 icon="mdi:dip-switch",
             )
