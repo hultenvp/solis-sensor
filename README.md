@@ -2,7 +2,7 @@
 
 # Control Beta Test
 
-This repo includes a beta version of device control using the same API as the SolisCloud app. This opeartes slighty differently depending on your HMI firmware version. This should be detected automatically.
+This repo includes a beta version of device control using the same API as the SolisCloud app. This operates slighty differently depending on your HMI firmware version. This should be detected automatically.
 
 Please report any issues via https://github.com/fboundy/solis-sensor/issues
 
@@ -15,7 +15,8 @@ The following controls should update the inverter immediately:
 - Force Charge SOC
 - Backup SOC
 
-The timed change controls are all sent to the API using one command and so they won't update untill the Update Charge/Discharge button is pressed. The controls included in this are all three sets of the following (where N is slots 1-3)
+The timed change controls are all sent to the API using one command and so they won't update untill the Update Charge/Discharge button is pressed. The controls included in this are all three sets of the following (where N is slots 1-3):
+
 - Timed Charge Current N
 - Timed Charge Start Time N
 - Timed Charge End Time N
@@ -27,7 +28,8 @@ The timed change controls are all sent to the API using one command and so they 
 
 ## Version 4B00 and Later
 
-Six slots are available and include an SOC limit and a voltage (though the purpose of the voltage is not clear). Only the start and end times for each Charge/Discharge slot need top to be sent to the inverter together so the following are updated immediately (where N is slot 1-6):
+Six slots are available and include an SOC limit and a voltage (though the purpose of the voltage is not clear). Only the start and end times for each Charge/Discharge slot need to to be sent to the inverter together so the following are updated immediately (where N is slot 1-6):
+
 - Energy Storage Control Switch (fewer available modes than pre-4B00)
 - Overdischarge SOC
 - Force Charge SOC
@@ -39,18 +41,20 @@ Six slots are available and include an SOC limit and a voltage (though the purpo
 - Timed Discharge SOC N
 - Timed Discharge Voltage N
 
-Each pair of start/end times has an associated button pushfor charge there are 6:
+Each pair of start/end times has an associated button push; for charge (where N is slot 1-6):
 
 - Timed Charge Start Time N
 - Timed Charge End Time N
 - Button Update Charge Time N
 
 And discharge:
+
 - Timed Discharge Start Time N
 - Timed Discharge End Time N
 - Button Update Discharge Time N
 
 # SolisCloud sensor integration
+
 HomeAssistant sensor for SolisCloud portal. 
 Still questions after the readme? Read the [wiki](https://github.com/hultenvp/solis-sensor/wiki) or look at the [discussions page](https://github.com/hultenvp/solis-sensor/discussions)
 
