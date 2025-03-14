@@ -60,7 +60,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
                     severity=IssueSeverity.WARNING,
                     translation_key="deprecated_yaml",
                 )
-        except TypeError:
+        except (TypeError, KeyError):
             continue
     return True
 
