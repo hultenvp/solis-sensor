@@ -294,12 +294,19 @@ class SoliscloudAPI(BaseAPI):
             _LOGGER.info("Login successful")
             _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
             self._is_online = True
-            try:
-                data = await self.fetch_inverter_data(next(iter(self._inverter_list)))
-                self._plant_name = getattr(data, INVERTER_PLANT_NAME)
-            except AttributeError:
-                _LOGGER.info("Failed to acquire plant name, login failed")
+            for inv in self._inverter_list.keys():
+                data = await self.fetch_inverter_data(inv)
+                try:
+                    self._plant_name = getattr(data, INVERTER_PLANT_NAME)
+                except AttributeError:
+                    _LOGGER.info("No access to inverter %s, removing", inv)
+                    del self._inverter_list[inv]
+            if len(self._inverter_list) == 0:
+                _LOGGER.warning("No valid inverters found, login failed")
                 self._is_online = False
+                return self._is_online
+            else:
+                _LOGGER.debug("Valid inverters: %s", list(self._inverter_list.keys()))
             try:
                 token = await self._fetch_token(self.config.username, self.config._password)
                 self._token = token
