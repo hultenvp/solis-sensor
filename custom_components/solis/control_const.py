@@ -301,10 +301,8 @@ ALL_CONTROLS = {
                 option_dict={
                     "33": "Self-Use Mode - Allow Grid Charging",
                     "49": "Self-Use Mode - Allow Grid Charging, Backup Mode On",
-                    "41": "Self-Use Mode - Allow Grid Charging, Battery Wakeup",
                     "1": "Self-Use Mode - No Grid Charging",
                     "17": "Self-Use Mode - No Grid Charging, Backup Mode On",
-                    "9": "Self-Use Mode - No Grid Charging, Battery Wakeup",
                     "96": "Feed-In Priority Mode - Allow Grid Charging",
                     "112": "Feed-In Priority Mode - Allow Grid Charging, Backup Mode On",
                     "64": "Feed-In Priority Mode - No Grid Charging",
