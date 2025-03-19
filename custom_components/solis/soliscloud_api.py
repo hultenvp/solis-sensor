@@ -788,9 +788,9 @@ class SoliscloudAPI(BaseAPI):
 
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
-            if jsondata["code"] == "0":
+            if str(jsondata["code"]) == "0":
                 jsondata = jsondata["data"][0]
-                if jsondata["code"] == "0":
+                if str(jsondata["code"]) == "0":
                     _LOGGER.debug(f"Set code returned OK. Reading code back.")
                     await asyncio.sleep(CONTROL_DELAY)
                     control_data = await self.get_control_data(device_serial, cid=str(cid))
