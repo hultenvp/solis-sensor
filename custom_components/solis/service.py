@@ -30,8 +30,6 @@ from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 SCHEDULE_OK = 300
 # Attempt retries every 1 minute if we fail to talk to the API, though
 SCHEDULE_NOK = 60
-# If we have controls then update more frequently because they can be changed externtally
-SCHEDULE_CONTROLS = 30
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -284,10 +282,7 @@ class InverterService:
                 if data is not None:
                     # And finally get the inverter details
                     # default to updating after SCHEDULE_OK seconds;
-                    if self.controllable:
-                        update = timedelta(seconds=SCHEDULE_CONTROLS)
-                    else:
-                        update = timedelta(seconds=SCHEDULE_OK)
+                    update = timedelta(seconds=SCHEDULE_OK)
                     # ...but try to figure out a better next-update time based on when the API last received its data
                     try:
                         ts = getattr(data, INVERTER_TIMESTAMP_UPDATE)

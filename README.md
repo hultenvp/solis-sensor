@@ -1,58 +1,4 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
-
-# Control Beta Test
-
-This repo includes a beta version of device control using the same API as the SolisCloud app. This operates slighty differently depending on your HMI firmware version. This should be detected automatically.
-
-Please report any issues via https://github.com/fboundy/solis-sensor/issues
-
-## Version 4A00 and Earlier
-
-The following controls should update the inverter immediately:
-
-- Energy Storage Control Switch
-- Overdischarge SOC
-- Force Charge SOC
-- Backup SOC
-
-The timed change controls are all sent to the API using one command and so they won't update untill the Update Charge/Discharge button is pressed. The controls included in this are all three sets of the following (where N is slots 1-3):
-
-- Timed Charge Current N
-- Timed Charge Start Time N
-- Timed Charge End Time N
-- Timed Discharge Current N
-- Timed Discharge Start Time N
-- Timed Discharge End Time N
-
-<b>Note that all three slots are sent at the same time</b>
-
-## Version 4B00 and Later
-
-Six slots are available and include an SOC limit and a voltage (though the purpose of the voltage is not clear). Only the start and end times for each Charge/Discharge slot need to to be sent to the inverter together so the following are updated immediately (where N is slot 1-6):
-
-- Energy Storage Control Switch (fewer available modes than pre-4B00)
-- Overdischarge SOC
-- Force Charge SOC
-- Backup SOC
-- Timed Charge Current N
-- Timed Charge SOC N
-- Timed Charge Voltage N
-- Timed Discharge Current N
-- Timed Discharge SOC N
-- Timed Discharge Voltage N
-
-Each pair of start/end times has an associated button push; for charge (where N is slot 1-6):
-
-- Timed Charge Start Time N
-- Timed Charge End Time N
-- Button Update Charge Time N
-
-And discharge:
-
-- Timed Discharge Start Time N
-- Timed Discharge End Time N
-- Button Update Discharge Time N
-
 # SolisCloud sensor integration
 
 HomeAssistant sensor for SolisCloud portal. 
@@ -166,6 +112,60 @@ The Solis integration now supports the energy dashboard introduced in Release 20
 
 ![dashboard integration](./image/energy_dashboard_integration.GIF)
 ![energy production](./image/solar_production_energy_dashboard.GIF)
+
+# Control Beta Test
+
+This includes a beta version of device control using the same API as the SolisCloud app, for use with inverters with an attached battery. This operates slighty differently depending on your HMI firmware version. This should be detected automatically.
+
+Please report any issues via https://github.com/fboundy/solis-sensor/issues
+
+## Version 4A00 and Earlier
+
+The following controls should update the inverter immediately:
+
+- Energy Storage Control Switch
+- Overdischarge SOC
+- Force Charge SOC
+- Backup SOC
+
+The timed change controls are all sent to the API using one command and so they won't update untill the Update Charge/Discharge button is pressed. The controls included in this are all three sets of the following (where N is slots 1-3):
+
+- Timed Charge Current N
+- Timed Charge Start Time N
+- Timed Charge End Time N
+- Timed Discharge Current N
+- Timed Discharge Start Time N
+- Timed Discharge End Time N
+
+<b>Note that all three slots are sent at the same time</b>
+
+## Version 4B00 and Later
+
+Six slots are available and include an SOC limit and a voltage (though the purpose of the voltage is not clear). Only the start and end times for each Charge/Discharge slot need to to be sent to the inverter together so the following are updated immediately (where N is slot 1-6):
+
+- Energy Storage Control Switch (fewer available modes than pre-4B00)
+- Overdischarge SOC
+- Force Charge SOC
+- Backup SOC
+- Timed Charge Current N
+- Timed Charge SOC N
+- Timed Charge Voltage N
+- Timed Discharge Current N
+- Timed Discharge SOC N
+- Timed Discharge Voltage N
+
+Each pair of start/end times has an associated button push; for charge (where N is slot 1-6):
+
+- Timed Charge Start Time N
+- Timed Charge End Time N
+- Button Update Charge Time N
+
+And discharge:
+
+- Timed Discharge Start Time N
+- Timed Discharge End Time N
+- Button Update Discharge Time N
+
 
 # Thanks
 Big thanks & kudo's to [@LucidityCrash](https://github.com/LucidityCrash) for all the work on getting the SolisCloud support working!

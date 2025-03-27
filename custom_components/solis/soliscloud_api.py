@@ -761,8 +761,10 @@ class SoliscloudAPI(BaseAPI):
 
     async def _fetch_token(self, username: str, password: str) -> str:
         """
-        Fetch Station Details
+        Fetch CSRF token for station control
         """
+        if password == "":
+          return ""
 
         params = {
             "username": username,
