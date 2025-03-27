@@ -308,12 +308,16 @@ class SoliscloudAPI(BaseAPI):
             else:
                 _LOGGER.debug("Valid inverters: %s", list(self._inverter_list.keys()))
             try:
-                token = await self._fetch_token(self.config.username, self.config._password)
-                self._token = token
-                if token == "":
-                    _LOGGER.info("Failed to acquire CSRF token")
+                if not self.config._password:
+                  _LOGGER.info("No control password set; control mode disabled")
+                  self._token = ""
                 else:
-                    _LOGGER.debug("CSRF token acquired")
+                  token = await self._fetch_token(self.config.username, self.config._password)
+                  self._token = token
+                  if token == "":
+                      _LOGGER.info("Failed to acquire CSRF token")
+                  else:
+                      _LOGGER.debug("CSRF token acquired")
             except:
                 _LOGGER.info("Failed to acquire CSRF token")
 
@@ -761,9 +765,8 @@ class SoliscloudAPI(BaseAPI):
 
     async def _fetch_token(self, username: str, password: str) -> str:
         """
-        Fetch Station Details
+        Fetch CSRF token for station control
         """
-
         params = {
             "username": username,
             "password": hashlib.md5(password.encode("utf-8")).hexdigest(),
@@ -777,7 +780,7 @@ class SoliscloudAPI(BaseAPI):
             else:
                 _LOGGER.info(f"({AUTHENTICATE:s} responded with error: {jsondata}")
         else:
-            _LOGGER.info("Unable to fetch authenticate with username and password")
+            _LOGGER.info("Unable to fetch authentication token with username and password")
         return ""
 
     async def write_control_data(self, device_serial: str, cid: str, value: str):
