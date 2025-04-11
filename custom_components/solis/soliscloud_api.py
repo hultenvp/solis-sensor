@@ -294,7 +294,7 @@ class SoliscloudAPI(BaseAPI):
             _LOGGER.info("Login successful")
             _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
             self._is_online = True
-            for inv in self._inverter_list.keys():
+            for inv in list(self._inverter_list):
                 data = await self.fetch_inverter_data(inv)
                 try:
                     self._plant_name = getattr(data, INVERTER_PLANT_NAME)
