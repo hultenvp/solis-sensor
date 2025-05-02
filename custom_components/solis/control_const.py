@@ -294,6 +294,18 @@ ALL_CONTROLS = {
                 native_step=1,
             )
         ],
+        "230": [
+            SolisNumberEntityDescription(
+                name="System Export Power Limit Value",
+                key="sytem_export_power_limit_value",
+                native_unit_of_measurement=UnitOfElectricCurrent.WATT,
+                device_class=NumberDeviceClass.POWER,
+                icon="mdi:transmission-tower-export",
+                native_min_value=0,
+                native_max_value=1000000000, # 1 GW
+                native_step=1,
+            )
+        ],
         "636": [
             SolisSelectEntityDescription(
                 name="Energy Storage Control Switch",
@@ -308,6 +320,17 @@ ALL_CONTROLS = {
                     "64": "Feed-In Priority Mode - No Grid Charging",
                     "80": "Feed-In Priority Mode - No Grid Charging, Backup Mode On",
                     "5": "Off-Grid Mode",
+                },
+                icon="mdi:dip-switch",
+            )
+        ],
+        "5161": [
+            SolisSelectEntityDescription(
+                name="Inverter energy export on/off Control Switch",
+                key="inverter_energy_export_on_off_control_switch",
+                option_dict={
+                    "190": "ON",
+                    "222": "OFF",
                 },
                 icon="mdi:dip-switch",
             )
