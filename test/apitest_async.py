@@ -47,7 +47,13 @@ async def collector_details_per_station(api, station_ids):
                     try:
                         response = await api.collector_detail(KeyId, secretKey, collector_sn=record["sn"])
                         if response is not None:
-                            print("collector_detail(station_id=", sid, ", collector_sn=", record["sn"], "): [OK]")
+                            print(
+                                "collector_detail(station_id=",
+                                sid,
+                                ", collector_sn=",
+                                record["sn"],
+                                "): [OK]",
+                            )
                             if verbose:
                                 print(json.dumps(response, sort_keys=True))
                     except SoliscloudAPI.SolisCloudError as err:
@@ -80,12 +86,23 @@ async def inverter_details_per_station(api, station_ids):
                         inverter_ids[sid].append(record["sn"])
                         response = await api.inverter_detail(KeyId, secretKey, inverter_sn=record["sn"])
                         if response is not None:
-                            print("inverter_detail(station_id =", sid, ", inverter_sn =", record["sn"], "): [OK]")
+                            print(
+                                "inverter_detail(station_id =",
+                                sid,
+                                ", inverter_sn =",
+                                record["sn"],
+                                "): [OK]",
+                            )
                             if verbose:
                                 print(json.dumps(response, sort_keys=True))
                     except SoliscloudAPI.SolisCloudError as err:
                         print(
-                            "inverter_detail(station_id=", sid, ", inverter_sn=", record["sn"], "):  Failed with:", err
+                            "inverter_detail(station_id=",
+                            sid,
+                            ", inverter_sn=",
+                            record["sn"],
+                            "):  Failed with:",
+                            err,
                         )
         except SoliscloudAPI.SolisCloudError as err:
             print("inverter_list(station_id =", sid, "): Failed with:", err)
@@ -96,7 +113,12 @@ async def station_graphs(api, station_ids):
         try:
             await asyncio.sleep(DELAY)
             response = await api.station_day(
-                KeyId, secretKey, currency="EUR", time="2022-12-27", time_zone=1, station_id=sid
+                KeyId,
+                secretKey,
+                currency="EUR",
+                time="2022-12-27",
+                time_zone=1,
+                station_id=sid,
             )
             if response is not None:
                 print("station_day(", sid, "): [OK]")
@@ -136,7 +158,12 @@ async def inverter_graphs(api, station_ids):
             try:
                 await asyncio.sleep(DELAY)
                 response = await api.inverter_day(
-                    KeyId, secretKey, currency="EUR", time="2022-12-27", time_zone=1, inverter_sn=isn
+                    KeyId,
+                    secretKey,
+                    currency="EUR",
+                    time="2022-12-27",
+                    time_zone=1,
+                    inverter_sn=isn,
                 )
                 if response is not None:
                     print("inverter_day(", isn, "): [OK]")

@@ -21,10 +21,23 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .const import (API_NAME, CONF_KEY_ID, CONF_PASSWORD, CONF_PLANT_ID,
-                    CONF_PORTAL_DOMAIN, CONF_SECRET, CONF_USERNAME,
-                    DEFAULT_DOMAIN, DOMAIN, EMPTY_ATTR, LAST_UPDATED,
-                    SENSOR_PREFIX, SENSOR_TYPES, SERIAL, VERSION)
+from .const import (
+    API_NAME,
+    CONF_KEY_ID,
+    CONF_PASSWORD,
+    CONF_PLANT_ID,
+    CONF_PORTAL_DOMAIN,
+    CONF_SECRET,
+    CONF_USERNAME,
+    DEFAULT_DOMAIN,
+    DOMAIN,
+    EMPTY_ATTR,
+    LAST_UPDATED,
+    SENSOR_PREFIX,
+    SENSOR_TYPES,
+    SERIAL,
+    VERSION,
+)
 from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
@@ -117,7 +130,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     # Prepare the sensor entities.
     inverter_name = config_entry.data[CONF_NAME]
     service = hass.data[DOMAIN][config_entry.entry_id]
-    cookie: dict[str, Any] = {"name": inverter_name, "service": service, "async_add_entities": async_add_entities}
+    cookie: dict[str, Any] = {
+        "name": inverter_name,
+        "service": service,
+        "async_add_entities": async_add_entities,
+    }
     # Will retry endlessly to discover
     _LOGGER.info("Scheduling discovery")
     service.schedule_discovery(on_discovered, cookie, 1)
@@ -146,7 +163,13 @@ def on_discovered(capabilities, cookie):
 class SolisSensor(ServiceSubscriber, SensorEntity):
     """Representation of a Solis sensor."""
 
-    def __init__(self, ginlong_service: InverterService, inverter_name: str, inverter_sn: str, sensor_type: str):
+    def __init__(
+        self,
+        ginlong_service: InverterService,
+        inverter_name: str,
+        inverter_sn: str,
+        sensor_type: str,
+    ):
         # Initialize the sensor.
         self._measured: datetime | None = None
         self._entity_type = "sensor"
@@ -198,7 +221,12 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         return DeviceInfo(
             #            config_entry_id=config.entry_id,
             #                        connections={(dr.CONNECTION_NETWORK_MAC, config.mac)},
-            identifiers={(DOMAIN, f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}")},
+            identifiers={
+                (
+                    DOMAIN,
+                    f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}",
+                )
+            },
             manufacturer=f"Solis {self._attributes[API_NAME]}",
             name=f"Solis_Inverter_{self._attributes[SERIAL]}",
             #            model=config.modelid,

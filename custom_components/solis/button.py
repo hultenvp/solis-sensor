@@ -7,9 +7,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
-from .control_const import (ALL_CONTROLS, RETRIES, RETRY_WAIT,
-                            SolisBaseControlEntity,
-                            SolisButtonEntityDescription)
+from .control_const import (
+    ALL_CONTROLS,
+    RETRIES,
+    RETRY_WAIT,
+    SolisBaseControlEntity,
+    SolisButtonEntityDescription,
+)
 from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
@@ -61,7 +65,15 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
 
 class SolisButtonEntity(SolisBaseControlEntity, ServiceSubscriber, ButtonEntity):
-    def __init__(self, service: InverterService, config_name, inverter_sn, cid, button_info, index):
+    def __init__(
+        self,
+        service: InverterService,
+        config_name,
+        inverter_sn,
+        cid,
+        button_info,
+        index,
+    ):
         super().__init__(service, config_name, inverter_sn, cid, button_info)
         self._index = index
         self._joiner = button_info.joiner

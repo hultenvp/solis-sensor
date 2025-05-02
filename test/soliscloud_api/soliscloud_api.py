@@ -63,7 +63,6 @@ class SoliscloudAPI:
         """
 
         def __init__(self, message="SolisCloud API error"):
-
             self.message = message
             super().__init__(self.message)
 
@@ -88,7 +87,6 @@ class SoliscloudAPI:
         """
 
         def __init__(self, message="Timeout error occurred"):
-
             self.message = message
             super().__init__(self.message)
 
@@ -98,7 +96,6 @@ class SoliscloudAPI:
         """
 
         def __init__(self, message="Undefined API error occurred", code="Unknown", response=None):
-
             self.message = message
             self.code = code
             self.response = response
@@ -124,7 +121,14 @@ class SoliscloudAPI:
     # All methods take key and secret as positional arguments followed by
     # one or more keyword arguments
     async def user_station_list(
-        self, key_id: str, secret: bytes, /, *, page_no: int = 1, page_size: int = 20, nmi_code: str = None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        page_no: int = 1,
+        page_size: int = 20,
+        nmi_code: str = None,
     ) -> dict[str, str]:
         """Power station List"""
 
@@ -170,7 +174,13 @@ class SoliscloudAPI:
         return await self._get_records(COLLECTOR_LIST, key_id, secret, params)
 
     async def collector_detail(
-        self, key_id: str, secret: bytes, /, *, collector_sn: int = None, collector_id: str = None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        collector_sn: int = None,
+        collector_id: str = None,
     ) -> dict[str, str]:
         """Datalogger details"""
 
@@ -211,7 +221,13 @@ class SoliscloudAPI:
         return await self._get_records(INVERTER_LIST, key_id, secret, params)
 
     async def inverter_detail(
-        self, key_id: str, secret: bytes, /, *, inverter_sn: int = None, inverter_id: str = None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        inverter_sn: int = None,
+        inverter_id: str = None,
     ) -> dict[str, str]:
         """Inverter details"""
 
@@ -243,7 +259,11 @@ class SoliscloudAPI:
 
         if time[4] != "-" or time[7] != "-" or len(time) != 10:
             raise SoliscloudAPI.ApiError("time must be in format YYYY-MM-DD")
-        params: dict[str, Any] = {"money": currency, "time": time, "timeZone": time_zone}
+        params: dict[str, Any] = {
+            "money": currency,
+            "time": time,
+            "timeZone": time_zone,
+        }
 
         if station_id is not None and nmi_code is None:
             params["id"] = station_id
@@ -255,7 +275,15 @@ class SoliscloudAPI:
         return await self._get_data(STATION_DAY, key_id, secret, params)
 
     async def station_month(
-        self, key_id: str, secret: bytes, /, *, currency: str, month: str, station_id: int = None, nmi_code=None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        currency: str,
+        month: str,
+        station_id: int = None,
+        nmi_code=None,
     ) -> dict[str, str]:
         """Station monthly graph"""
 
@@ -273,7 +301,15 @@ class SoliscloudAPI:
         return await self._get_data(STATION_MONTH, key_id, secret, params)
 
     async def station_year(
-        self, key_id: str, secret: bytes, /, *, currency: str, year: str, station_id: int = None, nmi_code=None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        currency: str,
+        year: str,
+        station_id: int = None,
+        nmi_code=None,
     ) -> dict[str, str]:
         """Station yearly graph"""
 
@@ -291,7 +327,14 @@ class SoliscloudAPI:
         return await self._get_data(STATION_YEAR, key_id, secret, params)
 
     async def station_all(
-        self, key_id: str, secret: bytes, /, *, currency: str, station_id: int = None, nmi_code: str = None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        currency: str,
+        station_id: int = None,
+        nmi_code: str = None,
     ) -> dict[str, str]:
         """Station cumulative graph"""
 
@@ -321,7 +364,11 @@ class SoliscloudAPI:
 
         if time[4] != "-" or time[7] != "-" or len(time) != 10:
             raise SoliscloudAPI.ApiError("time must be in format YYYY-MM-DD")
-        params: dict[str, Any] = {"money": currency, "time": time, "timeZone": time_zone}
+        params: dict[str, Any] = {
+            "money": currency,
+            "time": time,
+            "timeZone": time_zone,
+        }
 
         if inverter_id is not None and inverter_sn is None:
             params["id"] = inverter_id
@@ -385,7 +432,14 @@ class SoliscloudAPI:
         return await self._get_data(INVERTER_YEAR, key_id, secret, params)
 
     async def inverter_all(
-        self, key_id: str, secret: bytes, /, *, currency: str, inverter_id: int = None, inverter_sn: str = None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        currency: str,
+        inverter_id: int = None,
+        inverter_sn: str = None,
     ) -> dict[str, str]:
         """Inverter cumulative graph"""
 
@@ -456,7 +510,14 @@ class SoliscloudAPI:
         return await self._get_records(INVERTER_DETAIL_LIST, key_id, secret, params)
 
     async def station_day_energy_list(
-        self, key_id: str, secret: bytes, /, *, page_no: int = 1, page_size: int = 20, time: str
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        page_no: int = 1,
+        page_size: int = 20,
+        time: str,
     ) -> dict[str, str]:
         """Batch acquire station daily generation"""
 
@@ -464,12 +525,23 @@ class SoliscloudAPI:
             raise SoliscloudAPI.ApiError("PageSize must be <= 100")
         if time[4] != "-" or time[7] != "-" or len(time) != 10:
             raise SoliscloudAPI.ApiError("time must be in format YYYY-MM-DD")
-        params: dict[str, Any] = {"pageNo": page_no, "pageSize": page_size, "time": time}
+        params: dict[str, Any] = {
+            "pageNo": page_no,
+            "pageSize": page_size,
+            "time": time,
+        }
 
         return await self._get_records(STATION_DAY_ENERGY_LIST, key_id, secret, params)
 
     async def station_month_energy_list(
-        self, key_id: str, secret: bytes, /, *, page_no: int = 1, page_size: int = 20, month: str
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        page_no: int = 1,
+        page_size: int = 20,
+        month: str,
     ) -> dict[str, str]:
         """Batch acquire station monthly generation"""
 
@@ -477,12 +549,23 @@ class SoliscloudAPI:
             raise SoliscloudAPI.ApiError("PageSize must be <= 100")
         if month[4] != "-" or len(month) != 7:
             raise SoliscloudAPI.ApiError("month must be in format YYYY-MM")
-        params: dict[str, Any] = {"pageNo": page_no, "pageSize": page_size, "time": month}
+        params: dict[str, Any] = {
+            "pageNo": page_no,
+            "pageSize": page_size,
+            "time": month,
+        }
 
         return await self._get_records(STATION_MONTH_ENERGY_LIST, key_id, secret, params)
 
     async def station_year_energy_list(
-        self, key_id: str, secret: bytes, /, *, page_no: int = 1, page_size: int = 20, year: str
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        page_no: int = 1,
+        page_size: int = 20,
+        year: str,
     ) -> dict[str, str]:
         """Batch acquire station yearly generation"""
 
@@ -490,12 +573,23 @@ class SoliscloudAPI:
             raise SoliscloudAPI.ApiError("PageSize must be <= 100")
         if len(year) != 4:
             raise SoliscloudAPI.ApiError("year must be in format YYYY")
-        params: dict[str, Any] = {"pageNo": page_no, "pageSize": page_size, "time": year}
+        params: dict[str, Any] = {
+            "pageNo": page_no,
+            "pageSize": page_size,
+            "time": year,
+        }
 
         return await self._get_records(STATION_YEAR_ENERGY_LIST, key_id, secret, params)
 
     async def epm_list(
-        self, key_id: str, secret: bytes, /, *, page_no: int = 1, page_size: int = 20, station_id: str = None
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        page_no: int = 1,
+        page_size: int = 20,
+        station_id: str = None,
     ) -> dict[str, str]:
         """EPM list"""
 
@@ -515,13 +609,26 @@ class SoliscloudAPI:
         return await self._get_records(EPM_DETAIL, key_id, secret, params)
 
     async def epm_day(
-        self, key_id: str, secret: bytes, /, *, searchinfo: str, epm_sn: str, time: str, time_zone: int
+        self,
+        key_id: str,
+        secret: bytes,
+        /,
+        *,
+        searchinfo: str,
+        epm_sn: str,
+        time: str,
+        time_zone: int,
     ) -> dict[str, str]:
         """EPM daily graph"""
 
         if time[4] != "-" or time[7] != "-" or len(time) != 10:
             raise SoliscloudAPI.ApiError("time must be in format YYYY-MM-DD")
-        params: dict[str, Any] = {"searchinfo": searchinfo, "sn": epm_sn, "time": time, "timezone": time_zone}
+        params: dict[str, Any] = {
+            "searchinfo": searchinfo,
+            "sn": epm_sn,
+            "time": time,
+            "timezone": time_zone,
+        }
 
         return await self._get_records(EPM_DAY, key_id, secret, params)
 

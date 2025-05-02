@@ -7,9 +7,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, LAST_UPDATED
-from .control_const import (ALL_CONTROLS, RETRIES, RETRY_WAIT,
-                            SolisBaseControlEntity,
-                            SolisSelectEntityDescription)
+from .control_const import (
+    ALL_CONTROLS,
+    RETRIES,
+    RETRY_WAIT,
+    SolisBaseControlEntity,
+    SolisSelectEntityDescription,
+)
 from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)

@@ -7,8 +7,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, LAST_UPDATED
-from .control_const import (ALL_CONTROLS, RETRIES, RETRY_WAIT,
-                            SolisBaseControlEntity, SolisTimeEntityDescription)
+from .control_const import (
+    ALL_CONTROLS,
+    RETRIES,
+    RETRY_WAIT,
+    SolisBaseControlEntity,
+    SolisTimeEntityDescription,
+)
 from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,7 +70,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
 
 class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
-    def __init__(self, service: InverterService, config_name, inverter_sn, cid, time_info, index, initial_value):
+    def __init__(
+        self,
+        service: InverterService,
+        config_name,
+        inverter_sn,
+        cid,
+        time_info,
+        index,
+        initial_value,
+    ):
         super().__init__(service, config_name, inverter_sn, cid, time_info)
         self._attr_native_value = datetime(
             year=YEAR,
