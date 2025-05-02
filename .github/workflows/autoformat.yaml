@@ -12,10 +12,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Step 1.5: Checkout PR source branch
-      - name: Checkout PR branch
-        run: git checkout ${{ github.head_ref }}
-
       # Step 2: Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -54,10 +50,10 @@ jobs:
             git add .
 
             echo "Committing changes..."
-            git commit -m "Auto-format code with Black and isort"
+            git commit -a -m "Auto-format code with Black and isort"
 
             echo "Pushing changes to the branch..."
-            git push origin ${{ github.head_ref }}
+            git push -v origin ${{ github.head_ref }}
             echo "Push completed successfully."
           else
             echo "No changes detected. Nothing to commit or push."
