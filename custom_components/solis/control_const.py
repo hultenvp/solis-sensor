@@ -302,7 +302,7 @@ ALL_CONTROLS = {
                 device_class=NumberDeviceClass.POWER,
                 icon="mdi:transmission-tower-export",
                 native_min_value=0,
-                native_max_value=1000000000, # 1 GW
+                native_max_value=1000000000,  # 1 GW
                 native_step=1,
             )
         ],
