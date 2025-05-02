@@ -28,4 +28,4 @@ jobs:
 
       - name: Run black (check only)
         run: |
-          black . --check --diff
+          black . --check --diff --line-length 119
