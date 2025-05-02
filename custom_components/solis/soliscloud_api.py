@@ -455,7 +455,7 @@ class SoliscloudAPI(BaseAPI):
                 if jsondata["code"] == "0":
                     try:
                         hmi_flag = jsondata.get("data", {}).get("msg", "")
-                        self._hmi_fb00[device_serial] = hex(int(hmi_flag)) == "0xaa55"
+                        self._hmi_fb00[device_serial] = int(hmi_flag) >= 43605
                         if self._hmi_fb00[device_serial]:
                             _LOGGER.debug(f"HMI firmware version >=4B00 for Inverter SN {device_serial} ")
                         else:
