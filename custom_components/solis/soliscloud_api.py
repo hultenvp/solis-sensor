@@ -309,15 +309,15 @@ class SoliscloudAPI(BaseAPI):
                 _LOGGER.debug("Valid inverters: %s", list(self._inverter_list.keys()))
             try:
                 if not self.config._password:
-                  _LOGGER.info("No control password set; control mode disabled")
-                  self._token = ""
+                    _LOGGER.info("No control password set; control mode disabled")
+                    self._token = ""
                 else:
-                  token = await self._fetch_token(self.config.username, self.config._password)
-                  self._token = token
-                  if token == "":
-                      _LOGGER.info("Failed to acquire CSRF token")
-                  else:
-                      _LOGGER.debug("CSRF token acquired")
+                    token = await self._fetch_token(self.config.username, self.config._password)
+                    self._token = token
+                    if token == "":
+                        _LOGGER.info("Failed to acquire CSRF token")
+                    else:
+                        _LOGGER.debug("CSRF token acquired")
             except:
                 _LOGGER.info("Failed to acquire CSRF token")
 
