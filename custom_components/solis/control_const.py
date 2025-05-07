@@ -298,7 +298,7 @@ ALL_CONTROLS = {
             SolisNumberEntityDescription(
                 name="System Export Power Limit Value",
                 key="sytem_export_power_limit_value",
-                native_unit_of_measurement=UnitOfElectricCurrent.WATT,
+                native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
                 device_class=NumberDeviceClass.POWER,
                 icon="mdi:transmission-tower-export",
                 native_min_value=0,
