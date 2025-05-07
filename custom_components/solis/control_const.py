@@ -8,7 +8,7 @@ from homeassistant.components.number import (NumberDeviceClass,
 from homeassistant.components.select import SelectEntityDescription
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.time import TimeEntityDescription
-from homeassistant.const import PERCENTAGE, UnitOfElectricCurrent
+from homeassistant.const import PERCENTAGE, UnitOfElectricCurrent, UnitOfPower
 from homeassistant.helpers.entity import DeviceInfo
 
 from .const import API_NAME, DOMAIN, EMPTY_ATTR, SERIAL
@@ -298,7 +298,7 @@ ALL_CONTROLS = {
             SolisNumberEntityDescription(
                 name="System Export Power Limit Value",
                 key="sytem_export_power_limit_value",
-                native_unit_of_measurement=UnitOfElectricCurrent.WATT,
+                native_unit_of_measurement=UnitOfPower.WATT,
                 device_class=NumberDeviceClass.POWER,
                 icon="mdi:transmission-tower-export",
                 native_min_value=0,
