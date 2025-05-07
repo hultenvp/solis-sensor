@@ -11,14 +11,21 @@ from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import ATTR_NAME, CONF_NAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.issue_registry import (IssueSeverity,
-                                                  async_create_issue)
+from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
-from .const import (CONF_CONTROL, CONF_KEY_ID, CONF_PASSWORD, CONF_PLANT_ID,
-                    CONF_PORTAL_DOMAIN, CONF_PORTAL_VERSION, CONF_SECRET,
-                    CONF_USERNAME, DOMAIN)
+from .const import (
+    CONF_CONTROL,
+    CONF_KEY_ID,
+    CONF_PASSWORD,
+    CONF_PLANT_ID,
+    CONF_PORTAL_DOMAIN,
+    CONF_PORTAL_VERSION,
+    CONF_SECRET,
+    CONF_USERNAME,
+    DOMAIN,
+)
 from .ginlong_api import GinlongConfig
 from .ginlong_base import PortalConfig
 from .service import InverterService
@@ -93,7 +100,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         portal_key_id = config[CONF_KEY_ID]
         portal_secret: bytes = bytes(config[CONF_SECRET], "utf-8")
         portal_config = SoliscloudConfig(
-            portal_domain, portal_username, portal_key_id, portal_secret, portal_plantid, portal_password
+            portal_domain,
+            portal_username,
+            portal_key_id,
+            portal_secret,
+            portal_plantid,
+            portal_password,
         )
 
     # Initialize the Ginlong data service.

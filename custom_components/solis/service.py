@@ -20,9 +20,13 @@ from homeassistant.util import dt as dt_util
 from .control_const import ALL_CONTROLS, CONTROL_TYPES, HMI_CID
 from .ginlong_api import GinlongAPI, GinlongConfig
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
-from .ginlong_const import (INVERTER_ACPOWER, INVERTER_ENERGY_TODAY,
-                            INVERTER_SERIAL, INVERTER_STATE,
-                            INVERTER_TIMESTAMP_UPDATE)
+from .ginlong_const import (
+    INVERTER_ACPOWER,
+    INVERTER_ENERGY_TODAY,
+    INVERTER_SERIAL,
+    INVERTER_STATE,
+    INVERTER_TIMESTAMP_UPDATE,
+)
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 
 # REFRESH CONSTANTS
@@ -164,9 +168,16 @@ class InverterService:
             self._dicovery_complete = True
         else:
             self._retry_delay_seconds = min(MAX_RETRY_DELAY_SECONDS, self._retry_delay_seconds + RETRY_DELAY_SECONDS)
-            _LOGGER.warning("Failed to discover, scheduling retry in %s seconds.", self._retry_delay_seconds)
+            _LOGGER.warning(
+                "Failed to discover, scheduling retry in %s seconds.",
+                self._retry_delay_seconds,
+            )
             await self._logout()
-            self.schedule_discovery(self._discovery_callback, self._discovery_cookie, self._retry_delay_seconds)
+            self.schedule_discovery(
+                self._discovery_callback,
+                self._discovery_cookie,
+                self._retry_delay_seconds,
+            )
 
     async def _discover_controls(self, inverter_serials: list[str]):
         _LOGGER.debug(f"Starting controls discovery")

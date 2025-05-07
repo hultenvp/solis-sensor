@@ -3,8 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from homeassistant.components.button import ButtonEntityDescription
-from homeassistant.components.number import (NumberDeviceClass,
-                                             NumberEntityDescription)
+from homeassistant.components.number import NumberDeviceClass, NumberEntityDescription
 from homeassistant.components.select import SelectEntityDescription
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.time import TimeEntityDescription
@@ -57,7 +56,12 @@ class SolisBaseControlEntity:
     def device_info(self) -> DeviceInfo | None:
         """Return a device description for device registry."""
         return DeviceInfo(
-            identifiers={(DOMAIN, f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}")},
+            identifiers={
+                (
+                    DOMAIN,
+                    f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}",
+                )
+            },
             manufacturer=f"Solis {self._attributes[API_NAME]}",
             name=f"Solis_Inverter_{self._attributes[SERIAL]}",
         )

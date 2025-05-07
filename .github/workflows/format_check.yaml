@@ -1,0 +1,31 @@
+name: PR Validation and Auto-formatting
+
+on:
+  pull_request:
+
+jobs:
+  auto-format:
+    name: Auto-format and Push Changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full history for proper diff
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install formatting tools
+        run: |
+          pip install black isort
+
+      - name: Run isort (check only, black profile)
+        run: |
+          isort . --profile black --check --diff
+
+      - name: Run black (check only)
+        run: |
+          black . --check --diff --line-length 119

@@ -13,9 +13,19 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import selector
 
-from .const import (CONF_CONTROL, CONF_KEY_ID, CONF_PASSWORD, CONF_PLANT_ID,
-                    CONF_PORTAL_DOMAIN, CONF_PORTAL_VERSION, CONF_SECRET,
-                    CONF_USERNAME, DEFAULT_DOMAIN, DOMAIN, SENSOR_PREFIX)
+from .const import (
+    CONF_CONTROL,
+    CONF_KEY_ID,
+    CONF_PASSWORD,
+    CONF_PLANT_ID,
+    CONF_PORTAL_DOMAIN,
+    CONF_PORTAL_VERSION,
+    CONF_SECRET,
+    CONF_USERNAME,
+    DEFAULT_DOMAIN,
+    DOMAIN,
+    SENSOR_PREFIX,
+)
 from .ginlong_api import GinlongAPI, GinlongConfig
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 
@@ -142,7 +152,11 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_PLANT_ID, default=None): cv.positive_int,
         }
 
-        return self.async_show_form(step_id="credentials_password", data_schema=vol.Schema(data_schema), errors=errors)
+        return self.async_show_form(
+            step_id="credentials_password",
+            data_schema=vol.Schema(data_schema),
+            errors=errors,
+        )
 
     async def async_step_credentials_secret(self, user_input=None):
         """Handle key_id/secret based credential settings."""
@@ -189,7 +203,11 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
         }
 
-        return self.async_show_form(step_id="credentials_secret", data_schema=vol.Schema(data_schema), errors=errors)
+        return self.async_show_form(
+            step_id="credentials_secret",
+            data_schema=vol.Schema(data_schema),
+            errors=errors,
+        )
 
     async def async_step_import(self, user_input=None):
         """Import a config entry from configuration.yaml."""

@@ -5,11 +5,17 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import (PERCENTAGE, UnitOfApparentPower,
-                                 UnitOfElectricCurrent,
-                                 UnitOfElectricPotential, UnitOfEnergy,
-                                 UnitOfFrequency, UnitOfPower,
-                                 UnitOfReactivePower, UnitOfTemperature)
+from homeassistant.const import (
+    PERCENTAGE,
+    UnitOfApparentPower,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfEnergy,
+    UnitOfFrequency,
+    UnitOfPower,
+    UnitOfReactivePower,
+    UnitOfTemperature,
+)
 
 from .ginlong_const import *
 
@@ -43,8 +49,22 @@ DEFAULT_DOMAIN = "https://www.soliscloud.com:13333"
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
 SENSOR_TYPES = {
-    "inverterpowerstate": ["Power State", None, "mdi:power", None, SensorStateClass.MEASUREMENT, INVERTER_POWER_STATE],
-    "inverterstate": ["State", None, "mdi:state-machine", None, SensorStateClass.MEASUREMENT, INVERTER_STATE],
+    "inverterpowerstate": [
+        "Power State",
+        None,
+        "mdi:power",
+        None,
+        SensorStateClass.MEASUREMENT,
+        INVERTER_POWER_STATE,
+    ],
+    "inverterstate": [
+        "State",
+        None,
+        "mdi:state-machine",
+        None,
+        SensorStateClass.MEASUREMENT,
+        INVERTER_STATE,
+    ],
     "timestamponline": [
         "Timestamp Inverter Online",
         None,
@@ -62,7 +82,14 @@ SENSOR_TYPES = {
         INVERTER_TIMESTAMP_UPDATE,
     ],
     "status": ["Status", None, "mdi:solar-power", None, None, "status"],
-    "hmiversionall": ["hmiVersionAll", None, "mdi:solar-power", None, None, "hmi_version"],
+    "hmiversionall": [
+        "hmiVersionAll",
+        None,
+        "mdi:solar-power",
+        None,
+        None,
+        "hmi_version",
+    ],
     "temperature": [
         "Temperature",
         UnitOfTemperature.CELSIUS,

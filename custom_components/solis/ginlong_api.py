@@ -158,7 +158,13 @@ CHECK = set((INVERTER_STATE, INVERTER_TIMESTAMP_UPDATE, INVERTER_SERIAL, INVERTE
 class GinlongConfig(PortalConfig):
     """Portal configuration data"""
 
-    def __init__(self, portal_domain: str, portal_username: str, portal_password: str, portal_plantid: str) -> None:
+    def __init__(
+        self,
+        portal_domain: str,
+        portal_username: str,
+        portal_password: str,
+        portal_plantid: str,
+    ) -> None:
         super().__init__(portal_domain, portal_username, portal_plantid)
         self._password: str = portal_password
 
@@ -235,7 +241,10 @@ class GinlongAPI(BaseAPI):
                 _LOGGER.debug("Could not fetch inverter data, retry loging attempt")
                 self._online = False
             except KeyError:
-                _LOGGER.error("Unable to login to %s, are username and password correct?", self.config.domain)
+                _LOGGER.error(
+                    "Unable to login to %s, are username and password correct?",
+                    self.config.domain,
+                )
                 self._online = False
         else:
             self._online = False

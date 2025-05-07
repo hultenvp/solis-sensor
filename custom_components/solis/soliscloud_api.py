@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import hashlib
+
 # from hashlib import sha1
 import hmac
 import json
@@ -129,7 +130,11 @@ INVERTER_DATA: InverterDataType = {
         BAT_MONTHLY_ENERGY_CHARGED: ["batteryMonthChargeEnergy", float, 3],
         BAT_MONTHLY_ENERGY_CHARGED_STR: ["batteryMonthChargeEnergyStr", str, None],
         BAT_MONTHLY_ENERGY_DISCHARGED: ["batteryMonthDischargeEnergy", float, 3],
-        BAT_MONTHLY_ENERGY_DISCHARGED_STR: ["batteryMonthDischargeEnergyStr", str, None],
+        BAT_MONTHLY_ENERGY_DISCHARGED_STR: [
+            "batteryMonthDischargeEnergyStr",
+            str,
+            None,
+        ],
         BAT_YEARLY_ENERGY_CHARGED: ["batteryYearChargeEnergy", float, 3],
         BAT_YEARLY_ENERGY_CHARGED_STR: ["batteryYearChargeEnergyStr", str, None],
         BAT_YEARLY_ENERGY_DISCHARGED: ["batteryYearDischargeEnergy", float, 3],
@@ -343,7 +348,10 @@ class SoliscloudAPI(BaseAPI):
             result_json: dict = result[CONTENT]
             if result_json["code"] != "0":
                 _LOGGER.info(
-                    "%s responded with error: %s:%s", INVERTER_DETAIL, result_json["code"], result_json["msg"]
+                    "%s responded with error: %s:%s",
+                    INVERTER_DETAIL,
+                    result_json["code"],
+                    result_json["msg"],
                 )
                 return device_ids
             try:
@@ -411,7 +419,12 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             jsondata = result[CONTENT]
             if jsondata["code"] != "0":
-                _LOGGER.info("%s responded with error: %s:%s", INVERTER_DETAIL, jsondata["code"], jsondata["msg"])
+                _LOGGER.info(
+                    "%s responded with error: %s:%s",
+                    INVERTER_DETAIL,
+                    jsondata["code"],
+                    jsondata["msg"],
+                )
                 return None
         else:
             _LOGGER.info("Unable to fetch details for device with ID: %s", device_id)
@@ -510,7 +523,12 @@ class SoliscloudAPI(BaseAPI):
             if jsondata["code"] == "0":
                 return jsondata
             else:
-                _LOGGER.info("%s responded with error: %s:%s", PLANT_DETAIL, jsondata["code"], jsondata["msg"])
+                _LOGGER.info(
+                    "%s responded with error: %s:%s",
+                    PLANT_DETAIL,
+                    jsondata["code"],
+                    jsondata["msg"],
+                )
         else:
             _LOGGER.info("Unable to fetch details for Station with ID: %s", plant_id)
         return None
@@ -676,7 +694,12 @@ class SoliscloudAPI(BaseAPI):
                 if type_ is float:
                     result = round(float(result), precision)  # type: ignore
             except ValueError:
-                _LOGGER.debug("Failed to convert %s to type %s, raw value = %s", key, type_, data_raw)
+                _LOGGER.debug(
+                    "Failed to convert %s to type %s, raw value = %s",
+                    key,
+                    type_,
+                    data_raw,
+                )
         return result
 
     async def _get_data(self, url: str, params: dict[str, Any]) -> dict[str, Any]:

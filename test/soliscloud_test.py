@@ -78,7 +78,12 @@ requestStr = (
     + Body
 )
 
-header = {"Content-MD5": Content_MD5, "Content-Type": Content_Type, "Date": Date, "Authorization": Authorization}
+header = {
+    "Content-MD5": Content_MD5,
+    "Content-Type": Content_Type,
+    "Date": Date,
+    "Authorization": Authorization,
+}
 
 # print (requestStr)
 # print (header)
