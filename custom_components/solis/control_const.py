@@ -1052,5 +1052,16 @@ ALL_CONTROLS = {
                 icon="mdi:dip-switch",
             )
         ],
+        "5162": [
+            SolisSelectEntityDescription(
+                name="Inverter energy export on/off Control Switch",
+                key="inverter_energy_export_on_off_control_switch",
+                option_dict={
+                    "190": "ON",
+                    "222": "OFF",
+                },
+                icon="mdi:dip-switch",
+            )
+        ],
     },
 }
