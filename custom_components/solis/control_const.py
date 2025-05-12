@@ -262,6 +262,18 @@ ALL_CONTROLS = {
         #         key="update_timed_charge_discharge",
         #     ),
         # ],
+        "15": [
+            SolisNumberEntityDescription(
+                name="Power limit setting",
+                key="power_limit_setting",
+                native_unit_of_measurement=PERCENTAGE,
+                device_class=NumberDeviceClass.POWER_FACTOR,
+                icon="mdi:transmission-tower-export",
+                native_min_value=0,
+                native_max_value=110,
+                native_step=1,
+            )
+        ],
         "157": [
             SolisNumberEntityDescription(
                 name="Backup SOC",
@@ -850,6 +862,18 @@ ALL_CONTROLS = {
         ],
     },
     False: {
+        "15": [
+            SolisNumberEntityDescription(
+                name="Power limit setting (% of rated power)",
+                key="power_limit_setting",
+                native_unit_of_measurement=PERCENTAGE,
+                device_class=NumberDeviceClass.POWER_FACTOR,
+                icon="mdi:transmission-tower-export",
+                native_min_value=0,
+                native_max_value=110,
+                native_step=1,
+            )
+        ],
         "103": [
             SolisNumberEntityDescription(
                 name="Timed Charge Current 1",
