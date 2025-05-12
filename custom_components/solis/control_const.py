@@ -340,6 +340,18 @@ ALL_CONTROLS = {
                 icon="mdi:dip-switch",
             )
         ],
+        "696": [
+            SolisNumberEntityDescription(
+                name="Feed in Power Limit",
+                key="feed_in_power_limit",
+                icon="mdi:transmission-tower-export",
+                native_unit_of_measurement=UnitOfPower.WATT,
+                device_class=NumberDeviceClass.POWER,
+                native_min_value=0,
+                native_max_value=24000,
+                native_step=100,
+            )
+        ],
         "5161": [
             SolisSelectEntityDescription(
                 name="Inverter energy export on/off Control Switch",
@@ -1074,6 +1086,18 @@ ALL_CONTROLS = {
                     98: "Feed-in priority",
                 },
                 icon="mdi:dip-switch",
+            )
+        ],
+        "696": [
+            SolisNumberEntityDescription(
+                name="Feed in Power Limit",
+                key="feed_in_power_limit",
+                icon="mdi:transmission-tower-export",
+                native_unit_of_measurement=UnitOfPower.WATT,
+                device_class=NumberDeviceClass.POWER,
+                native_min_value=0,
+                native_max_value=24000,
+                native_step=100,
             )
         ],
         "5162": [
