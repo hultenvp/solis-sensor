@@ -57,6 +57,7 @@ PLANT_LIST = "/v1/api/userStationList"
 AUTHENTICATE = "/v2/api/login"
 CONTROL = "/v2/api/control"
 AT_READ = "/v2/api/atRead"
+TREE = "/v2/api/control/list/tree"
 
 from .control_const import ALL_CONTROLS, HMI_CID
 
@@ -252,6 +253,26 @@ class SoliscloudConfig(PortalConfig):
         return self._workarounds
 
 
+class SolisCloudApiControlDefinition:
+
+    def __init__(
+        self, identity: str, name: str, menu_options: dict[str, str], unit: str, min_value: float, max_value: float
+    ):
+        self.identity = identity
+        self.name = name
+        self.menu_options = menu_options
+        self.unit = unit
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def to_string(self):
+        return f"id: {self.identity}, name: {self.name}, menu_options: {self.menu_options}, unit: {self.unit}, min_value: {self.min_value}, max_value: {self.max_value}"
+
+    @property
+    def identity(self) -> str:
+        return self.identity
+
+
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
 
@@ -262,7 +283,7 @@ class SoliscloudAPI(BaseAPI):
         self._data: dict[str, str | int | float] = {}
         self._inverter_list: dict[str, str] | None = None
         self._token = ""
-        self._hmi_fb00 = {}
+        self._all_available_inverter_controls: dict[str, list[SolisCloudApiControlDefinition]] = {}
 
     @property
     def api_name(self) -> str:
@@ -273,9 +294,6 @@ class SoliscloudAPI(BaseAPI):
     def config(self) -> SoliscloudConfig:
         """Config this for this API instance."""
         return self._config
-
-    def hmi_fb00(self, inverter_sn):
-        return self._hmi_fb00.get(inverter_sn, None)
 
     @property
     def is_online(self) -> bool:
@@ -453,37 +471,67 @@ class SoliscloudAPI(BaseAPI):
                 if value is not None:
                     self._data[dictkey] = value
 
+    async def load_all_available_controls_for_device(self, device_serial: str):
+        # Build dict of all menu items.
+        menu_items = await self._collect_menu_items(device_serial)
+        for menu_item_id in menu_items:
+            # Build dict of all controls for each menu item.
+            await self._collect_controls_in_menu(device_serial, menu_item_id)
+
+    async def _collect_controls_in_menu(self, device_serial: str, menu_item_id: str):
+        params = {"inverterSn": str(device_serial), "pid": str(menu_item_id)}
+        result = await self._post_data_json(TREE, params, csrf=True)
+        if result[SUCCESS] is True:
+            jsondata = result[CONTENT]
+            if jsondata["code"] == "0":
+                for item in jsondata["data"]:
+                    self._all_available_inverter_controls[device_serial].append(
+                        SolisCloudApiControlDefinition(
+                            item["id"],
+                            item["name"],
+                            self._parse_menu_options(item["menu"]),
+                            item["unit"],
+                            item["minValue"],
+                            item["maxValue"],
+                        )
+                    )
+            else:
+                _LOGGER.debug(f"Unable to determine menu items for Inverter SN {device_serial}")
+        else:
+            _LOGGER.debug(f"Unable to determine menu items for Inverter SN {device_serial}")
+
+    def _parse_menu_options(self, menu: str):
+        list_of_menu_options = json.loads(menu)
+        menu_options: dict[str, str] = {}
+        for menu_option in list_of_menu_options:
+            menu_options[menu_option["value"]] = menu_option["name"]
+        return menu_options
+
+    async def _collect_menu_items(self, device_serial: str) -> list[str]:
+        params = {"inverterSn": str(device_serial)}
+        result = await self._post_data_json(TREE, params, csrf=True)
+        if result[SUCCESS] is True:
+            jsondata = result[CONTENT]
+            if jsondata["code"] == "0":
+                menu_items = []
+                for item in jsondata["data"]:
+                    menu_items.append(item["id"])
+                return menu_items
+            else:
+                _LOGGER.warning(
+                    f"Unable to determine menu items for Inverter SN {device_serial}, {json.dumps(result)}"
+                )
+        else:
+            _LOGGER.warning(f"Unable to determine menu items for Inverter SN {device_serial}, {json.dumps(result)}")
+
+        return []
+
     async def get_control_data(self, device_serial: str, cid="") -> dict[str, Any] | None:
         control_data = {}
 
-        if device_serial not in self._hmi_fb00:
-            _LOGGER.debug(f"No firmware version found for Inverter SN {device_serial}")
-            params = {
-                "inverterSn": str(device_serial),
-                "cid": HMI_CID,
-            }
-            result = await self._post_data_json(AT_READ, params, csrf=True)
-            if result[SUCCESS] is True:
-                jsondata = result[CONTENT]
-                if jsondata["code"] == "0":
-                    try:
-                        hmi_flag = jsondata.get("data", {}).get("msg", "")
-                        self._hmi_fb00[device_serial] = int(hmi_flag) >= 43605
-                        if self._hmi_fb00[device_serial]:
-                            _LOGGER.debug(f"HMI firmware version ({hmi_flag}) >=4B00 for Inverter SN {device_serial} ")
-                        else:
-                            _LOGGER.debug(f"HMI firmware version ({hmi_flag}) <4B00 for Inverter SN {device_serial} ")
-
-                    except:
-                        _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
-                else:
-                    _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
-            else:
-                _LOGGER.debug(f"Unable to determine HMI firmware version for Inverter SN {device_serial}")
-
-        if device_serial in self._hmi_fb00:
+        if device_serial in self._all_available_inverter_controls:
             if cid == "":
-                controls = ALL_CONTROLS[self._hmi_fb00[device_serial]]
+                controls = [ctrl.identity for ctrl in self._all_available_inverter_controls[device_serial]]
             else:
                 controls = [cid]
             for cid in controls:
