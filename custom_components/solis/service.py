@@ -185,19 +185,28 @@ class InverterService:
         control_lookup = {CONTROL_TYPES[platform]: platform for platform in CONTROL_TYPES}
         for inverter_sn in inverter_serials:
             controls[inverter_sn] = {platform: [] for platform in CONTROL_TYPES}
-            await self._api.get_control_data(inverter_sn, HMI_CID)
-            hmi_flag = self._api.hmi_fb00(inverter_sn)
-            _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_flag}")
-            control_desciptions = ALL_CONTROLS[hmi_flag]
-            for cid in control_desciptions:
-                button = len(control_desciptions[cid]) > 1
-                initial_value = await self._api.get_control_data(inverter_sn, cid)
-                initial_value = initial_value.get(cid, None)
-                for index, entity_description in enumerate(control_desciptions[cid]):
+            await self._api.load_all_available_controls_for_device(inverter_sn)
+
+            # Compare all controls with configured controls in control_const.py and only select known ones.
+            # Log id, name, possible values or data type for each unknown control.
+            available_known_controls = []
+            for control_definition in self._api._all_available_inverter_controls[inverter_sn]:
+                if control_definition.id in ALL_CONTROLS:
+                    available_known_controls.append(ALL_CONTROLS[control_definition.id])
+                else:
+                    _LOGGER.debug(f"Unknown control for inverter Sn {inverter_sn:s}: {control_definition.to_string:s}")
+
+            for known_control in available_known_controls:
+                button = len(available_known_controls[known_control]) > 1
+                initial_value = await self._api.get_control_data(inverter_sn, known_control)
+                initial_value = initial_value.get(known_control, None)
+                for index, entity_description in enumerate(available_known_controls[known_control]):
                     entity_type = control_lookup[type(entity_description)]
-                    controls[inverter_sn][entity_type].append((cid, index, entity_description, button, initial_value))
+                    controls[inverter_sn][entity_type].append(
+                        (known_control, index, entity_description, button, initial_value)
+                    )
                     _LOGGER.debug(
-                        f"Adding {entity_type:s} entity {entity_description.name:s} for inverter Sn {inverter_sn:s} cid {cid:s} with index {index:d}"
+                        f"Adding {entity_type:s} entity {entity_description.name:s} for inverter Sn {inverter_sn:s} cid {known_control:s} with index {index:d}"
                     )
 
         self._controls = controls
