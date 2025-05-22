@@ -43,7 +43,7 @@ from .service import InverterService, ServiceSubscriber
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = "3.11.0"
+VERSION = "3.12.0"
 
 # ATTRIBUTES
 LAST_UPDATED = "Last updated"

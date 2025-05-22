@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from datetime import datetime
 
 from homeassistant.components.number import NumberEntity
@@ -97,8 +98,13 @@ class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity)
         # When the data from the API changes this method will be called with value as the new value
         # return super().do_update(value, last_updated)
         _LOGGER.debug(f"Update state for {self._name}")
+        _LOGGER.debug(f"    value: {value}{self._attr_native_unit_of_measurement}")
 
         value = self.split(value)
+
+        # Convert hectowatts to watts for Home Assistant
+        if re.search(r"Solis Feed in Power Limit$", self._name) and value is not None:
+            value = str(int(value) * 100)
 
         if self.hass and self._attr_native_value != value:
             self._attr_native_value = value
@@ -124,4 +130,8 @@ class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity)
         self._attributes[LAST_UPDATED] = datetime.now()
         self.async_write_ha_state()
         if not self._button:
-            await self.write_control_data(str(value))
+            # Convert watts to hectowatts for API
+            api_value = value
+            if re.search(r"Solis Feed in Power Limit$", self._name) and value is not None:
+                api_value = str(int(value) / 100)
+            await self.write_control_data(str(api_value))
