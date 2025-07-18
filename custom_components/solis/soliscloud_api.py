@@ -178,7 +178,7 @@ INVERTER_DATA: InverterDataType = {
         METER_ITEM_B_VOLTAGE: ["uB", float, 3],
         METER_ITEM_C_CURRENT: ["iC", float, 3],
         METER_ITEM_C_VOLTAGE: ["uC", float, 3],
-        HMI_VERSION_ALL: ["hmiVersionAll", int, None],
+        HMI_VERSION_ALL: ["hmiVersionAll", str, None],
     },
     PLANT_DETAIL: {
         INVERTER_PLANT_NAME: ["sno", str, None],  # stationName no longer available?
@@ -388,17 +388,18 @@ class SoliscloudAPI(BaseAPI):
                 await asyncio.sleep(1)
                 payload_detail = await self._get_station_details(self.config.plant_id)
                 if payload is not None:
-                    # _LOGGER.debug("%s", payload)
                     self._collect_inverter_data(payload)
-                # if payload2 is not None:
-                #    self._collect_station_list_data(payload2)
-                if inverter_serial not in self._hmi_fb00:
-                    hmi_flag = self._data[HMI_VERSION_ALL]
-                    self._hmi_fb00[inverter_serial] = int(hmi_flag) >= 4200
-                    if self._hmi_fb00[inverter_serial]:
-                        _LOGGER.debug(f"HMI firmware version ({hmi_flag}) >=4200 for Inverter SN {inverter_serial} ")
-                    else:
-                        _LOGGER.debug(f"HMI firmware version ({hmi_flag}) <4200 for Inverter SN {inverter_serial} ")
+                    if inverter_serial not in self._hmi_fb00:
+                        hmi_flag = self._data[HMI_VERSION_ALL]
+                        self._hmi_fb00[inverter_serial] = int(hmi_flag) >= 4200
+                        if self._hmi_fb00[inverter_serial]:
+                            _LOGGER.debug(
+                                f"HMI firmware version ({hmi_flag}) >=4200 for Inverter SN {inverter_serial} "
+                            )
+                        else:
+                            _LOGGER.debug(
+                                f"HMI firmware version ({hmi_flag}) <4200 for Inverter SN {inverter_serial} "
+                            )
 
                 if (self._token != "") and controls:
                     _LOGGER.debug(f"Fetching control data for SN:{inverter_serial}")

@@ -83,12 +83,12 @@ SENSOR_TYPES = {
     ],
     "status": ["Status", None, "mdi:solar-power", None, None, "status"],
     "hmiversionall": [
-        "hmiVersionAll",
+        "HMI Version all",
         None,
         "mdi:solar-power",
         None,
         None,
-        "hmi_version",
+        HMI_VERSION_ALL,
     ],
     "temperature": [
         "Temperature",
