@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "12090da8-e3d1-470d-9108-2c200b364b05",
+		"name": "Solis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45015694"
+	},
+	"item": [
+		{
+			"name": "Base request",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const secret = pm.environment.get(\"api_secret\");  // base64-encoded or raw binary key\r",
+							"const keyId = pm.environment.get(\"api_key_id\");    // your API key ID\r",
+							"const verb = \"POST\";  // or GET, PUT, etc.\r",
+							"const canonicalizedResource = pm.request.url.getPath();  // or hardcode if needed\r",
+							"\r",
+							"// 1. Get request body as string with compact JSON\r",
+							"let body = JSON.stringify(pm.request.body ? pm.request.body.raw : {}, null, 0);\r",
+							"body = body.replace(/\\s+/g, '');  // remove whitespace between keys/values\r",
+							"\r",
+							"// 2. Compute Content-MD5\r",
+							"const md5Digest = CryptoJS.MD5(body);\r",
+							"const contentMD5 = CryptoJS.enc.Base64.stringify(md5Digest);\r",
+							"\r",
+							"// 3. Get current date in GMT format (RFC1123)\r",
+							"const date = new Date().toUTCString();  // \"Fri, 16 May 2025 15:03:00 GMT\"\r",
+							"\r",
+							"// 4. Compute signature string\r",
+							"const contentType = \"application/json\";\r",
+							"const signString = `${verb}\\n${contentMD5}\\n${contentType}\\n${date}\\n${canonicalizedResource}`;\r",
+							"\r",
+							"// 5. Generate HMAC-SHA1 signature (base64)\r",
+							"const hmac = CryptoJS.HmacSHA1(signString, secret);\r",
+							"const signature = CryptoJS.enc.Base64.stringify(hmac);\r",
+							"\r",
+							"// 6. Assemble Authorization header\r",
+							"const authorization = `API ${keyId}:${signature}`;\r",
+							"\r",
+							"// 7. Set headers\r",
+							"pm.request.headers.upsert({ key: \"Content-MD5\", value: contentMD5 });\r",
+							"pm.request.headers.upsert({ key: \"Content-Type\", value: contentType });\r",
+							"pm.request.headers.upsert({ key: \"Date\", value: date });\r",
+							"pm.request.headers.upsert({ key: \"Authorization\", value: authorization });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"inverterSn\": \"{{inverter_sn}}\", \"cid\": \"5161\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://soliscloud.com:13333/v2/api/atRead",
+					"protocol": "https",
+					"host": [
+						"soliscloud",
+						"com"
+					],
+					"port": "13333",
+					"path": [
+						"v2",
+						"api",
+						"atRead"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "inverterDetail",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const secret = pm.environment.get(\"api_secret\");  // base64-encoded or raw binary key\r",
+							"const keyId = pm.environment.get(\"api_key_id\");    // your API key ID\r",
+							"const verb = \"POST\";  // or GET, PUT, etc.\r",
+							"const canonicalizedResource = pm.request.url.getPath();  // or hardcode if needed\r",
+							"\r",
+							"// 1. Get request body as string with compact JSON\r",
+							"let body = JSON.stringify(pm.request.body ? pm.request.body.raw : {}, null, 0);\r",
+							"body = body.replace(/\\s+/g, '');  // remove whitespace between keys/values\r",
+							"\r",
+							"// 2. Compute Content-MD5\r",
+							"const md5Digest = CryptoJS.MD5(body);\r",
+							"const contentMD5 = CryptoJS.enc.Base64.stringify(md5Digest);\r",
+							"\r",
+							"// 3. Get current date in GMT format (RFC1123)\r",
+							"const date = new Date().toUTCString();  // \"Fri, 16 May 2025 15:03:00 GMT\"\r",
+							"\r",
+							"// 4. Compute signature string\r",
+							"const contentType = \"application/json\";\r",
+							"const signString = `${verb}\\n${contentMD5}\\n${contentType}\\n${date}\\n${canonicalizedResource}`;\r",
+							"\r",
+							"// 5. Generate HMAC-SHA1 signature (base64)\r",
+							"const hmac = CryptoJS.HmacSHA1(signString, secret);\r",
+							"const signature = CryptoJS.enc.Base64.stringify(hmac);\r",
+							"\r",
+							"// 6. Assemble Authorization header\r",
+							"const authorization = `API ${keyId}:${signature}`;\r",
+							"\r",
+							"// 7. Set headers\r",
+							"pm.request.headers.upsert({ key: \"Content-MD5\", value: contentMD5 });\r",
+							"pm.request.headers.upsert({ key: \"Content-Type\", value: contentType });\r",
+							"pm.request.headers.upsert({ key: \"Date\", value: date });\r",
+							"pm.request.headers.upsert({ key: \"Authorization\", value: authorization });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"sn\": \"{{inverter_sn}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://soliscloud.com:13333/v1/api/inverterDetail",
+					"protocol": "https",
+					"host": [
+						"soliscloud",
+						"com"
+					],
+					"port": "13333",
+					"path": [
+						"v1",
+						"api",
+						"inverterDetail"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
