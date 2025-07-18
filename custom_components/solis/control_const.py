@@ -105,7 +105,7 @@ class SolisButtonEntityDescription(ButtonEntityDescription):
     joiner: str = ","
 
 
-# Control types dict[bool: dict] where key is HMI_4200 flag
+# Control types dict[bool: dict] where key is HMI flag
 
 CONTROL_TYPES = {
     "time": SolisTimeEntityDescription,
