@@ -17,7 +17,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
 
-from .control_const import ALL_CONTROLS, CONTROL_TYPES, HMI_CID
+from .control_const import ALL_CONTROLS, CONTROL_TYPES
 from .ginlong_api import GinlongAPI, GinlongConfig
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .ginlong_const import (
@@ -185,7 +185,6 @@ class InverterService:
         control_lookup = {CONTROL_TYPES[platform]: platform for platform in CONTROL_TYPES}
         for inverter_sn in inverter_serials:
             controls[inverter_sn] = {platform: [] for platform in CONTROL_TYPES}
-            await self._api.get_control_data(inverter_sn, HMI_CID)
             hmi_flag = self._api.hmi_fb00(inverter_sn)
             _LOGGER.debug(f"Inverter SN {inverter_sn} HMI status {hmi_flag}")
             control_desciptions = ALL_CONTROLS[hmi_flag]
