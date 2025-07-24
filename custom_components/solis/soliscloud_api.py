@@ -391,7 +391,7 @@ class SoliscloudAPI(BaseAPI):
                     self._collect_inverter_data(payload)
                     if inverter_serial not in self._hmi_fb00:
                         hmi_flag = self._data[HMI_VERSION_ALL]
-                        self._hmi_fb00[inverter_serial] = int(hmi_flag, 16) >= 4200
+                        self._hmi_fb00[inverter_serial] = int(hmi_flag, 16) >= int("4200", 16)
                         if self._hmi_fb00[inverter_serial]:
                             _LOGGER.debug(
                                 f"HMI firmware version ({hmi_flag}) >=4200 for Inverter SN {inverter_serial} "
