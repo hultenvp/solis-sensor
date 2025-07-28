@@ -15,7 +15,6 @@ from .const import API_NAME, DOMAIN, EMPTY_ATTR, SERIAL
 RETRIES = 1000
 RETRY_WAIT = 10
 
-HMI_CID = "6798"
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -106,7 +105,7 @@ class SolisButtonEntityDescription(ButtonEntityDescription):
     joiner: str = ","
 
 
-# Control types dict[bool: dict] where key is HMI_4B00 flag
+# Control types dict[bool: dict] where key is HMI flag
 
 CONTROL_TYPES = {
     "time": SolisTimeEntityDescription,
