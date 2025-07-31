@@ -30,7 +30,9 @@
                     "portal_key_id": "API Key ID provided by SolisCloud",
                     "portal_control_api": "Enable SolisCloud control",
                     "portal_secret": "API Secret provided by SolisCloud",
-                    "portal_plant_id": "Station ID as found on portal website"
+                    "portal_plant_id": "Station ID as found on portal website",
+                    "refresh_ok": "Refresh interval in seconds (default 300s)",
+                    "refresh_nok": "Refresh interval in seconds for errors (default 60s)"
                 },
                 "sections": {
                     "Control": {
@@ -52,8 +54,17 @@
                 "title": "Solis control",
                 "description": "Soliscloud control API (experimental!, requires restart)",
                 "data": {
-                    "portal_control_api": "Enable/disable control API",
-                    "portal_password": "Portal password"
+                    "refresh_ok": "Refresh interval in seconds (default 300s)",
+                    "refresh_nok": "Refresh interval in seconds for errors (default 60s)"
+                },
+                "sections": {
+                    "Control": {
+                        "name": "SolisCloud control API (experimental!)",
+                        "data": {
+                            "portal_control_api": "Enable/disable control API",
+                            "portal_password": "Portal password"
+                        }
+                    }
                 }
             }
         }
