@@ -29,13 +29,6 @@ from .ginlong_const import (
 )
 from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 
-
-# REFRESH CONSTANTS
-# Match up with the default SolisCloud API resolution of 5 minutes
-#SCHEDULE_OK = 300
-# Attempt retries every 1 minute if we fail to talk to the API, though
-#SCHEDULE_NOK = 60
-
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
@@ -283,7 +276,7 @@ class InverterService:
 
     async def async_update(self, *_) -> None:
         """Update the data from Ginlong portal."""
-        update = timedelta(seconds=self._schedule_nok)#SCHEDULE_NOK)
+        update = timedelta(seconds=self._schedule_nok)#
         # Login using username and password, but only every HRS_BETWEEN_LOGIN hours
         if await self._login():
             inverters = self._api.inverters
@@ -295,7 +288,7 @@ class InverterService:
                 if data is not None:
                     # And finally get the inverter details
                     # default to updating after SCHEDULE_OK seconds;
-                    update = timedelta(seconds=self._schedule_ok)#SCHEDULE_OK)
+                    update = timedelta(seconds=self._schedule_ok)
                     # ...but try to figure out a better next-update time based on when the API last received its data
                     try:
                         ts = getattr(data, INVERTER_TIMESTAMP_UPDATE)
@@ -307,7 +300,7 @@ class InverterService:
                     self._last_updated = datetime.now()
                     await self.update_devices(data)
                 else:
-                    update = timedelta(seconds=self._schedule_nok)#SCHEDULE_NOK)
+                    update = timedelta(seconds=self._schedule_nok)
                     # Reset session and try to login again next time
                     await self._logout()
 
