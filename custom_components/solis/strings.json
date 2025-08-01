@@ -32,7 +32,7 @@
                     "portal_secret": "API Secret provided by SolisCloud",
                     "portal_plant_id": "Station ID as found on portal website",
                     "refresh_ok": "Refresh interval in seconds (default 300s)",
-                    "refresh_nok": "Refresh interval in seconds for errors (default 60s)"
+                    "refresh_nok": "Refresh interval in seconds, after an API error (default 60s)"
                 },
                 "sections": {
                     "Control": {
