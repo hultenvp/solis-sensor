@@ -77,9 +77,11 @@ class ServiceSubscriber(ABC):
 class InverterService:
     """Serves all plantId's and inverters on a Ginlong account"""
 
-    def __init__(self, portal_config: PortalConfig, hass: HomeAssistant, refresh_ok: int = 300, refresh_nok: int = 60) -> None:
-        self._schedule_ok : int = refresh_ok
-        self._schedule_nok : int = refresh_nok
+    def __init__(
+        self, portal_config: PortalConfig, hass: HomeAssistant, refresh_ok: int = 300, refresh_nok: int = 60
+    ) -> None:
+        self._schedule_ok: int = refresh_ok
+        self._schedule_nok: int = refresh_nok
         self._last_updated: datetime | None = None
         self._logintime: datetime | None = None
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
@@ -276,7 +278,7 @@ class InverterService:
 
     async def async_update(self, *_) -> None:
         """Update the data from Ginlong portal."""
-        update = timedelta(seconds=self._schedule_nok)#
+        update = timedelta(seconds=self._schedule_nok)
         # Login using username and password, but only every HRS_BETWEEN_LOGIN hours
         if await self._login():
             inverters = self._api.inverters

@@ -22,11 +22,11 @@ from .const import (
     CONF_PLANT_ID,
     CONF_PORTAL_DOMAIN,
     CONF_PORTAL_VERSION,
+    CONF_REFRESH_NOK,
+    CONF_REFRESH_OK,
     CONF_SECRET,
     CONF_USERNAME,
     DOMAIN,
-    CONF_REFRESH_OK,
-    CONF_REFRESH_NOK,
 )
 from .ginlong_api import GinlongConfig
 from .ginlong_base import PortalConfig
