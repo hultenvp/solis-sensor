@@ -60,7 +60,6 @@ class SolisOptionsFlowHandler(OptionsFlow):
             for key in (CONF_CONTROL, CONF_PASSWORD, CONF_REFRESH_OK, CONF_REFRESH_NOK):
                 if key in user_input:
                     updated_config[key] = user_input[key]
-
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
                 data=updated_config,
@@ -201,8 +200,8 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
 
         data_schema = {
             vol.Required(CONF_USERNAME, default=None): cv.string,
-            vol.Required(CONF_SECRET, default="00"): cv.string,
             vol.Required(CONF_KEY_ID, default=""): cv.string,
+            vol.Required(CONF_SECRET, default="00"): cv.string,
             vol.Required(CONF_PLANT_ID, default=None): cv.string,
             vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,

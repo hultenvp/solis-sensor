@@ -12,12 +12,12 @@ Still questions after the readme? Read the [wiki](https://github.com/hultenvp/so
 The new portal requires a key-id, secret and username to function.
 You can obtain key and secret via SolisCloud.
 * Submit a [service ticket](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud) and wait till it is resolved.
-* Go to https://www.soliscloud.com/#/apiManage.
+* Go to https://www.soliscloud.com/apiManage .
 * Activate API management and agree with the usage conditions.
-* After activation, click on view key tot get a pop-up window asking for the verification code.
+* After activation, click on view key to get a pop-up window asking for the verification code.
 * First click on "Verification code" after which you get an image with 2 puzzle pieces, which you need to overlap each other using the slider below.
 * After that, you will receive an email with the verification code you need to enter (within 60 seconds).
-* Once confirmed, you get the API ID, secret and API URL
+* Once confirmed, you get the API key ID, key secret and API URL.
 
 ## Platform v2 (legacy, not maintained)
 Platform V2 backend was used by Ginlong before being decomissioned in May 2023. The same backend API is also used for different PV inverter brand portals. The platform v2 integration logs in to the platform and exposes the data retrieved as sensors.
@@ -34,7 +34,7 @@ The use of HACS is supported and is the preferred means of installing this integ
 ## Manual installation
 
 Create a directory called `solis` in the `<config directory>/custom_components/` directory on your Home Assistant instance.
-Install this component by copying the files in [`/custom_components/solis/`]
+Install this component by copying the files and directories in [`/custom_components/solis/`]
 
 This is how your custom_components directory should be:
 ```bash
@@ -52,6 +52,8 @@ custom_components
 │   ├── soliscloud_api.py
 │   ├── soliscloud_const.py
 │   ├── strings.json
+│   ├── translations
+│   │   └── en.json
 │   └── workarounds.yaml
 ```
 Now restart your Home Assistant Instance before continuing to the next step
@@ -113,7 +115,7 @@ The Solis integration now supports the energy dashboard introduced in Release 20
 ![dashboard integration](./image/energy_dashboard_integration.GIF)
 ![energy production](./image/solar_production_energy_dashboard.GIF)
 
-# Control Beta Test
+# Inverter Control Beta Test
 
 This includes a beta version of device control using the same API as the SolisCloud app, for use with inverters with an attached battery. This operates slighty differently depending on your HMI firmware version. This should be detected automatically.
 
