@@ -57,15 +57,15 @@
                 },
                 "sections": {
                     "Control": {
-                        "name": "SolisCloud control API (experimental!)",
+                        "name": "Inverter control API (experimental!, requires restart if changed)",
                         "data": {
                             "portal_control_api": "Enable/disable control API",
                             "portal_password": "Portal password"
                         }
                     }
                 },
-                "title": "SolisCloud control",
-                "description": "Inverter control API (experimental!, requires restart if changed)"
+                "title": "SolisCloud Options",
+                "description": "Optional configuration. Some changes require a restart of Home Assistant."
             }
         }
     },

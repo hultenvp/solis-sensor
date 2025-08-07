@@ -60,7 +60,6 @@ class SolisOptionsFlowHandler(OptionsFlow):
             for key in (CONF_CONTROL, CONF_PASSWORD, CONF_REFRESH_OK, CONF_REFRESH_NOK):
                 if key in user_input:
                     updated_config[key] = user_input[key]
-
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
                 data=updated_config,
