@@ -20,6 +20,8 @@ from .const import (
     CONF_PLANT_ID,
     CONF_PORTAL_DOMAIN,
     CONF_PORTAL_VERSION,
+    CONF_REFRESH_NOK,
+    CONF_REFRESH_OK,
     CONF_SECRET,
     CONF_USERNAME,
     DEFAULT_DOMAIN,
@@ -55,7 +57,7 @@ class SolisOptionsFlowHandler(OptionsFlow):
             for key in self.config_entry.data.keys():
                 updated_config[key] = self.config_entry.data[key]
             updated_config[CONF_CONTROL] = False
-            for key in (CONF_CONTROL, CONF_PASSWORD):
+            for key in (CONF_CONTROL, CONF_PASSWORD, CONF_REFRESH_OK, CONF_REFRESH_NOK):
                 if key in user_input:
                     updated_config[key] = user_input[key]
 
@@ -65,8 +67,18 @@ class SolisOptionsFlowHandler(OptionsFlow):
                 title=user_input.get(CONF_NAME),
             )
         data_schema = {
-            vol.Required(CONF_CONTROL, default=False): bool,
-            vol.Optional(CONF_PASSWORD, default=""): cv.string,
+            vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
+            vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
+            vol.Required("Control"): data_entry_flow.section(
+                vol.Schema(
+                    {
+                        vol.Required(CONF_CONTROL, default=False): bool,
+                        vol.Optional(CONF_PASSWORD, default=""): cv.string,
+                    }
+                ),
+                # Whether or not the section is initially collapsed (default = False)
+                {"collapsed": False},
+            ),
         }
 
         return self.async_show_form(
@@ -169,6 +181,8 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             password = user_input.get(CONF_PASSWORD)
             key_id = user_input.get(CONF_KEY_ID)
             secret: bytes = bytes("", "utf-8")
+            schedule_ok = user_input.get(CONF_REFRESH_OK)
+            schedule_nok = user_input.get(CONF_REFRESH_NOK)
             try:
                 secret = bytes(user_input.get(CONF_SECRET), "utf-8")
             except TypeError:
@@ -183,7 +197,6 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
                         return self.async_create_entry(title=f"Station {api.plant_name}", data=self._data)
-
                     errors["base"] = "auth"
 
         data_schema = {
@@ -191,6 +204,8 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_KEY_ID, default=""): cv.string,
             vol.Required(CONF_SECRET, default="00"): cv.string,
             vol.Required(CONF_PLANT_ID, default=None): cv.string,
+            vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
+            vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
                 vol.Schema(
                     {

@@ -22,6 +22,8 @@ from .const import (
     CONF_PLANT_ID,
     CONF_PORTAL_DOMAIN,
     CONF_PORTAL_VERSION,
+    CONF_REFRESH_NOK,
+    CONF_REFRESH_OK,
     CONF_SECRET,
     CONF_USERNAME,
     DOMAIN,
@@ -109,7 +111,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
     # Initialize the Ginlong data service.
-    service: InverterService = InverterService(portal_config, hass)
+    refresh_ok = config[CONF_REFRESH_OK]
+    refresh_error = config[CONF_REFRESH_NOK]
+    service: InverterService = InverterService(portal_config, hass, refresh_ok, refresh_error)
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.
