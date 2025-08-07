@@ -51,28 +51,28 @@
     "options": {
         "step": {
             "init": {
-		"data": {
-		    "refresh_ok": "Refresh interval in seconds (default 300s)",
-		    "refresh_nok": "Refresh interval in seconds for errors (default 60s)"
-		},
-		"sections": {
-		    "Control": {
-			"name": "SolisCloud control API (experimental!)",
-			"data": {
-			    "portal_control_api": "Enable/disable control API",
-			    "portal_password": "Portal password"
-			}
-		    }
-		},
-		"title": "SolisCloud control",
-		"description": "Inverter control API (experimental!, requires restart if changed)"
-	    }
-	}
+                "data": {
+                    "refresh_ok": "Refresh interval in seconds (default 300s)",
+                    "refresh_nok": "Refresh interval in seconds for errors (default 60s)"
+                },
+                "sections": {
+                    "Control": {
+                        "name": "SolisCloud control API (experimental!)",
+                        "data": {
+                            "portal_control_api": "Enable/disable control API",
+                            "portal_password": "Portal password"
+                        }
+                    }
+                },
+                "title": "SolisCloud control",
+                "description": "Inverter control API (experimental!, requires restart if changed)"
+            }
+        }
     },
     "issues": {
-	"deprecated_yaml": {
-	    "title": "The Solis YAML configuration is being removed",
-	    "description": "Configuring Solis using YAML is being removed.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the Solis YAML configuration from your configuration.yaml file and restart Home Assistant to fix this issue."
-	}
+        "deprecated_yaml": {
+            "title": "The Solis YAML configuration is being removed",
+            "description": "Configuring Solis using YAML is being removed.\n\nYour existing YAML configuration has been imported into the UI automatically.\n\nRemove the Solis YAML configuration from your configuration.yaml file and restart Home Assistant to fix this issue."
+        }
     }
 }
