@@ -394,11 +394,11 @@ class SoliscloudAPI(BaseAPI):
                         self._hmi_fb00[inverter_serial] = int(hmi_flag, 16) >= int("4b00", 16)
                         if self._hmi_fb00[inverter_serial]:
                             _LOGGER.debug(
-                                f"HMI firmware version ({hmi_flag}) >=4200 for Inverter SN {inverter_serial} "
+                                f"HMI firmware version ({hmi_flag}) >=4B00 for Inverter SN {inverter_serial} "
                             )
                         else:
                             _LOGGER.debug(
-                                f"HMI firmware version ({hmi_flag}) <4200 for Inverter SN {inverter_serial} "
+                                f"HMI firmware version ({hmi_flag}) <4B00 for Inverter SN {inverter_serial} "
                             )
 
                 if (self._token != "") and controls:
