@@ -53,19 +53,26 @@ class SolisOptionsFlowHandler(OptionsFlow):
         errors = {}
 
         if user_input is not None:
-            updated_config = {}
-            for key in self.config_entry.data.keys():
-                updated_config[key] = self.config_entry.data[key]
-            updated_config[CONF_CONTROL] = False
-            for key in (CONF_CONTROL, CONF_PASSWORD, CONF_REFRESH_OK, CONF_REFRESH_NOK):
-                if key in user_input:
-                    updated_config[key] = user_input[key]
+            updated_config = dict(self.config_entry.data)
+
+            control_section = user_input.get("Control") or {}
+            new_pw = control_section.get(CONF_PASSWORD)
+
+            if new_pw:  # only overwrite if user actually typed something
+                updated_config[CONF_PASSWORD] = new_pw
+
+            updated_config[CONF_CONTROL] = control_section.get(CONF_CONTROL, updated_config.get(CONF_CONTROL, False))
+            updated_config[CONF_REFRESH_OK] = user_input.get(CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
+            updated_config[CONF_REFRESH_NOK] = user_input.get(
+                CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 60)
+            )
 
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
                 data=updated_config,
-                title=user_input.get(CONF_NAME),
+                title=self.config_entry.title,
             )
+
         data_schema = {
             vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
@@ -115,12 +122,12 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            self._data = user_input
+            self._data = dict(user_input)
             if user_input.get(CONF_PORTAL_VERSION) is None:
-                user_input[CONF_PORTAL_VERSION] = PLATFORMV2
-            if user_input.get(CONF_PORTAL_VERSION) == PLATFORMV2:
-                return await self.async_step_credentials_password(user_input)
-            return await self.async_step_credentials_secret(user_input)
+                self._data[CONF_PORTAL_VERSION] = PLATFORMV2
+            if self._data[CONF_PORTAL_VERSION] == PLATFORMV2:
+                return await self.async_step_credentials_password()  # no arg
+            return await self.async_step_credentials_secret()  # no arg
 
         data_schema = {
             vol.Required(CONF_NAME, default=SENSOR_PREFIX): cv.string,
@@ -160,7 +167,7 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
 
         data_schema = {
             vol.Required(CONF_USERNAME, default=None): cv.string,
-            vol.Required(CONF_PASSWORD, default=""): cv.string,
+            vol.Required(CONF_PASSWORD): cv.string,
             vol.Required(CONF_PLANT_ID, default=None): cv.positive_int,
         }
 
@@ -171,27 +178,32 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_credentials_secret(self, user_input=None):
-        """Handle key_id/secret based credential settings."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            control_section = user_input.get("Control") or {}
+            password = control_section.get(CONF_PASSWORD) or user_input.get(CONF_PASSWORD)
+
             url = self._data.get(CONF_PORTAL_DOMAIN)
             plant_id = user_input.get(CONF_PLANT_ID)
             username = user_input.get(CONF_USERNAME)
-            password = user_input.get(CONF_PASSWORD)
             key_id = user_input.get(CONF_KEY_ID)
-            secret: bytes = bytes("", "utf-8")
-            schedule_ok = user_input.get(CONF_REFRESH_OK)
-            schedule_nok = user_input.get(CONF_REFRESH_NOK)
+
+            # SECRET comes from top-level field
             try:
                 secret = bytes(user_input.get(CONF_SECRET), "utf-8")
             except TypeError:
-                pass
+                secret = b""
+
             if url[:8] != "https://":
                 errors["base"] = "invalid_path"
             else:
                 if username and key_id and secret and plant_id:
-                    self._data.update(user_input)
+                    # Merge nested section keys into _data so CONF_PASSWORD is stored
+                    merged = dict(user_input)
+                    merged.update(control_section)  # brings CONF_PASSWORD, CONF_CONTROL to top
+                    self._data.update(merged)
+
                     config = SoliscloudConfig(url, username, key_id, secret, plant_id, password)
                     api = SoliscloudAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
@@ -210,10 +222,9 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
                 vol.Schema(
                     {
                         vol.Required(CONF_CONTROL, default=False): bool,
-                        vol.Optional(CONF_PASSWORD, default=""): cv.string,
+                        vol.Optional(CONF_PASSWORD): cv.string,
                     }
                 ),
-                # Whether or not the section is initially collapsed (default = False)
                 {"collapsed": False},
             ),
         }
