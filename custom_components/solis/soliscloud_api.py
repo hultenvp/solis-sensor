@@ -391,7 +391,7 @@ class SoliscloudAPI(BaseAPI):
                     self._collect_inverter_data(payload)
                     if inverter_serial not in self._hmi_fb00:
                         hmi_flag = self._data[HMI_VERSION_ALL]
-                        self._hmi_fb00[inverter_serial] = int(hmi_flag, 16) >= int("4200", 16)
+                        self._hmi_fb00[inverter_serial] = int(hmi_flag, 16) >= int("4b00", 16)
                         if self._hmi_fb00[inverter_serial]:
                             _LOGGER.debug(
                                 f"HMI firmware version ({hmi_flag}) >=4200 for Inverter SN {inverter_serial} "
@@ -792,8 +792,6 @@ class SoliscloudAPI(BaseAPI):
         return ""
 
     async def write_control_data(self, device_serial: str, cid: str, value: str):
-        _LOGGER.debug(f">>> Writing value {value} for cid {cid} to inverter {device_serial}")
-
         params = {"inverterSn": str(device_serial), "cid": str(cid), "value": value}
         result = await self._post_data_json(CONTROL, params, csrf=True)
 
