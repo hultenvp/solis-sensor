@@ -12,13 +12,15 @@ from homeassistant.helpers.entity import DeviceInfo
 
 from .const import API_NAME, DOMAIN, EMPTY_ATTR, SERIAL
 
-RETRIES = 1000
+RETRIES = 100
 RETRY_WAIT = 10
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class SolisBaseControlEntity:
+    _attr_entity_registry_enabled_default = True
+
     def __init__(self, service, config_name, inverter_sn, cid, info):
         self._measured: datetime | None = None
         self._entity_type = "control"
@@ -37,7 +39,7 @@ class SolisBaseControlEntity:
 
     @property
     def unique_id(self) -> str:
-        return f"{self._platform_name}_{self._key}"
+        return f"{self._platform_name}_{self._inverter_sn}_{self._key}"
 
     @property
     def name(self) -> str:
@@ -58,10 +60,10 @@ class SolisBaseControlEntity:
             identifiers={
                 (
                     DOMAIN,
-                    f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}",
+                    f"{self._attributes[SERIAL]}_{self._attributes[API_NAME]}",
                 )
             },
-            manufacturer=f"Solis {self._attributes[API_NAME]}",
+            manufacturer=f"Solis",
             name=f"Solis_Inverter_{self._attributes[SERIAL]}",
         )
 
@@ -261,18 +263,18 @@ ALL_CONTROLS = {
         #         key="update_timed_charge_discharge",
         #     ),
         # ],
-        "15": [
-            SolisNumberEntityDescription(
-                name="Power limit setting",
-                key="power_limit_setting",
-                native_unit_of_measurement=PERCENTAGE,
-                device_class=NumberDeviceClass.POWER_FACTOR,
-                icon="mdi:transmission-tower-export",
-                native_min_value=0,
-                native_max_value=110,
-                native_step=1,
-            )
-        ],
+        # "15": [
+        #     SolisNumberEntityDescription(
+        #         name="Power limit setting",
+        #         key="power_limit_setting",
+        #         native_unit_of_measurement=PERCENTAGE,
+        #         device_class=NumberDeviceClass.POWER_FACTOR,
+        #         icon="mdi:transmission-tower-export",
+        #         native_min_value=0,
+        #         native_max_value=110,
+        #         native_step=1,
+        #     )
+        # ],
         "157": [
             SolisNumberEntityDescription(
                 name="Backup SOC",
@@ -309,18 +311,18 @@ ALL_CONTROLS = {
                 native_step=1,
             )
         ],
-        "230": [
-            SolisNumberEntityDescription(
-                name="System Export Power Limit Value",
-                key="sytem_export_power_limit_value",
-                native_unit_of_measurement=UnitOfPower.WATT,
-                device_class=NumberDeviceClass.POWER,
-                icon="mdi:transmission-tower-export",
-                native_min_value=0,
-                native_max_value=1000000000,  # 1 GW
-                native_step=1,
-            )
-        ],
+        # "230": [
+        #     SolisNumberEntityDescription(
+        #         name="System Export Power Limit Value",
+        #         key="sytem_export_power_limit_value",
+        #         native_unit_of_measurement=UnitOfPower.WATT,
+        #         device_class=NumberDeviceClass.POWER,
+        #         icon="mdi:transmission-tower-export",
+        #         native_min_value=0,
+        #         native_max_value=1000000000,  # 1 GW
+        #         native_step=1,
+        #     )
+        # ],
         "636": [
             SolisSelectEntityDescription(
                 name="Energy Storage Control Switch",
@@ -351,17 +353,17 @@ ALL_CONTROLS = {
                 native_step=100,
             )
         ],
-        "5161": [
-            SolisSelectEntityDescription(
-                name="Inverter energy export on/off Control Switch",
-                key="inverter_energy_export_on_off_control_switch",
-                option_dict={
-                    "190": "ON",
-                    "222": "OFF",
-                },
-                icon="mdi:dip-switch",
-            )
-        ],
+        # "5161": [
+        #     SolisSelectEntityDescription(
+        #         name="Inverter energy export on/off Control Switch",
+        #         key="inverter_energy_export_on_off_control_switch",
+        #         option_dict={
+        #             "190": "ON",
+        #             "222": "OFF",
+        #         },
+        #         icon="mdi:dip-switch",
+        #     )
+        # ],
         "5928": [
             SolisNumberEntityDescription(
                 name="Timed Charge SOC 1",
