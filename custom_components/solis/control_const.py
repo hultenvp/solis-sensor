@@ -263,18 +263,18 @@ ALL_CONTROLS = {
         #         key="update_timed_charge_discharge",
         #     ),
         # ],
-        # "15": [
-        #     SolisNumberEntityDescription(
-        #         name="Power limit setting",
-        #         key="power_limit_setting",
-        #         native_unit_of_measurement=PERCENTAGE,
-        #         device_class=NumberDeviceClass.POWER_FACTOR,
-        #         icon="mdi:transmission-tower-export",
-        #         native_min_value=0,
-        #         native_max_value=110,
-        #         native_step=1,
-        #     )
-        # ],
+        "15": [
+            SolisNumberEntityDescription(
+                name="Power limit setting",
+                key="power_limit_setting",
+                native_unit_of_measurement=PERCENTAGE,
+                device_class=NumberDeviceClass.POWER_FACTOR,
+                icon="mdi:transmission-tower-export",
+                native_min_value=0,
+                native_max_value=110,
+                native_step=1,
+            )
+        ],
         "157": [
             SolisNumberEntityDescription(
                 name="Backup SOC",
@@ -311,18 +311,18 @@ ALL_CONTROLS = {
                 native_step=1,
             )
         ],
-        # "230": [
-        #     SolisNumberEntityDescription(
-        #         name="System Export Power Limit Value",
-        #         key="sytem_export_power_limit_value",
-        #         native_unit_of_measurement=UnitOfPower.WATT,
-        #         device_class=NumberDeviceClass.POWER,
-        #         icon="mdi:transmission-tower-export",
-        #         native_min_value=0,
-        #         native_max_value=1000000000,  # 1 GW
-        #         native_step=1,
-        #     )
-        # ],
+        "230": [
+            SolisNumberEntityDescription(
+                name="System Export Power Limit Value",
+                key="sytem_export_power_limit_value",
+                native_unit_of_measurement=UnitOfPower.WATT,
+                device_class=NumberDeviceClass.POWER,
+                icon="mdi:transmission-tower-export",
+                native_min_value=0,
+                native_max_value=1000000000,  # 1 GW
+                native_step=1,
+            )
+        ],
         "636": [
             SolisSelectEntityDescription(
                 name="Energy Storage Control Switch",
@@ -353,17 +353,17 @@ ALL_CONTROLS = {
                 native_step=100,
             )
         ],
-        # "5161": [
-        #     SolisSelectEntityDescription(
-        #         name="Inverter energy export on/off Control Switch",
-        #         key="inverter_energy_export_on_off_control_switch",
-        #         option_dict={
-        #             "190": "ON",
-        #             "222": "OFF",
-        #         },
-        #         icon="mdi:dip-switch",
-        #     )
-        # ],
+        "5161": [
+            SolisSelectEntityDescription(
+                name="Inverter energy export on/off Control Switch",
+                key="inverter_energy_export_on_off_control_switch",
+                option_dict={
+                    "190": "ON",
+                    "222": "OFF",
+                },
+                icon="mdi:dip-switch",
+            )
+        ],
         "5928": [
             SolisNumberEntityDescription(
                 name="Timed Charge SOC 1",
