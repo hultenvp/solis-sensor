@@ -1077,7 +1077,7 @@ ALL_CONTROLS = {
                     
                     "51": "Self-Use with Backup - Allow Timed Charge/Discharge, Allow Grid Charging",
                     "19": "Self-Use with Backup - Allow Timed Charge/Discharge, No Grid Charging",
-                    "49": "Self-Use with Backup - No Timed Charge/Discharge, Allow grid Charging",
+                    "49": "Self-Use with Backup - No Timed Charge/Discharge, Allow Grid Charging",
                     "17": "Self-Use with Backup - No Timed Charge/Discharge, No Grid Charging",
                    
                     "43": "Battery Awaken - Allow Timed Charge/Discharge",
@@ -1085,7 +1085,7 @@ ALL_CONTROLS = {
                     
                     "98": "Feed-in Priority - Allow Timed Charge/Discharge, Allow Grid Charging",
                     "66": "Feed-in Priority - Allow Timed Charge/Discharge, No Grid Charging",
-                    "96": "Feed-in Priority - No Timed Charge/Discharge, Allow Grid Charging, ",
+                    "96": "Feed-in Priority - No Timed Charge/Discharge, Allow Grid Charging",
                     "64": "Feed-in Priority - No Timed Charge/Discharge, No Grid Charging",
                     
                     "114": "Feed-in Priority with Backup - Allow Timed Charge/Discharge, Allow Grid Charging",
