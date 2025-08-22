@@ -7,19 +7,19 @@
         },
         "step": {
             "user": {
-                "title": "Portal selection",
-                "description": "Enter the PV portal URL and portal version",
                 "data": {
                     "name": "Name of the inverter",
                     "portal_domain": "PV Portal URL, e.g. https://www.soliscloud.com:13333",
-                    "portal_version": "PV Portal version (Soliscloud? Read the ReadMe!)"
-                }
+                    "portal_version": "PV Portal version (SolisCloud? Read the README)"
+                },
+                "title": "Portal selection",
+                "description": "Enter the PV portal URL and portal version"
             },
             "credentials_password": {
                 "data": {
                     "portal_username": "Portal username or email address",
                     "portal_password": "Portal password",
-                    "portal_plant_id": "Plant ID as found on portal website"
+                    "portal_plant_id": "Plant ID as found on portal website (see README)"
                 },
                 "description": "Enter credentials and plantID",
                 "title": "Add Ginlong Portal v2 credentials"
@@ -28,15 +28,17 @@
                 "data": {
                     "portal_username": "Portal username or email address",
                     "portal_key_id": "API Key ID provided by SolisCloud",
+                    "portal_secret": "API Key secret provided by SolisCloud",
+                    "portal_plant_id": "Station ID as found on portal website (see README)",
                     "portal_control_api": "Enable SolisCloud control",
-                    "portal_secret": "API Secret provided by SolisCloud",
-                    "portal_plant_id": "Station ID as found on portal website"
+                    "refresh_ok": "Refresh interval in seconds (default 300s)",
+                    "refresh_nok": "Refresh interval in seconds, after an API error (default 60s)"
                 },
                 "sections": {
                     "Control": {
-                        "name": "Soliscloud control API (experimental!)",
+                        "name": "Inverter control API (experimental!)",
                         "data": {
-                            "portal_control_api": "Enable SolisCloud control API",
+                            "portal_control_api": "Enable inverter control API",
                             "portal_password": "Portal password"    
                         }
                     }
@@ -49,12 +51,21 @@
     "options": {
         "step": {
             "init": {
-                "title": "Solis control",
-                "description": "Soliscloud control API (experimental!, requires restart)",
                 "data": {
-                    "portal_control_api": "Enable/disable control API",
-                    "portal_password": "Portal password"
-                }
+                    "refresh_ok": "Refresh interval in seconds (default 300s)",
+                    "refresh_nok": "Refresh interval in seconds for errors (default 60s)"
+                },
+                "sections": {
+                    "Control": {
+                        "name": "Inverter control API (experimental!, requires restart if changed)",
+                        "data": {
+                            "portal_control_api": "Enable/disable control API",
+                            "portal_password": "Portal password"
+                        }
+                    }
+                },
+                "title": "SolisCloud Options",
+                "description": "Optional configuration. Some changes require a restart of Home Assistant."
             }
         }
     },

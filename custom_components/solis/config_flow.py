@@ -213,8 +213,8 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
 
         data_schema = {
             vol.Required(CONF_USERNAME, default=None): cv.string,
-            vol.Required(CONF_SECRET, default="00"): cv.string,
             vol.Required(CONF_KEY_ID, default=""): cv.string,
+            vol.Required(CONF_SECRET, default="00"): cv.string,
             vol.Required(CONF_PLANT_ID, default=None): cv.string,
             vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
