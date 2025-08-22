@@ -27,12 +27,14 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     service = hass.data[DOMAIN][config_entry.entry_id]
 
     _LOGGER.info(f"Waiting for discovery of controls for plant {plant_id}")
-    await asyncio.sleep(8)
+    await asyncio.sleep(RETRY_WAIT)
     attempts = 0
     while (attempts < RETRIES) and (not service.has_controls):
         _LOGGER.debug(f"    Attempt {attempts} failed")
         await asyncio.sleep(RETRY_WAIT)
         attempts += 1
+
+    _LOGGER.debug(f"    Attempt {attempts} succeeded")
 
     if service.has_controls:
         entities = []

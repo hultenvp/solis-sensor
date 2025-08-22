@@ -12,13 +12,15 @@ from homeassistant.helpers.entity import DeviceInfo
 
 from .const import API_NAME, DOMAIN, EMPTY_ATTR, SERIAL
 
-RETRIES = 1000
+RETRIES = 100
 RETRY_WAIT = 10
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class SolisBaseControlEntity:
+    _attr_entity_registry_enabled_default = True
+
     def __init__(self, service, config_name, inverter_sn, cid, info):
         self._measured: datetime | None = None
         self._entity_type = "control"
@@ -37,7 +39,7 @@ class SolisBaseControlEntity:
 
     @property
     def unique_id(self) -> str:
-        return f"{self._platform_name}_{self._key}"
+        return f"{self._platform_name}_{self._inverter_sn}_{self._key}"
 
     @property
     def name(self) -> str:
@@ -58,10 +60,10 @@ class SolisBaseControlEntity:
             identifiers={
                 (
                     DOMAIN,
-                    f"{self._attributes[SERIAL]}_{DOMAIN, self._attributes[API_NAME]}",
+                    f"{self._attributes[SERIAL]}_{self._attributes[API_NAME]}",
                 )
             },
-            manufacturer=f"Solis {self._attributes[API_NAME]}",
+            manufacturer=f"Solis",
             name=f"Solis_Inverter_{self._attributes[SERIAL]}",
         )
 
@@ -1070,19 +1072,19 @@ ALL_CONTROLS = {
                 name="Energy Storage Control Switch",
                 key="energy_storage_control_switch",
                 option_dict={
-                    1: "Self-Use - No Grid Charging",
-                    3: "Timed Charge/Discharge - No Grid Charging",
-                    17: "Backup/Reserve - No Grid Charging",
-                    33: "Self-Use - No Timed Charge/Discharge",
-                    35: "Self-Use",
-                    37: "Off-Grid Mode",
-                    41: "Battery Awaken",
-                    43: "Battery Awaken + Timed Charge/Discharge",
-                    49: "Backup/Reserve - No Timed Charge/Discharge",
-                    51: "Backup/Reserve",
-                    64: "Feed-in priority - No Grid Charging",
-                    96: "Feed-in priority - No Timed Charge/Discharge",
-                    98: "Feed-in priority",
+                    "1": "Self-Use - No Grid Charging",
+                    "3": "Timed Charge/Discharge - No Grid Charging",
+                    "17": "Backup/Reserve - No Grid Charging",
+                    "33": "Self-Use - No Timed Charge/Discharge",
+                    "35": "Self-Use",
+                    "37": "Off-Grid Mode",
+                    "41": "Battery Awaken",
+                    "43": "Battery Awaken + Timed Charge/Discharge",
+                    "49": "Backup/Reserve - No Timed Charge/Discharge",
+                    "51": "Backup/Reserve",
+                    "64": "Feed-in priority - No Grid Charging",
+                    "96": "Feed-in priority - No Timed Charge/Discharge",
+                    "98": "Feed-in priority",
                 },
                 icon="mdi:dip-switch",
             )
