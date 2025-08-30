@@ -111,8 +111,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
     # Initialize the Ginlong data service.
-    refresh_ok = config[CONF_REFRESH_OK]
-    refresh_error = config[CONF_REFRESH_NOK]
+    refresh_ok = 300
+    refresh_error = 60
+    try:
+        # Fixme: https://github.com/hultenvp/solis-sensor/issues/496
+        refresh_ok = config[CONF_REFRESH_OK]
+        refresh_error = config[CONF_REFRESH_NOK]
+    except KeyError:
+        pass
     service: InverterService = InverterService(portal_config, hass, refresh_ok, refresh_error)
     hass.data[DOMAIN][entry.entry_id] = service
 
