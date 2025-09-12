@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 # from typing import final
 from aiohttp import ClientSession
 
-from .ginlong_const import INVERTER_STATE
+from .soliscloud_const import INVERTER_STATE
 
 _LOGGER = logging.getLogger(__name__)
 
