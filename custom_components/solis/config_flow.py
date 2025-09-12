@@ -61,8 +61,10 @@ class SolisOptionsFlowHandler(OptionsFlow):
             if new_pw:  # only overwrite if user actually typed something
                 updated_config[CONF_PASSWORD] = new_pw
 
-            updated_config[CONF_CONTROL] = control_section.get(CONF_CONTROL, updated_config.get(CONF_CONTROL, False))
-            updated_config[CONF_REFRESH_OK] = user_input.get(CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
+            updated_config[CONF_CONTROL] = control_section.get(
+                CONF_CONTROL, updated_config.get(CONF_CONTROL, False))
+            updated_config[CONF_REFRESH_OK] = user_input.get(
+                CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
             updated_config[CONF_REFRESH_NOK] = user_input.get(
                 CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 60)
             )
@@ -74,13 +76,17 @@ class SolisOptionsFlowHandler(OptionsFlow):
             )
 
         data_schema = {
-            vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
-            vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
+            vol.Required(CONF_REFRESH_OK, default=self.config_entry.data.get(
+                            CONF_REFRESH_OK, 300)): cv.positive_int,
+            vol.Required(CONF_REFRESH_NOK, default=self.config_entry.data.get(
+                            CONF_REFRESH_NOK, 60)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
                 vol.Schema(
                     {
-                        vol.Required(CONF_CONTROL, default=False): bool,
-                        vol.Optional(CONF_PASSWORD, default=""): cv.string,
+                        vol.Required(CONF_CONTROL, default=self.config_entry.data.get(
+                            CONF_CONTROL, False)): bool,
+                        vol.Optional(CONF_PASSWORD, default=self.config_entry.data.get(
+                            CONF_PASSWORD, "")): cv.string,
                     }
                 ),
                 # Whether or not the section is initially collapsed (default = False)
