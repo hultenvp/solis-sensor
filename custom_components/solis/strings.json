@@ -13,16 +13,7 @@
                     "portal_version": "PV Portal version (SolisCloud? Read the README)"
                 },
                 "title": "Portal selection",
-                "description": "Enter the PV portal URL and portal version"
-            },
-            "credentials_password": {
-                "data": {
-                    "portal_username": "Portal username or email address",
-                    "portal_password": "Portal password",
-                    "portal_plant_id": "Plant ID as found on portal website (see README)"
-                },
-                "description": "Enter credentials and plantID",
-                "title": "Add Ginlong Portal v2 credentials"
+                "description": "Enter integration name and the PV portal URL"
             },
             "credentials_secret": {
                 "data": {

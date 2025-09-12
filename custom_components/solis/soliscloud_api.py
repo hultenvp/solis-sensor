@@ -26,13 +26,12 @@ import yaml
 from aiohttp import ClientError, ClientSession
 
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
-from .ginlong_const import *
 from .soliscloud_const import *
 
 _LOGGER = logging.getLogger(__name__)
 
 # VERSION
-VERSION = "0.6.1"
+VERSION = "0.6.2"
 
 # API NAME
 API_NAME = "SolisCloud"

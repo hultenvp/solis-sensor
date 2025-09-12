@@ -17,7 +17,7 @@ from homeassistant.const import (
     UnitOfTemperature,
 )
 
-from .ginlong_const import *
+from .soliscloud_const import *
 
 VERSION = "3.7.1"
 

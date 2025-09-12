@@ -18,9 +18,8 @@ from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
 
 from .control_const import ALL_CONTROLS, CONTROL_TYPES
-from .ginlong_api import GinlongAPI, GinlongConfig
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
-from .ginlong_const import (
+from .soliscloud_const import (
     INVERTER_ACPOWER,
     INVERTER_ENERGY_TODAY,
     INVERTER_SERIAL,
@@ -93,9 +92,7 @@ class InverterService:
         self._controllable: bool = False
         self._controls: dict[str, dict[str, list[tuple]]] = {}
         # self._active_times: dict[str, dict] = {}
-        if isinstance(portal_config, GinlongConfig):
-            self._api: BaseAPI = GinlongAPI(portal_config)
-        elif isinstance(portal_config, SoliscloudConfig):
+        if isinstance(portal_config, SoliscloudConfig):
             self._api = SoliscloudAPI(portal_config)
         else:
             _LOGGER.error("Failed to initialize service, incompatible config")
