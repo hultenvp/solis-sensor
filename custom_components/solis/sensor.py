@@ -42,9 +42,6 @@ from .service import InverterService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
 
-# VERSION
-VERSION = "3.13.2"
-
 # ATTRIBUTES
 LAST_UPDATED = "Last updated"
 SERIAL = "Inverter serial"
