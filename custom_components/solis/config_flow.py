@@ -196,10 +196,7 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             key_id = user_input.get(CONF_KEY_ID)
 
             # SECRET comes from top-level field
-            try:
-                secret = bytes(user_input.get(CONF_SECRET), "utf-8")
-            except TypeError:
-                secret = b""
+            secret = bytes(user_input.get(CONF_SECRET, b""), "utf-8")
 
             if url[:8] != "https://":
                 errors["base"] = "invalid_path"
