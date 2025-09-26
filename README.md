@@ -99,10 +99,10 @@ The integration can be configured via the UI.
   2. In the Plant Overview tab, under the Plant Name column, Click on your actual plant name, per the screenshot below:
   <img width="301" alt="image" src="https://github.com/hultenvp/solis-sensor/blob/master/image/soliscloud_mainpage.png">
   
-  3. Copy the 19-digit number from the URL: https://www.soliscloud.com/#/station/stationdetail_1?id=XXXXXXXXXXXXXXXXXXX and paste it in the station ID field:
+  3. Copy the 19-digit number from the URL: https://www.soliscloud.com/station/stationDetails/generalSituation/XXXXXXXXXXXXXXXXXXX and paste it in the station ID field:
   <img width="301" alt="image" src="https://github.com/hultenvp/solis-sensor/blob/master/image/soliscloud_stationdetail.png">
 
-If the plant id in the overview page (https://soliscloud.com/#/station/stationdetail_1?id=xxxxxxxxxxx) is empty then you will get "no inverter found errors. Change the name of the installation by choosing "change information" on the top right of the overview page. After that a plantid is generated.
+If the plant id in the overview page (https://www.soliscloud.com/station/stationDetails/generalSituation/XXXXXXXXXXXXXXXXXXX) is empty then you will get "no inverter found" errors. Change the name of the installation by choosing "change information" on the top right of the overview page. After that a plantid is generated.
 
 # Energy dashboard
 The Solis integration now supports the energy dashboard introduced in Release 2021.8. 
