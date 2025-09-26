@@ -1,6 +1,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
->❗As from release 4.0.0 the legacy Ginlong v2 API support has been removed. If you still use the integration for some MyEvolvecloud legacy endpoint ising v2 then stick to the v3.x versions or fork
+>❗As from release 4.0.0 the legacy Ginlong v2 API support has been removed. If you still use the integration for some MyEvolvecloud legacy endpoint using the v2 API then stick to the v3.x versions or fork
 
 # SolisCloud sensor integration
 
