@@ -21,7 +21,6 @@ from .const import (
     CONF_PASSWORD,
     CONF_PLANT_ID,
     CONF_PORTAL_DOMAIN,
-    CONF_PORTAL_VERSION,
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
     CONF_SECRET,
@@ -83,7 +82,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     portal_domain = config[CONF_PORTAL_DOMAIN]
     portal_plantid = config[CONF_PLANT_ID]
     portal_username = config[CONF_USERNAME]
-    portal_version = config[CONF_PORTAL_VERSION]
     portal_control = False
     portal_password = None
     try:
