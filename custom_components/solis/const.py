@@ -19,7 +19,7 @@ from homeassistant.const import (
 
 from .soliscloud_const import *
 
-VERSION = "3.7.1"
+VERSION = "3.7.2"
 
 # ATTRIBUTES
 LAST_UPDATED = "Last updated"
@@ -34,7 +34,6 @@ EMPTY_ATTR: dict[str, Any] = {
 
 
 CONF_PORTAL_DOMAIN = "portal_domain"
-CONF_PORTAL_VERSION = "portal_version"
 CONF_USERNAME = "portal_username"
 CONF_PASSWORD = "portal_password"
 CONF_SECRET = "portal_secret"
