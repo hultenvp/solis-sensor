@@ -505,7 +505,7 @@ ALL_CONTROLS = {
         ],
         "5971": [
             SolisNumberEntityDescription(
-                name="Timed Discharge Current",
+                name="Timed Discharge Current 2",
                 key="timed_discharge_current_2",
                 native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
                 device_class=SensorDeviceClass.CURRENT,
