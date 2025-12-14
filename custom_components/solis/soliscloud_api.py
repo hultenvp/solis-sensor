@@ -261,7 +261,7 @@ class SoliscloudConfig(PortalConfig):
         portal_domain: str,
         portal_username: str,
         portal_key_id: str,
-        portal_secret: bytes,
+        portal_secret: bytes | str,
         portal_plantid: str,
         portal_password: str,
     ) -> None:
@@ -271,9 +271,13 @@ class SoliscloudConfig(PortalConfig):
             portal_plantid,
         )
         self._key_id: str = portal_key_id
-        self._secret: bytes = portal_secret
+        if isinstance(portal_secret, str):
+            self._secret = portal_secret.encode("utf-8")
+        else:
+            self._secret = portal_secret
+
         self._workarounds = {}
-        self._password: str = portal_password
+        self._password = portal_password
 
     async def load_workarounds(self):
         try:
