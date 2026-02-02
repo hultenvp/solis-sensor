@@ -1,17 +1,18 @@
 """Config flow for Solis integration."""
 
+from __future__ import annotations
+
 import logging
 from typing import Any
 
-import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+import homeassistant.helpers.config_validation as cv
 from homeassistant import data_entry_flow
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.selector import selector
 
 from .const import (
     CONF_CONTROL,
@@ -31,163 +32,158 @@ from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
 
-SOLISCLOUD = "soliscloud"
-
 
 class SolisOptionsFlowHandler(OptionsFlow):
     """Handle options."""
 
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        self.config_entry = config_entry
+
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """
-        Handle a flow initialized by the user.
-
-        Args:
-            user_input: The input received from the user or none.
-
-        Returns:
-            The created config entry.
-        """
-        errors = {}
+        errors: dict[str, str] = {}
 
         if user_input is not None:
-            updated_config = dict(self.config_entry.data)
+            updated = dict(self.config_entry.data)
+
+            updated[CONF_REFRESH_OK] = user_input.get(CONF_REFRESH_OK, updated.get(CONF_REFRESH_OK, 300))
+            updated[CONF_REFRESH_NOK] = user_input.get(CONF_REFRESH_NOK, updated.get(CONF_REFRESH_NOK, 60))
 
             control_section = user_input.get("Control") or {}
-            new_pw = control_section.get(CONF_PASSWORD)
+            updated[CONF_CONTROL] = bool(control_section.get(CONF_CONTROL, updated.get(CONF_CONTROL, False)))
 
-            if new_pw:  # only overwrite if user actually typed something
-                updated_config[CONF_PASSWORD] = new_pw
+            new_pw = (control_section.get(CONF_PASSWORD) or "").strip()
+            if new_pw:
+                updated[CONF_PASSWORD] = new_pw
 
-            updated_config[CONF_CONTROL] = control_section.get(
-                CONF_CONTROL, updated_config.get(CONF_CONTROL, False))
-            updated_config[CONF_REFRESH_OK] = user_input.get(
-                CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
-            updated_config[CONF_REFRESH_NOK] = user_input.get(
-                CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 60)
-            )
+            self.hass.config_entries.async_update_entry(self.config_entry, data=updated, title=self.config_entry.title)
+            return self.async_create_entry(title="", data={})
 
-            self.hass.config_entries.async_update_entry(
-                self.config_entry,
-                data=updated_config,
-                title=self.config_entry.title,
-            )
-
-        data_schema = {
-            vol.Required(CONF_REFRESH_OK, default=self.config_entry.data.get(
-                            CONF_REFRESH_OK, 300)): cv.positive_int,
-            vol.Required(CONF_REFRESH_NOK, default=self.config_entry.data.get(
-                            CONF_REFRESH_NOK, 60)): cv.positive_int,
-            vol.Required("Control"): data_entry_flow.section(
-                vol.Schema(
-                    {
-                        vol.Required(CONF_CONTROL, default=self.config_entry.data.get(
-                            CONF_CONTROL, False)): bool,
-                        vol.Optional(CONF_PASSWORD, default=self.config_entry.data.get(
-                            CONF_PASSWORD, "")): cv.string,
-                    }
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_REFRESH_OK, default=self.config_entry.data.get(CONF_REFRESH_OK, 300)): cv.positive_int,
+                vol.Required(CONF_REFRESH_NOK, default=self.config_entry.data.get(CONF_REFRESH_NOK, 60)): cv.positive_int,
+                vol.Required("Control"): data_entry_flow.section(
+                    vol.Schema(
+                        {
+                            vol.Required(CONF_CONTROL, default=self.config_entry.data.get(CONF_CONTROL, False)): bool,
+                            vol.Optional(CONF_PASSWORD, default=""): cv.string,
+                        }
+                    ),
+                    {"collapsed": False},
                 ),
-                # Whether or not the section is initially collapsed (default = False)
-                {"collapsed": False},
-            ),
-        }
-
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(data_schema),
-            errors=errors,
+            }
         )
+
+        return self.async_show_form(step_id="init", data_schema=data_schema, errors=errors)
 
 
 class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Solis."""
 
     VERSION = 1
-    _data = None
+
+    def __init__(self) -> None:
+        self._data: dict[str, Any] = {}
 
     @staticmethod
     @callback
-    def async_get_options_flow(
-        config_entry: ConfigEntry,
-    ) -> SolisOptionsFlowHandler:
-        """
-        Get the options flow for this handler.
+    def async_get_options_flow(config_entry: ConfigEntry) -> SolisOptionsFlowHandler:
+        return SolisOptionsFlowHandler(config_entry)
 
-        Args:
-            config_entry: The ConfigEntry instance.
-
-        Returns:
-            The created config flow.
-        """
-        return SolisOptionsFlowHandler()
-
-    async def async_step_user(self, user_input=None):
-        """Select server url and API version."""
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            self._data = dict(user_input)
-            return await self.async_step_credentials_secret()  # no arg
+            name = (user_input.get(CONF_NAME) or SENSOR_PREFIX).strip()
+            url = (user_input.get(CONF_PORTAL_DOMAIN) or DEFAULT_DOMAIN).strip()
 
-        data_schema = {
-            vol.Required(CONF_NAME, default=SENSOR_PREFIX): cv.string,
-            vol.Required(CONF_PORTAL_DOMAIN, default=DEFAULT_DOMAIN): cv.string,
-        }
-
-        return self.async_show_form(step_id="user", data_schema=vol.Schema(data_schema), errors=errors)
-
-
-    async def async_step_credentials_secret(self, user_input=None):
-        errors: dict[str, str] = {}
-
-        if user_input is not None:
-            control_section = user_input.get("Control") or {}
-            password = control_section.get(CONF_PASSWORD) or user_input.get(CONF_PASSWORD)
-
-            url = self._data.get(CONF_PORTAL_DOMAIN)
-            plant_id = user_input.get(CONF_PLANT_ID)
-            username = user_input.get(CONF_USERNAME)
-            key_id = user_input.get(CONF_KEY_ID)
-
-            # SECRET comes from top-level field
-            secret = bytes(user_input.get(CONF_SECRET, b""), "utf-8")
-
-            if url[:8] != "https://":
+            if not url.startswith("https://"):
                 errors["base"] = "invalid_path"
             else:
-                if username and key_id and secret and plant_id:
-                    # Merge nested section keys into _data so CONF_PASSWORD is stored
-                    merged = dict(user_input)
-                    merged.update(control_section)  # brings CONF_PASSWORD, CONF_CONTROL to top
-                    self._data.update(merged)
+                self._data = {
+                    CONF_NAME: name,
+                    CONF_PORTAL_DOMAIN: url,
+                }
+                return await self.async_step_credentials_secret()
 
-                    config = SoliscloudConfig(url, username, key_id, secret, plant_id, password)
-                    api = SoliscloudAPI(config)
-                    if await api.login(async_get_clientsession(self.hass)):
-                        await self.async_set_unique_id(plant_id)
-                        return self.async_create_entry(title=f"Station {api.plant_name}", data=self._data)
-                    errors["base"] = "auth"
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_NAME, default=SENSOR_PREFIX): cv.string,
+                vol.Required(CONF_PORTAL_DOMAIN, default=DEFAULT_DOMAIN): cv.string,
+            }
+        )
+        return self.async_show_form(step_id="user", data_schema=data_schema, errors=errors)
 
-        data_schema = {
-            vol.Required(CONF_USERNAME, default=None): cv.string,
-            vol.Required(CONF_KEY_ID, default=""): cv.string,
-            vol.Required(CONF_SECRET, default="00"): cv.string,
-            vol.Required(CONF_PLANT_ID, default=None): cv.string,
-            vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
-            vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
-            vol.Required("Control"): data_entry_flow.section(
-                vol.Schema(
+    async def async_step_credentials_secret(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            url = (self._data.get(CONF_PORTAL_DOMAIN) or "").strip()
+
+            plant_id = (user_input.get(CONF_PLANT_ID) or "").strip()
+            key_id = (user_input.get(CONF_KEY_ID) or "").strip()
+            secret = (user_input.get(CONF_SECRET) or "").strip()
+
+            # Username mag leeg zijn, maar nooit None
+            username = (user_input.get(CONF_USERNAME) or "").strip()
+
+            refresh_ok = int(user_input.get(CONF_REFRESH_OK, 300))
+            refresh_nok = int(user_input.get(CONF_REFRESH_NOK, 60))
+
+            # Control/password doen we niet in de setup (alleen options),
+            # maar we bewaren wel de checkbox zodat entry consistent is.
+            control_section = user_input.get("Control") or {}
+            control_enabled = bool(control_section.get(CONF_CONTROL, False))
+            password = ""  # setup gebruikt geen portal password
+
+            if not url.startswith("https://"):
+                errors["base"] = "invalid_path"
+            elif not (plant_id and key_id and secret):
+                errors["base"] = "missing_fields"
+            else:
+                await self.async_set_unique_id(plant_id)
+                self._abort_if_unique_id_configured()
+
+                self._data.update(
                     {
-                        vol.Required(CONF_CONTROL, default=False): bool,
-                        vol.Optional(CONF_PASSWORD): cv.string,
+                        CONF_USERNAME: username,
+                        CONF_KEY_ID: key_id,
+                        CONF_SECRET: secret,
+                        CONF_PLANT_ID: plant_id,
+                        CONF_REFRESH_OK: refresh_ok,
+                        CONF_REFRESH_NOK: refresh_nok,
+                        CONF_CONTROL: control_enabled,
+                        CONF_PASSWORD: password,
                     }
-                ),
-                {"collapsed": False},
-            ),
-        }
+                )
 
-        return self.async_show_form(
-            step_id="credentials_secret",
-            data_schema=vol.Schema(data_schema),
-            errors=errors,
+                config = SoliscloudConfig(url, username, key_id, secret, plant_id, password)
+                api = SoliscloudAPI(config)
+
+                if await api.login(async_get_clientsession(self.hass)):
+                    title = getattr(api, "plant_name", None) or f"Station {plant_id}"
+                    return self.async_create_entry(title=title, data=self._data)
+
+                errors["base"] = "auth"
+
+        data_schema = vol.Schema(
+            {
+                vol.Optional(CONF_USERNAME, default=""): cv.string,
+                vol.Required(CONF_KEY_ID, default=""): cv.string,
+                vol.Required(CONF_SECRET, default=""): cv.string,
+                vol.Required(CONF_PLANT_ID, default=""): cv.string,
+                vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
+                vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
+                vol.Required("Control"): data_entry_flow.section(
+                    vol.Schema(
+                        {
+                            vol.Required(CONF_CONTROL, default=False): bool,
+                            vol.Optional(CONF_PASSWORD, default=""): cv.string,
+                        }
+                    ),
+                    {"collapsed": False},
+                ),
+            }
         )
 
+        return self.async_show_form(step_id="credentials_secret", data_schema=data_schema, errors=errors)

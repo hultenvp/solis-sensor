@@ -4,23 +4,47 @@
 
 # SolisCloud sensor integration
 
-HomeAssistant sensor for SolisCloud portal. 
+Home sligAssistant sensor for SolisCloud portal. 
 Still questions after the readme? Read the [wiki](https://github.com/hultenvp/solis-sensor/wiki) or look at the [discussions page](https://github.com/hultenvp/solis-sensor/discussions)
 
 ## SolisCloud
 >❗The SolisCloud API is known to be unstable and can fail to respond resulting in "no inverter found" issues. See [troubleshooting](#warning--known-limitations) section. Join the discussion [here](https://github.com/hultenvp/solis-sensor/discussions/71) to find out about known limitations and to ask questions.
 
-[SolisCloud](https://www.soliscloud.com/) is the next generation Portal for Solis branded PV systems from Ginlong. 
+[SolisCloud](https://www.soliscloud.com/) is the next generation portal for Solis branded PV systems from Ginlong.
 
-The new portal requires a key-id, secret and username to function.
-You can obtain key and secret via SolisCloud.
-* Submit a [service ticket](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud) and wait till it is resolved.
-* Go to https://www.soliscloud.com/apiManage .
-* Activate API management and agree with the usage conditions.
-* After activation, click on view key to get a pop-up window asking for the verification code.
-* First click on "Verification code" after which you get an image with 2 puzzle pieces, which you need to overlap each other using the slider below.
-* After that, you will receive an email with the verification code you need to enter (within 60 seconds).
-* Once confirmed, you get the API key ID, key secret and API URL.
+The new portal requires an API key ID and API secret to function.  
+A portal username is optional and only required for specific control features.
+
+You can obtain an API key and secret via SolisCloud:
+* Submit a [service ticket](https://solis-service.solisinverters.com/support/solutions/articles/44002212561-api-access-soliscloud) and wait until it is resolved.
+* Go to https://www.soliscloud.com/apiManage
+* Activate API management and agree to the usage conditions.
+* After activation, click **View Key** and complete the verification process.
+* Once confirmed, you will receive the API key ID, API secret and API URL.
+
+
+
+### 🔧 Authentication note (API-only access)
+
+For **read-only access** (monitoring, sensors, and the Home Assistant energy dashboard),
+the SolisCloud API works with **API Key ID + API Secret + Plant ID only**.
+
+A portal username and password are **not required** for data access and are only
+used for **optional inverter control features**.
+
+Recent versions of this integration have been updated to:
+- Allow an empty username during configuration
+- Accept API secrets provided as either strings or bytes
+- Prevent `None` values in Home Assistant config flow validation
+
+If you previously encountered errors such as:
+- *“username or password incorrect”*
+- *“string value is None”*
+
+during setup while using valid API credentials, this was caused by config flow
+validation and **not by the SolisCloud API itself**.
+
+
 
 ## HACS installation
 
@@ -93,7 +117,8 @@ The integration can be configured via the UI.
 
 
 **Soliscloud**            
-* Provide username, key id, secret and station id. If you want to add multiple plants just repeat "add integration" for each plant.
+* Provide API Key ID, API Secret and Station ID.  
+  Username is optional and only required for inverter control features.
 * To get StationId: 
   1. Log in to [SolisCloud](https://www.soliscloud.com/)
   2. In the Plant Overview tab, under the Plant Name column, Click on your actual plant name, per the screenshot below:
@@ -126,7 +151,7 @@ The following controls should update the inverter immediately:
 - Force Charge SOC
 - Backup SOC
 
-The timed change controls are all sent to the API using one command and so they won't update untill the Update Charge/Discharge button is pressed. The controls included in this are all three sets of the following (where N is slots 1-3):
+The timed change controls are all sent to the API using one command and so they won't update until the Update Charge/Discharge button is pressed. The controls included in this are all three sets of the following (where N is slots 1-3):
 
 - Timed Charge Current N
 - Timed Charge Start Time N
@@ -167,3 +192,11 @@ And discharge:
 
 # Thanks
 Big thanks & kudo's to [@LucidityCrash](https://github.com/LucidityCrash) for all the work on getting the SolisCloud support working!
+
+
+---
+
+Thanks to the original developers and maintainers for creating and maintaining
+this integration. Getting SolisCloud data reliably into Home Assistant requires
+significant effort, and this project makes that possible.
+
