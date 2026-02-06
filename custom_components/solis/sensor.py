@@ -8,8 +8,10 @@ For more information: https://github.com/hultenvp/solis-sensor/
 from __future__ import annotations
 
 import logging
+import soliscloud_api.types as st
 from datetime import datetime, timedelta
 from typing import Any
+from enum import IntEnum
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -38,7 +40,7 @@ from .const import (
     SERIAL,
     VERSION,
 )
-from .service import InverterService, ServiceSubscriber
+from .service import SolisCloudService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -95,7 +97,7 @@ PLATFORM_SCHEMA = vol.All(
 
 
 def create_sensors(
-    sensors: dict[str, list[str]], inverter_service: InverterService, inverter_name: str
+    sensors: dict[str, list[str]], inverter_service: SolisCloudService, inverter_name: str
 ) -> list[SolisSensor]:
     """Create the sensors."""
     hass_sensors = []
@@ -165,7 +167,7 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
 
     def __init__(
         self,
-        ginlong_service: InverterService,
+        ginlong_service: SolisCloudService,
         inverter_name: str,
         inverter_sn: str,
         sensor_type: str,
@@ -186,8 +188,22 @@ class SolisSensor(ServiceSubscriber, SensorEntity):
         self._attr_unique_id = f"{inverter_sn}{self._name}".replace(" ", "_")
         ginlong_service.subscribe(self, inverter_sn, SENSOR_TYPES[sensor_type][5])
 
-    def do_update(self, value: Any, last_updated: datetime) -> bool:
+    def do_update(self, sensor_value: Any, last_updated: datetime) -> bool:
         """Update the sensor."""
+        value = sensor_value
+        _LOGGER.error("Value: %s", type(value))
+        if isinstance(sensor_value, st.DimensionedType):
+            #_LOGGER.error("DimensionedType!")
+            value = sensor_value.value
+        elif isinstance(value, IntEnum):
+            #_LOGGER.error("IntEnum!")
+            self.options = list(e.name for e in type(value))
+            value = sensor_value.name
+            #_LOGGER.error("Value: %s", value)
+            #_LOGGER.error("Options: %s", self.options)
+        elif isinstance(value, datetime):
+            #_LOGGER.error("DateTime!")
+            value = sensor_value.timestamp()
         if self.hass and self._attr_native_value != value:
             self._attr_native_value = value
             self._attributes[LAST_UPDATED] = last_updated

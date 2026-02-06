@@ -1,6 +1,6 @@
 {
   "domain": "solis",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "config_flow": true,
   "name": "Solis Inverter",
   "iot_class": "cloud_polling",
@@ -9,6 +9,7 @@
   "dependencies": [],
   "codeowners": ["@hultenvp"],
   "requirements": [
-    "aiofiles>=23.1.0,<25.0.0"
+    "aiofiles>=23.1.0,<25.0.0",
+    "soliscloud-api>=1.3.2"
   ]
 }

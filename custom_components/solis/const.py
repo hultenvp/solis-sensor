@@ -54,16 +54,16 @@ SENSOR_TYPES = {
         "Power State",
         None,
         "mdi:power",
+        SensorDeviceClass.ENUM,
         None,
-        SensorStateClass.MEASUREMENT,
         INVERTER_POWER_STATE,
     ],
     "inverterstate": [
         "State",
         None,
         "mdi:state-machine",
+        SensorDeviceClass.ENUM,
         None,
-        SensorStateClass.MEASUREMENT,
         INVERTER_STATE,
     ],
     "timestamponline": [
@@ -80,7 +80,7 @@ SENSOR_TYPES = {
         "mdi:calendar-clock",
         None,
         SensorStateClass.MEASUREMENT,
-        INVERTER_TIMESTAMP_UPDATE,
+        'data_timestamp',
     ],
     "status": ["Status", None, "mdi:solar-power", None, None, "status"],
     "hmiversionall": [
@@ -98,14 +98,6 @@ SENSOR_TYPES = {
         SensorDeviceClass.TEMPERATURE,
         SensorStateClass.MEASUREMENT,
         INVERTER_TEMPERATURE,
-    ],
-    "radiatortemperature1": [
-        "Radiator temperature 1",  # Solarman only
-        UnitOfTemperature.CELSIUS,
-        "mdi:thermometer",
-        SensorDeviceClass.TEMPERATURE,
-        SensorStateClass.MEASUREMENT,
-        RADIATOR1_TEMP,
     ],
     "acoutputvoltage1": [
         "AC Voltage R",
@@ -171,14 +163,14 @@ SENSOR_TYPES = {
         SensorStateClass.MEASUREMENT,
         INVERTER_ACFREQUENCY,
     ],
-    "energylastmonth": [
-        "Energy Last Month",
-        UnitOfEnergy.KILO_WATT_HOUR,
-        "mdi:flash-outline",
-        SensorDeviceClass.ENERGY,
-        SensorStateClass.TOTAL_INCREASING,
-        INVERTER_ENERGY_LAST_MONTH,
-    ],
+    #"energylastmonth": [
+    #    "Energy Last Month",
+    #    UnitOfEnergy.KILO_WATT_HOUR,
+    #    "mdi:flash-outline",
+    #    SensorDeviceClass.ENERGY,
+    #    SensorStateClass.TOTAL_INCREASING,
+    #    INVERTER_ENERGY_LAST_MONTH,
+    #],
     "energytoday": [
         "Energy Today",
         UnitOfEnergy.KILO_WATT_HOUR,
@@ -211,14 +203,6 @@ SENSOR_TYPES = {
         SensorStateClass.TOTAL_INCREASING,
         INVERTER_ENERGY_TOTAL_LIFE,
     ],
-    "batpack1capacityremaining": [
-        "Battery pack 1 remaining battery capacity",  # Solarman only
-        PERCENTAGE,
-        "mdi:battery",
-        SensorDeviceClass.BATTERY,
-        SensorStateClass.MEASUREMENT,
-        BAT1_REMAINING_CAPACITY,
-    ],
     "batpower": [
         "Battery Power",
         UnitOfPower.WATT,
@@ -235,14 +219,14 @@ SENSOR_TYPES = {
         SensorStateClass.MEASUREMENT,
         BAT_VOLTAGE,
     ],
-    "batstatus": [  # Key: ['label', unit, icon, device class, state class, api_attribute_name]
-        "Battery Status",
-        None,
-        "mdi:battery",
-        None,
-        None,
-        BAT_STATUS,
-    ],
+    #"batstatus": [  # Key: ['label', unit, icon, device class, state class, api_attribute_name]
+    #    "Battery Status",
+    #    None,
+    #    "mdi:battery",
+    #    None,
+    #    None,
+    #    BAT_STATUS,
+    #],
     "batcurrent": [
         "Battery Current",
         UnitOfElectricCurrent.AMPERE,

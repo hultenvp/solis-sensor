@@ -15,7 +15,7 @@ from .control_const import (
     SolisBaseControlEntity,
     SolisNumberEntityDescription,
 )
-from .service import InverterService, ServiceSubscriber
+from .service import SolisCloudService, ServiceSubscriber
 
 _LOGGER = logging.getLogger(__name__)
 # RETRIES = 100
@@ -72,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 class SolisNumberEntity(SolisBaseControlEntity, ServiceSubscriber, NumberEntity):
     def __init__(
         self,
-        service: InverterService,
+        service: SolisCloudService,
         config_name,
         inverter_sn: str,
         cid: str,

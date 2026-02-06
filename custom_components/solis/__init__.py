@@ -28,7 +28,7 @@ from .const import (
     DOMAIN,
 )
 from .ginlong_base import PortalConfig
-from .service import InverterService
+from .service import SolisCloudService
 from .soliscloud_api import SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
@@ -112,7 +112,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         refresh_error = config[CONF_REFRESH_NOK]
     except KeyError:
         pass
-    service: InverterService = InverterService(portal_config, hass, refresh_ok, refresh_error)
+    service: SolisCloudService = SolisCloudService(portal_config, hass, refresh_ok, refresh_error)
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.
