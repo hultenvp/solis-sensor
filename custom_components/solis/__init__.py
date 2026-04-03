@@ -21,6 +21,7 @@ from .const import (
     CONF_PASSWORD,
     CONF_PLANT_ID,
     CONF_PORTAL_DOMAIN,
+    CONF_REFRESH_INVERTER_DISCOVERY,
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
     CONF_SECRET,
@@ -112,7 +113,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         refresh_error = config[CONF_REFRESH_NOK]
     except KeyError:
         pass
-    service: InverterService = InverterService(portal_config, hass, refresh_ok, refresh_error)
+
+    refresh_inverter_discovery = 300
+    try:
+        refresh_inverter_discovery = config[CONF_REFRESH_INVERTER_DISCOVERY]
+    except KeyError:
+        pass
+
+    service: InverterService = InverterService(
+        portal_config, hass, refresh_ok, refresh_error, refresh_inverter_discovery
+    )
     hass.data[DOMAIN][entry.entry_id] = service
 
     # Forward the setup to the sensor platform.

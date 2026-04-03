@@ -301,6 +301,10 @@ class SoliscloudConfig(PortalConfig):
         return self._workarounds
 
 
+class SoliscloudApiError(Exception):
+    """Raised when a SolisCloud API call fails."""
+
+
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
 
@@ -310,6 +314,7 @@ class SoliscloudAPI(BaseAPI):
         self._is_online: bool = False
         self._data: dict[str, str | int | float] = {}
         self._inverter_list: dict[str, str] | None = None
+        self._plant_name: str | None = None
         self._token = ""
         self._hmi_fb00 = {}
 
@@ -340,14 +345,25 @@ class SoliscloudAPI(BaseAPI):
         await self._config.load_workarounds()
 
         # Request inverter list
-        self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
+        try:
+            self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
+        except SoliscloudApiError as err:
+            _LOGGER.warning("Failed to fetch inverter list: %s", err)
+            self._inverter_list = {}
+            self._is_online = False
+            return self._is_online
+
+        # Inverter list request completed without errors. This means authorization was successful
+        _LOGGER.info("Login successful")
+        self._is_online = True
+        
         if len(self._inverter_list) == 0:
             _LOGGER.warning("No inverters found")
-            self._is_online = False
+            station = await self._get_station_details(self.config.plant_id)
+            if station:
+                self._plant_name = station.get("data", {}).get("sno")
         else:
-            _LOGGER.info("Login successful")
             _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
-            self._is_online = True
             for inv in list(self._inverter_list):
                 data = await self.fetch_inverter_data(inv)
                 try:
@@ -356,9 +372,7 @@ class SoliscloudAPI(BaseAPI):
                     _LOGGER.info("No access to inverter %s, removing", inv)
                     del self._inverter_list[inv]
             if len(self._inverter_list) == 0:
-                _LOGGER.warning("No valid inverters found, login failed")
-                self._is_online = False
-                return self._is_online
+                _LOGGER.warning("No valid inverters found")
             else:
                 _LOGGER.debug("Valid inverters: %s", list(self._inverter_list.keys()))
             try:
@@ -386,6 +400,8 @@ class SoliscloudAPI(BaseAPI):
     async def fetch_inverter_list(self, plant_id: str) -> dict[str, str]:
         """
         Fetch return list of inverters { inverter serial : device_id }
+
+        Raises SoliscloudApiError on API failure.
         """
 
         device_ids = {}
@@ -396,13 +412,10 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
             if result_json["code"] != "0":
-                _LOGGER.info(
-                    "%s responded with error: %s:%s",
-                    INVERTER_DETAIL,
-                    result_json["code"],
-                    result_json["msg"],
+                raise SoliscloudApiError(
+                    f"{INVERTER_DETAIL} responded with error: "
+                    f"{result_json['code']}:{result_json['msg']}"
                 )
-                return device_ids
             try:
                 for record in result_json["data"]["page"]["records"]:
                     serial = record.get("sn")
@@ -412,10 +425,13 @@ class SoliscloudAPI(BaseAPI):
                 _LOGGER.debug("Response contains unexpected data: %s", result_json)
         elif result[STATUS_CODE] == 408:
             now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
-            _LOGGER.warning(
-                "Your system time must be set correctly for this integration \
-            to work, your time is %s",
-                now,
+            raise SoliscloudApiError(
+                "Your system time must be set correctly for this integration "
+                f"to work, your time is {now}"
+            )
+        else:
+            raise SoliscloudApiError(
+                f"Failed to fetch inverter list (status {result[STATUS_CODE]})"
             )
         return device_ids
 
