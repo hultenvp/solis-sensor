@@ -563,6 +563,22 @@ SENSOR_TYPES = {
         SensorStateClass.TOTAL_INCREASING,
         BACKUP_TODAY_ENERGY,
     ],
+    "smartloadpower": [
+        "Smart Load Power",
+        UnitOfPower.WATT,
+        "mdi:home-lightning-bolt",
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        SMART_LOAD_POWER,
+    ],
+    "smartloadtodayenergy": [
+        "Daily Smart Load Energy",
+        UnitOfEnergy.KILO_WATT_HOUR,
+        "mdi:home-lightning-bolt",
+        SensorDeviceClass.ENERGY,
+        SensorStateClass.TOTAL_INCREASING,
+        SMART_LOAD_TODAY_ENERGY,
+    ],
     "meterItemACurrent": [
         "Meter item A current",
         UnitOfElectricCurrent.AMPERE,

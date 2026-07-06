@@ -219,6 +219,9 @@ INVERTER_DATA: InverterDataType = {
         SOC_DISCHARGE_SET: ["socDischargeSet", float, 0],
         BYPASS_LOAD_POWER: ["bypassLoadPower", float, 3],
         BYPASS_LOAD_POWER_STR: ["bypassLoadPowerStr", str, None],
+        SMART_LOAD_POWER: ["backup2Power", float, 3],
+        SMART_LOAD_POWER_STR: ["backup2PowerStr", str, None],
+        SMART_LOAD_TODAY_ENERGY: ["backup2TodayEnergy", float, 3],
         METER_ITEM_A_CURRENT: ["iA", float, 3],
         METER_ITEM_A_VOLTAGE: ["uA", float, 3],
         METER_ITEM_B_CURRENT: ["iB", float, 3],
@@ -651,6 +654,7 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(GRID_YEARLY_ENERGY_PURCHASED, GRID_YEARLY_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_DAILY_ENERGY_USED, GRID_DAILY_ENERGY_USED_STR)
             self._fix_units(BYPASS_LOAD_POWER, BYPASS_LOAD_POWER_STR)
+            self._fix_units(SMART_LOAD_POWER, SMART_LOAD_POWER_STR)
 
             # Just temporary till SolisCloud is fixed
             try:
