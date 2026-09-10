@@ -21,6 +21,7 @@ from .const import (
     CONF_PORTAL_DOMAIN,
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
+    CONF_REQUEST_TIMEOUT,
     CONF_SECRET,
     CONF_USERNAME,
     DEFAULT_DOMAIN,
@@ -73,8 +74,9 @@ class SolisOptionsFlowHandler(OptionsFlow):
             updated_config[CONF_REFRESH_OK] = user_input.get(
                 CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
             updated_config[CONF_REFRESH_NOK] = user_input.get(
-                CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 60)
-            )
+                CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 60))
+            updated_config[CONF_REQUEST_TIMEOUT] = user_input.get(
+                CONF_REQUEST_TIMEOUT, updated_config.get(CONF_REQUEST_TIMEOUT, 30))
 
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
@@ -97,6 +99,8 @@ class SolisOptionsFlowHandler(OptionsFlow):
                 CONF_REFRESH_OK, 300)): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=self.config_entry.data.get(
                 CONF_REFRESH_NOK, 60)): cv.positive_int,
+            vol.Required(CONF_REQUEST_TIMEOUT, default=self.config_entry.data.get(
+                CONF_REQUEST_TIMEOUT, 30)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
                 vol.Schema(
                     {
@@ -194,6 +198,7 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_PLANT_ID, default=None): cv.string,
             vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
+            vol.Required(CONF_REQUEST_TIMEOUT, default=30): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
                 vol.Schema(
                     {

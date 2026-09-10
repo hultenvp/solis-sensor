@@ -42,7 +42,7 @@ CONF_PLANT_ID = "portal_plant_id"
 CONF_CONTROL = "portal_control_api"
 CONF_REFRESH_OK = "refresh_ok"
 CONF_REFRESH_NOK = "refresh_nok"
-
+CONF_REQUEST_TIMEOUT = "request_timeout"
 DOMAIN = "solis"
 SENSOR_PREFIX = "Solis"
 DEFAULT_DOMAIN = "https://v3.soliscloud.com:13333"
