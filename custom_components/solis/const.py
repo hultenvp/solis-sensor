@@ -42,10 +42,14 @@ CONF_PLANT_ID = "portal_plant_id"
 CONF_CONTROL = "portal_control_api"
 CONF_REFRESH_OK = "refresh_ok"
 CONF_REFRESH_NOK = "refresh_nok"
+CONF_TIMEOUT = "timeout"
 
 DOMAIN = "solis"
 SENSOR_PREFIX = "Solis"
 DEFAULT_DOMAIN = "https://v3.soliscloud.com:13333"
+# Seconds to wait for a single API call before giving up. SolisCloud can be
+# slow under load; 10s was the previous hard-coded value.
+DEFAULT_TIMEOUT = 10
 
 # Supported sensor types:
 # Key: ['label', unit, icon, device class, state class, api_attribute_name]
