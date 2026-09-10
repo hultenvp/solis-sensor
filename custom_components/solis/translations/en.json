@@ -39,7 +39,7 @@
                         "name": "Inverter control API (experimental!)",
                         "data": {
                             "portal_control_api": "Enable inverter control API",
-                            "portal_password": "Portal password"    
+                            "portal_password": "Portal password"
                         }
                     }
                 },
@@ -58,7 +58,8 @@
                     "portal_username": "Portal username or email address",
                     "portal_key_id": "API Key ID provided by SolisCloud",
                     "portal_secret": "API Key secret provided by SolisCloud",
-                    "portal_plant_id": "Station ID as found on portal website (see README)"
+                    "portal_plant_id": "Station ID as found on portal website (see README)",
+                    "timeout": "API call timeout in seconds (default 10s)"
                 },
                 "sections": {
                     "Control": {
