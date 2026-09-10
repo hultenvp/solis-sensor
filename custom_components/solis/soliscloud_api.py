@@ -265,6 +265,7 @@ class SoliscloudConfig(PortalConfig):
         portal_secret: bytes,
         portal_plantid: str,
         portal_password: str,
+        timeout: int = 10,
     ) -> None:
         super().__init__(
             portal_domain,
@@ -275,6 +276,7 @@ class SoliscloudConfig(PortalConfig):
         self._secret: bytes = portal_secret
         self._workarounds = {}
         self._password: str = portal_password
+        self._timeout: int = timeout
 
     async def load_workarounds(self):
         try:
@@ -294,6 +296,11 @@ class SoliscloudConfig(PortalConfig):
     def secret(self) -> bytes:
         """API Key."""
         return self._secret
+
+    @property
+    def timeout(self) -> int:
+        """Seconds to wait for a single API call."""
+        return self._timeout
 
     @property
     def workarounds(self) -> dict[str, Any]:
@@ -743,7 +750,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(self.config.timeout):
                 resp = await self._session.get(url, params=params)
 
                 result[STATUS_CODE] = resp.status
@@ -800,7 +807,7 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(self.config.timeout):
                 url = f"{self.config.domain}{canonicalized_resource}"
                 resp = await self._session.post(url, json=params, headers=header)
 
