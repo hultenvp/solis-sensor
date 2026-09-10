@@ -23,7 +23,7 @@ from typing import Any
 import aiofiles
 import async_timeout
 import yaml
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientError, ClientSession, ClientTimeout
 
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
 from .soliscloud_const import *
@@ -265,6 +265,7 @@ class SoliscloudConfig(PortalConfig):
         portal_secret: bytes,
         portal_plantid: str,
         portal_password: str,
+        request_timeout: int = 30,
     ) -> None:
         super().__init__(
             portal_domain,
@@ -275,6 +276,7 @@ class SoliscloudConfig(PortalConfig):
         self._secret: bytes = portal_secret
         self._workarounds = {}
         self._password: str = portal_password
+        self._request_timeout: int = request_timeout
 
     async def load_workarounds(self):
         try:
@@ -299,6 +301,11 @@ class SoliscloudConfig(PortalConfig):
     def workarounds(self) -> dict[str, Any]:
         """Return all workaround settings"""
         return self._workarounds
+
+    @property
+    def request_timeout(self) -> int:
+        """HTTP request timeout in seconds."""
+        return self._request_timeout
 
 
 class SoliscloudAPI(BaseAPI):
@@ -339,6 +346,7 @@ class SoliscloudAPI(BaseAPI):
         # Load workarounds
         await self._config.load_workarounds()
 
+        _LOGGER.debug("Requesting inverter list with timeout %ss", self.config.request_timeout)
         # Request inverter list
         self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
         if len(self._inverter_list) == 0:
@@ -410,13 +418,20 @@ class SoliscloudAPI(BaseAPI):
                     device_ids[serial] = device_id
             except TypeError:
                 _LOGGER.debug("Response contains unexpected data: %s", result_json)
-        elif result[STATUS_CODE] == 408:
-            now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
+        else:
             _LOGGER.warning(
-                "Your system time must be set correctly for this integration \
-            to work, your time is %s",
-                now,
+                "Inverter list request failed after %ss: %s (status=%s)",
+                self.config.request_timeout,
+                result[MESSAGE],
+                result[STATUS_CODE],
             )
+            if result[STATUS_CODE] == 408:
+                now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
+                _LOGGER.warning(
+                    "Your system time must be set correctly for this integration \
+            to work, your time is %s",
+                    now,
+                )
         return device_ids
 
     async def fetch_inverter_data(self, inverter_serial: str, controls=True) -> GinlongData | None:
@@ -743,8 +758,9 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            async with async_timeout.timeout(10):
-                resp = await self._session.get(url, params=params)
+            timeout = ClientTimeout(total=self.config.request_timeout)
+            async with async_timeout.timeout(self.config.request_timeout):
+                resp = await self._session.get(url, params=params, timeout=timeout)
 
                 result[STATUS_CODE] = resp.status
                 result[CONTENT] = await resp.json()
@@ -753,6 +769,7 @@ class SoliscloudAPI(BaseAPI):
                     result[MESSAGE] = "OK"
                 else:
                     result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
+                    _LOGGER.debug("%s responded with HTTP %s", url, resp.status)
                 return result
         except (asyncio.TimeoutError, ClientError) as err:
             result[MESSAGE] = "Exception: %s" % err.__class__
@@ -800,9 +817,10 @@ class SoliscloudAPI(BaseAPI):
         if self._session is None:
             return result
         try:
-            async with async_timeout.timeout(10):
+            timeout = ClientTimeout(total=self.config.request_timeout)
+            async with async_timeout.timeout(self.config.request_timeout):
                 url = f"{self.config.domain}{canonicalized_resource}"
-                resp = await self._session.post(url, json=params, headers=header)
+                resp = await self._session.post(url, json=params, headers=header, timeout=timeout)
 
                 result[STATUS_CODE] = resp.status
                 result[CONTENT] = await resp.json()
@@ -811,13 +829,18 @@ class SoliscloudAPI(BaseAPI):
                     result[MESSAGE] = "OK"
                 else:
                     result[MESSAGE] = "Got http statuscode: %d" % (resp.status)
+                    _LOGGER.debug(
+                        "%s responded with HTTP %s",
+                        canonicalized_resource,
+                        resp.status,
+                    )
         except (asyncio.TimeoutError, ClientError) as err:
             result[MESSAGE] = f"{repr(err)}"
             _LOGGER.debug("Error from URI (%s) : %s", canonicalized_resource, result[MESSAGE])
         finally:
             if resp is not None:
                 await resp.release()
-            return result
+        return result
 
     async def _fetch_token(self, username: str, password: str) -> str:
         """
