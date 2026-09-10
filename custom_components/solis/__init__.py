@@ -24,7 +24,9 @@ from .const import (
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
     CONF_SECRET,
+    CONF_TIMEOUT,
     CONF_USERNAME,
+    DEFAULT_TIMEOUT,
     DOMAIN,
 )
 from .ginlong_base import PortalConfig
@@ -101,6 +103,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         portal_secret,
         portal_plantid,
         portal_password,
+        config.get(CONF_TIMEOUT, DEFAULT_TIMEOUT),
     )
 
     # Initialize the Ginlong data service.
