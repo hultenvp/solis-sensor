@@ -219,6 +219,9 @@ INVERTER_DATA: InverterDataType = {
         SOC_DISCHARGE_SET: ["socDischargeSet", float, 0],
         BYPASS_LOAD_POWER: ["bypassLoadPower", float, 3],
         BYPASS_LOAD_POWER_STR: ["bypassLoadPowerStr", str, None],
+        SMART_LOAD_POWER: ["backup2Power", float, 3],
+        SMART_LOAD_POWER_STR: ["backup2PowerStr", str, None],
+        SMART_LOAD_TODAY_ENERGY: ["backup2TodayEnergy", float, 3],
         METER_ITEM_A_CURRENT: ["iA", float, 3],
         METER_ITEM_A_VOLTAGE: ["uA", float, 3],
         METER_ITEM_B_CURRENT: ["iB", float, 3],
@@ -308,6 +311,10 @@ class SoliscloudConfig(PortalConfig):
         return self._request_timeout
 
 
+class SoliscloudApiError(Exception):
+    """Raised when a SolisCloud API call fails."""
+
+
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
 
@@ -317,6 +324,7 @@ class SoliscloudAPI(BaseAPI):
         self._is_online: bool = False
         self._data: dict[str, str | int | float] = {}
         self._inverter_list: dict[str, str] | None = None
+        self._plant_name: str | None = None
         self._token = ""
         self._hmi_fb00 = {}
 
@@ -348,14 +356,25 @@ class SoliscloudAPI(BaseAPI):
 
         _LOGGER.debug("Requesting inverter list with timeout %ss", self.config.request_timeout)
         # Request inverter list
-        self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
+        try:
+            self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
+        except SoliscloudApiError as err:
+            _LOGGER.warning("Failed to fetch inverter list: %s", err)
+            self._inverter_list = {}
+            self._is_online = False
+            return self._is_online
+
+        # Inverter list request completed without errors. This means authorization was successful
+        _LOGGER.info("Login successful")
+        self._is_online = True
+        
         if len(self._inverter_list) == 0:
             _LOGGER.warning("No inverters found")
-            self._is_online = False
+            station = await self._get_station_details(self.config.plant_id)
+            if station:
+                self._plant_name = station.get("data", {}).get("sno")
         else:
-            _LOGGER.info("Login successful")
             _LOGGER.debug("Found inverters: %s", list(self._inverter_list.keys()))
-            self._is_online = True
             for inv in list(self._inverter_list):
                 data = await self.fetch_inverter_data(inv)
                 try:
@@ -364,9 +383,7 @@ class SoliscloudAPI(BaseAPI):
                     _LOGGER.info("No access to inverter %s, removing", inv)
                     del self._inverter_list[inv]
             if len(self._inverter_list) == 0:
-                _LOGGER.warning("No valid inverters found, login failed")
-                self._is_online = False
-                return self._is_online
+                _LOGGER.warning("No valid inverters found")
             else:
                 _LOGGER.debug("Valid inverters: %s", list(self._inverter_list.keys()))
             try:
@@ -394,6 +411,8 @@ class SoliscloudAPI(BaseAPI):
     async def fetch_inverter_list(self, plant_id: str) -> dict[str, str]:
         """
         Fetch return list of inverters { inverter serial : device_id }
+
+        Raises SoliscloudApiError on API failure.
         """
 
         device_ids = {}
@@ -404,13 +423,10 @@ class SoliscloudAPI(BaseAPI):
         if result[SUCCESS] is True:
             result_json: dict = result[CONTENT]
             if result_json["code"] != "0":
-                _LOGGER.info(
-                    "%s responded with error: %s:%s",
-                    INVERTER_DETAIL,
-                    result_json["code"],
-                    result_json["msg"],
+                raise SoliscloudApiError(
+                    f"{INVERTER_DETAIL} responded with error: "
+                    f"{result_json['code']}:{result_json['msg']}"
                 )
-                return device_ids
             try:
                 for record in result_json["data"]["page"]["records"]:
                     serial = record.get("sn")
@@ -418,12 +434,16 @@ class SoliscloudAPI(BaseAPI):
                     device_ids[serial] = device_id
             except TypeError:
                 _LOGGER.debug("Response contains unexpected data: %s", result_json)
+        elif result[STATUS_CODE] == 408:
+            now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
+            raise SoliscloudApiError(
+                "Your system time must be set correctly for this integration "
+                f"to work, your time is {now}"
+            )
         else:
-            _LOGGER.warning(
-                "Inverter list request failed after %ss: %s (status=%s)",
-                self.config.request_timeout,
-                result[MESSAGE],
-                result[STATUS_CODE],
+            raise SoliscloudApiError(
+                f"Inverter list request failed after {self.config.request_timeout}s: \
+                {result[MESSAGE]} (status={result[STATUS_CODE]})"
             )
             if result[STATUS_CODE] == 408:
                 now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
@@ -666,6 +686,7 @@ class SoliscloudAPI(BaseAPI):
             self._fix_units(GRID_YEARLY_ENERGY_PURCHASED, GRID_YEARLY_ENERGY_PURCHASED_STR)
             self._fix_units(GRID_DAILY_ENERGY_USED, GRID_DAILY_ENERGY_USED_STR)
             self._fix_units(BYPASS_LOAD_POWER, BYPASS_LOAD_POWER_STR)
+            self._fix_units(SMART_LOAD_POWER, SMART_LOAD_POWER_STR)
 
             # Just temporary till SolisCloud is fixed
             try:

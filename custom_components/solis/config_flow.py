@@ -19,6 +19,7 @@ from .const import (
     CONF_PASSWORD,
     CONF_PLANT_ID,
     CONF_PORTAL_DOMAIN,
+    CONF_REFRESH_INVERTER_DISCOVERY,
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
     CONF_REQUEST_TIMEOUT,
@@ -76,8 +77,9 @@ class SolisOptionsFlowHandler(OptionsFlow):
                 CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
             updated_config[CONF_REFRESH_NOK] = user_input.get(
                 CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 10))
-            updated_config[CONF_REQUEST_TIMEOUT] = user_input.get(
-                CONF_REQUEST_TIMEOUT, updated_config.get(CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT))
+            updated_config[CONF_REFRESH_INVERTER_DISCOVERY] = user_input.get(
+                CONF_REFRESH_INVERTER_DISCOVERY, updated_config.get(CONF_REFRESH_INVERTER_DISCOVERY, 300)
+            )
 
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
@@ -102,6 +104,8 @@ class SolisOptionsFlowHandler(OptionsFlow):
                 CONF_REFRESH_NOK, 10)): cv.positive_int,
             vol.Required(CONF_REQUEST_TIMEOUT, default=self.config_entry.data.get(
                 CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT)): cv.positive_int,
+            vol.Required(CONF_REFRESH_INVERTER_DISCOVERY, default=self.config_entry.data.get(
+                CONF_REFRESH_INVERTER_DISCOVERY, 300)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
                 vol.Schema(
                     {
@@ -192,22 +196,34 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
                     api = SoliscloudAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
-                        return self.async_create_entry(title=f"Station {api.plant_name}", data=self._data)
+                        if not api.inverters:
+                            _LOGGER.warning(
+                                "No inverters found for plant %s. The integration will be set up, "
+                                "but no sensors will be available until an inverter is connected.",
+                                plant_id,
+                            )
+                        title = f"Station {api.plant_name}" if api.plant_name else f"Station {plant_id}"
+                        return self.async_create_entry(title=title, data=self._data)
                     errors["base"] = "auth"
 
+        prev = user_input or {}
+        prev_control = prev.get("Control") or {}
         data_schema = {
-            vol.Required(CONF_USERNAME, default=None): cv.string,
-            vol.Required(CONF_KEY_ID, default=""): cv.string,
-            vol.Required(CONF_SECRET, default=""): cv.string,
-            vol.Required(CONF_PLANT_ID, default=None): cv.string,
-            vol.Required(CONF_REFRESH_OK, default=300): cv.positive_int,
-            vol.Required(CONF_REFRESH_NOK, default=60): cv.positive_int,
-            vol.Required(CONF_REQUEST_TIMEOUT, default=DEFAULT_REQUEST_TIMEOUT): cv.positive_int,
+            vol.Required(CONF_USERNAME, default=prev.get(CONF_USERNAME)): cv.string,
+            vol.Required(CONF_KEY_ID, default=prev.get(CONF_KEY_ID)): cv.string,
+            vol.Required(CONF_SECRET, default=prev.get(CONF_SECRET)): cv.string,
+            vol.Required(CONF_PLANT_ID, default=prev.get(CONF_PLANT_ID)): cv.string,
+            vol.Required(CONF_REFRESH_OK, default=prev.get(CONF_REFRESH_OK, 300)): cv.positive_int,
+            vol.Required(CONF_REFRESH_NOK, default=prev.get(CONF_REFRESH_NOK, 60)): cv.positive_int,
+            vol.Required(CONF_REQUEST_TIMEOUT, default=prev.get(
+                CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT): cv.positive_int,
+            vol.Required(CONF_REFRESH_INVERTER_DISCOVERY, default=prev.get(
+                CONF_REFRESH_INVERTER_DISCOVERY, 300)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
                 vol.Schema(
                     {
-                        vol.Required(CONF_CONTROL, default=False): bool,
-                        vol.Optional(CONF_PASSWORD): cv.string,
+                        vol.Required(CONF_CONTROL, default=prev_control.get(CONF_CONTROL, False)): bool,
+                        vol.Optional(CONF_PASSWORD, default=prev_control.get(CONF_PASSWORD, "")): cv.string,
                     }
                 ),
                 {"collapsed": False},

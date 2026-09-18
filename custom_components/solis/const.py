@@ -43,6 +43,7 @@ CONF_CONTROL = "portal_control_api"
 CONF_REFRESH_OK = "refresh_ok"
 CONF_REFRESH_NOK = "refresh_nok"
 CONF_REQUEST_TIMEOUT = "request_timeout"
+CONF_REFRESH_INVERTER_DISCOVERY = "refresh_inverter_discovery"
 
 DOMAIN = "solis"
 SENSOR_PREFIX = "Solis"
@@ -564,6 +565,22 @@ SENSOR_TYPES = {
         SensorDeviceClass.ENERGY,
         SensorStateClass.TOTAL_INCREASING,
         BACKUP_TODAY_ENERGY,
+    ],
+    "smartloadpower": [
+        "Smart Load Power",
+        UnitOfPower.WATT,
+        "mdi:home-lightning-bolt",
+        SensorDeviceClass.POWER,
+        SensorStateClass.MEASUREMENT,
+        SMART_LOAD_POWER,
+    ],
+    "smartloadtodayenergy": [
+        "Daily Smart Load Energy",
+        UnitOfEnergy.KILO_WATT_HOUR,
+        "mdi:home-lightning-bolt",
+        SensorDeviceClass.ENERGY,
+        SensorStateClass.TOTAL_INCREASING,
+        SMART_LOAD_TODAY_ENERGY,
     ],
     "meterItemACurrent": [
         "Meter item A current",
