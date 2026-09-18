@@ -72,13 +72,15 @@ class SolisBaseControlEntity:
         return data
 
     def split(self, value):
+        if value is None or value == '4056129965_00':
+            return None  # or '00:00:00' for time, 0 for number
         if len(self._splitter) > 0:
             # if there's more than one split string then replace all of the later ones with the first before we split
             for x in self._splitter[1:]:
                 value = value.replace(x, self._splitter[0])
             values = value.split(self._splitter[0])
 
-            if self._index <= len(values):
+            if self._index < len(values):
                 return values[self._index]
             else:
                 _LOGGER.warning(f"Unable to retrieve item {self._index:d} from {value} for {self._key}")
