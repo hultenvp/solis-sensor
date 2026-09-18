@@ -19,6 +19,7 @@ from homeassistant.util import dt as dt_util
 
 from .control_const import ALL_CONTROLS, CONTROL_TYPES
 from .ginlong_base import BaseAPI, GinlongData, PortalConfig
+from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 from .soliscloud_const import (
     INVERTER_ACPOWER,
     INVERTER_ENERGY_TODAY,
@@ -26,7 +27,6 @@ from .soliscloud_const import (
     INVERTER_STATE,
     INVERTER_TIMESTAMP_UPDATE,
 )
-from .soliscloud_api import SoliscloudAPI, SoliscloudConfig
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,8 +37,8 @@ VERSION = "1.0.3"
 HRS_BETWEEN_LOGIN = timedelta(hours=2)
 
 # Autodiscover
-RETRY_DELAY_SECONDS = 60
-MAX_RETRY_DELAY_SECONDS = 900
+RETRY_DELAY_SECONDS = 10
+MAX_RETRY_DELAY_SECONDS = 300
 
 # Status constants
 ONLINE = "Online"

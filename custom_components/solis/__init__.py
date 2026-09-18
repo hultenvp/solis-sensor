@@ -24,8 +24,10 @@ from .const import (
     CONF_REFRESH_INVERTER_DISCOVERY,
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
+    CONF_REQUEST_TIMEOUT,
     CONF_SECRET,
     CONF_USERNAME,
+    DEFAULT_REQUEST_TIMEOUT,
     DOMAIN,
 )
 from .ginlong_base import PortalConfig
@@ -95,6 +97,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     portal_config: PortalConfig | None = None
     portal_key_id = config[CONF_KEY_ID]
     portal_secret: bytes = bytes(config[CONF_SECRET], "utf-8")
+    request_timeout = DEFAULT_REQUEST_TIMEOUT
+    try:
+        request_timeout = config[CONF_REQUEST_TIMEOUT]
+    except KeyError:
+        pass
     portal_config = SoliscloudConfig(
         portal_domain,
         portal_username,
@@ -102,6 +109,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         portal_secret,
         portal_plantid,
         portal_password,
+        request_timeout,
     )
 
     # Initialize the Ginlong data service.

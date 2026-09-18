@@ -22,9 +22,11 @@ from .const import (
     CONF_REFRESH_INVERTER_DISCOVERY,
     CONF_REFRESH_NOK,
     CONF_REFRESH_OK,
+    CONF_REQUEST_TIMEOUT,
     CONF_SECRET,
     CONF_USERNAME,
     DEFAULT_DOMAIN,
+    DEFAULT_REQUEST_TIMEOUT,
     DOMAIN,
     SENSOR_PREFIX,
 )
@@ -74,7 +76,7 @@ class SolisOptionsFlowHandler(OptionsFlow):
             updated_config[CONF_REFRESH_OK] = user_input.get(
                 CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
             updated_config[CONF_REFRESH_NOK] = user_input.get(
-                CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 60))
+                CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 10))
             updated_config[CONF_REFRESH_INVERTER_DISCOVERY] = user_input.get(
                 CONF_REFRESH_INVERTER_DISCOVERY, updated_config.get(CONF_REFRESH_INVERTER_DISCOVERY, 300)
             )
@@ -99,7 +101,9 @@ class SolisOptionsFlowHandler(OptionsFlow):
             vol.Required(CONF_REFRESH_OK, default=self.config_entry.data.get(
                 CONF_REFRESH_OK, 300)): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=self.config_entry.data.get(
-                CONF_REFRESH_NOK, 60)): cv.positive_int,
+                CONF_REFRESH_NOK, 10)): cv.positive_int,
+            vol.Required(CONF_REQUEST_TIMEOUT, default=self.config_entry.data.get(
+                CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT)): cv.positive_int,
             vol.Required(CONF_REFRESH_INVERTER_DISCOVERY, default=self.config_entry.data.get(
                 CONF_REFRESH_INVERTER_DISCOVERY, 300)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
@@ -185,7 +189,10 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
                     merged.update(control_section)  # brings CONF_PASSWORD, CONF_CONTROL to top
                     self._data.update(merged)
 
-                    config = SoliscloudConfig(url, username, key_id, secret, plant_id, password)
+                    request_timeout = user_input.get(CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT)
+                    config = SoliscloudConfig(
+                        url, username, key_id, secret, plant_id, password, request_timeout
+                    )
                     api = SoliscloudAPI(config)
                     if await api.login(async_get_clientsession(self.hass)):
                         await self.async_set_unique_id(plant_id)
@@ -208,6 +215,8 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_PLANT_ID, default=prev.get(CONF_PLANT_ID)): cv.string,
             vol.Required(CONF_REFRESH_OK, default=prev.get(CONF_REFRESH_OK, 300)): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=prev.get(CONF_REFRESH_NOK, 60)): cv.positive_int,
+            vol.Required(CONF_REQUEST_TIMEOUT, default=prev.get(
+                CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT): cv.positive_int,
             vol.Required(CONF_REFRESH_INVERTER_DISCOVERY, default=prev.get(
                 CONF_REFRESH_INVERTER_DISCOVERY, 300)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
