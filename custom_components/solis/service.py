@@ -77,10 +77,12 @@ class InverterService:
     """Serves all plantId's and inverters on a Ginlong account"""
 
     def __init__(
-        self, portal_config: PortalConfig, hass: HomeAssistant, refresh_ok: int = 300, refresh_nok: int = 60
+        self, portal_config: PortalConfig, hass: HomeAssistant, refresh_ok: int = 300, refresh_nok: int = 60,
+        refresh_inverter_discovery: int = 300,
     ) -> None:
         self._schedule_ok: int = refresh_ok
         self._schedule_nok: int = refresh_nok
+        self._schedule_inverter_discovery: int = refresh_inverter_discovery
         self._last_updated: datetime | None = None
         self._logintime: datetime | None = None
         self._subscriptions: dict[str, dict[str, ServiceSubscriber]] = {}
@@ -280,6 +282,13 @@ class InverterService:
         if await self._login():
             inverters = self._api.inverters
             if inverters is None:
+                return
+            if not inverters:
+                # No inverters found, retry discovery after configured delay
+                _LOGGER.debug("No inverters available, retrying in %s seconds", self._schedule_inverter_discovery)
+                update = timedelta(seconds=self._schedule_inverter_discovery)
+                await self._logout()
+                self.schedule_update(update)
                 return
             for inverter_serial in inverters:
                 data = await self._api.fetch_inverter_data(inverter_serial)

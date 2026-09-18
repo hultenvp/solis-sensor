@@ -32,7 +32,8 @@
                     "portal_plant_id": "Station ID as found on portal website (see README)",
                     "portal_control_api": "Enable SolisCloud control",
                     "refresh_ok": "Refresh interval in seconds (default 300s)",
-                    "refresh_nok": "Refresh interval in seconds, after an API error (default 60s)"
+                    "refresh_nok": "Refresh interval in seconds, after an API error (default 60s)",
+                    "refresh_inverter_discovery": "Inverter discovery retry interval in seconds (default 300s)"
                 },
                 "sections": {
                     "Control": {
@@ -54,6 +55,7 @@
                 "data": {
                     "refresh_ok": "Refresh interval in seconds (default 300s)",
                     "refresh_nok": "Refresh interval in seconds for errors (default 60s)",
+                    "refresh_inverter_discovery": "Inverter discovery retry interval in seconds (default 300s)",
                     "portal_domain": "PV Portal version (SolisCloud? Read the README)",
                     "portal_username": "Portal username or email address",
                     "portal_key_id": "API Key ID provided by SolisCloud",

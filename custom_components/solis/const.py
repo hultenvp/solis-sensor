@@ -42,6 +42,7 @@ CONF_PLANT_ID = "portal_plant_id"
 CONF_CONTROL = "portal_control_api"
 CONF_REFRESH_OK = "refresh_ok"
 CONF_REFRESH_NOK = "refresh_nok"
+CONF_REFRESH_INVERTER_DISCOVERY = "refresh_inverter_discovery"
 
 DOMAIN = "solis"
 SENSOR_PREFIX = "Solis"
