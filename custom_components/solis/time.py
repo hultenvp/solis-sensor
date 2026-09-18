@@ -103,7 +103,11 @@ class SolisTimeEntity(SolisBaseControlEntity, ServiceSubscriber, TimeEntity):
         # return super().do_update(value, last_updated)
         _LOGGER.debug(f"Update state for {self._name}")
         _LOGGER.debug(f">>> Initial value: {value}")
-        values = self.split(value).split(":")
+        split_value = self.split(value)
+        if split_value is None:
+            values = ['00', '00', '00']
+        else:
+            values = split_value.split(":")
         _LOGGER.debug(f">>> Split value: {values}")
         time_value = None
         try:
