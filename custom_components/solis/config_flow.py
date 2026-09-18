@@ -77,6 +77,8 @@ class SolisOptionsFlowHandler(OptionsFlow):
                 CONF_REFRESH_OK, updated_config.get(CONF_REFRESH_OK, 300))
             updated_config[CONF_REFRESH_NOK] = user_input.get(
                 CONF_REFRESH_NOK, updated_config.get(CONF_REFRESH_NOK, 10))
+            updated_config[CONF_REQUEST_TIMEOUT] = user_input.get(
+                CONF_REQUEST_TIMEOUT, updated_config.get(CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT))
             updated_config[CONF_REFRESH_INVERTER_DISCOVERY] = user_input.get(
                 CONF_REFRESH_INVERTER_DISCOVERY, updated_config.get(CONF_REFRESH_INVERTER_DISCOVERY, 300)
             )
