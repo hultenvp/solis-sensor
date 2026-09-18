@@ -214,7 +214,7 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_SECRET, default=prev.get(CONF_SECRET)): cv.string,
             vol.Required(CONF_PLANT_ID, default=prev.get(CONF_PLANT_ID)): cv.string,
             vol.Required(CONF_REFRESH_OK, default=prev.get(CONF_REFRESH_OK, 300)): cv.positive_int,
-            vol.Required(CONF_REFRESH_NOK, default=prev.get(CONF_REFRESH_NOK, 60)): cv.positive_int,
+            vol.Required(CONF_REFRESH_NOK, default=prev.get(CONF_REFRESH_NOK, 10)): cv.positive_int,
             vol.Required(CONF_REQUEST_TIMEOUT, default=prev.get(
                 CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT)): cv.positive_int,
             vol.Required(CONF_REFRESH_INVERTER_DISCOVERY, default=prev.get(
