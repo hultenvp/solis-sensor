@@ -13,16 +13,7 @@
                     "portal_version": "PV Portal version (SolisCloud? Read the README)"
                 },
                 "title": "Portal selection",
-                "description": "Enter the PV portal URL and portal version"
-            },
-            "credentials_password": {
-                "data": {
-                    "portal_username": "Portal username or email address",
-                    "portal_password": "Portal password",
-                    "portal_plant_id": "Plant ID as found on portal website (see README)"
-                },
-                "description": "Enter credentials and plantID",
-                "title": "Add Ginlong Portal v2 credentials"
+                "description": "Enter integration name and the PV portal URL"
             },
             "credentials_secret": {
                 "data": {
@@ -33,7 +24,7 @@
                     "portal_control_api": "Enable SolisCloud control",
                     "refresh_ok": "Refresh interval in seconds (default 300s)",
                     "refresh_nok": "Refresh interval in seconds, after an API error (default 10s)",
-                    "request_timeout": "Request timeout in seconds (default 30s)"
+                    "request_timeout": "API request timeout in seconds (default 30s)",
                     "refresh_inverter_discovery": "Inverter discovery retry interval in seconds (default 300s)"
                 },
                 "sections": {
@@ -54,15 +45,15 @@
         "step": {
             "init": {
                 "data": {
-                    "refresh_ok": "Refresh interval in seconds (default 300s)",
-                    "refresh_nok": "Refresh interval in seconds for errors (default 10s)",
-                    "request_timeout": "Request timeout in seconds (default 30s)",
-                    "refresh_inverter_discovery": "Inverter discovery retry interval in seconds (default 300s)",
-                    "portal_domain": "PV Portal version (SolisCloud? Read the README)",
+                    "portal_domain": "PV Portal URL, e.g. https://www.soliscloud.com:13333",
                     "portal_username": "Portal username or email address",
                     "portal_key_id": "API Key ID provided by SolisCloud",
                     "portal_secret": "API Key secret provided by SolisCloud",
-                    "portal_plant_id": "Station ID as found on portal website (see README)"
+                    "portal_plant_id": "Station ID as found on portal website (see README)",
+                    "refresh_ok": "Refresh interval in seconds (default 300s)",
+                    "refresh_nok": "Refresh interval in seconds for errors (default 10s)",
+                    "request_timeout": "API request timeout in seconds (default 30s)",
+                    "refresh_inverter_discovery": "Inverter discovery retry interval in seconds (default 300s)"
                 },
                 "sections": {
                     "Control": {
