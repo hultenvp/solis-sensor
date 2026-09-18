@@ -216,7 +216,7 @@ class SolisConfigFlow(ConfigFlow, domain=DOMAIN):
             vol.Required(CONF_REFRESH_OK, default=prev.get(CONF_REFRESH_OK, 300)): cv.positive_int,
             vol.Required(CONF_REFRESH_NOK, default=prev.get(CONF_REFRESH_NOK, 60)): cv.positive_int,
             vol.Required(CONF_REQUEST_TIMEOUT, default=prev.get(
-                CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT): cv.positive_int,
+                CONF_REQUEST_TIMEOUT, DEFAULT_REQUEST_TIMEOUT)): cv.positive_int,
             vol.Required(CONF_REFRESH_INVERTER_DISCOVERY, default=prev.get(
                 CONF_REFRESH_INVERTER_DISCOVERY, 300)): cv.positive_int,
             vol.Required("Control"): data_entry_flow.section(
