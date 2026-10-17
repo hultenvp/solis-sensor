@@ -318,6 +318,11 @@ class SoliscloudApiError(Exception):
 class SoliscloudAPI(BaseAPI):
     """Class with functions for reading data from the Soliscloud Portal."""
 
+    # Last successful inverter list per plant id. Stored on the class so a
+    # config-entry reload (new instance) cannot drop inverters after a
+    # transient /v1/api/inverterList failure or partial reply.
+    _last_good_inverters: dict[str, dict[str, str]] = {}
+
     def __init__(self, config: SoliscloudConfig) -> None:
         self._config: SoliscloudConfig = config
         self._session: ClientSession | None = None
@@ -355,19 +360,36 @@ class SoliscloudAPI(BaseAPI):
         await self._config.load_workarounds()
 
         _LOGGER.debug("Requesting inverter list with timeout %ss", self.config.request_timeout)
+        plant_id = str(self.config.plant_id)
+        last_good = dict(self._last_good_inverters.get(plant_id, {}))
         # Request inverter list
         try:
             self._inverter_list = await self.fetch_inverter_list(self.config.plant_id)
         except SoliscloudApiError as err:
             _LOGGER.warning("Failed to fetch inverter list: %s", err)
-            self._inverter_list = {}
-            self._is_online = False
-            return self._is_online
+            if not last_good:
+                # Stay offline so discovery retries; do not treat this as "no inverters".
+                self._inverter_list = {}
+                self._is_online = False
+                return self._is_online
+            _LOGGER.warning(
+                "Using last known inverter list for plant %s: %s",
+                plant_id,
+                list(last_good),
+            )
+            self._inverter_list = dict(last_good)
 
-        # Inverter list request completed without errors. This means authorization was successful
+        # A 502 / timeout / partial reply must not hide inverters we already know.
+        for serial, device_id in last_good.items():
+            if serial not in self._inverter_list:
+                _LOGGER.warning("Inverter %s missing from inverterList reply, keeping last known", serial)
+                self._inverter_list[serial] = device_id
+
+        # Inverter list available (fetched and/or last known). Authorization succeeded
+        # for HMAC calls, or we are continuing with a previously verified list.
         _LOGGER.info("Login successful")
         self._is_online = True
-        
+
         if len(self._inverter_list) == 0:
             _LOGGER.warning("No inverters found")
             station = await self._get_station_details(self.config.plant_id)
@@ -380,11 +402,16 @@ class SoliscloudAPI(BaseAPI):
                 try:
                     self._plant_name = getattr(data, INVERTER_PLANT_NAME)
                 except AttributeError:
-                    _LOGGER.info("No access to inverter %s, removing", inv)
-                    del self._inverter_list[inv]
+                    # fetch_inverter_data returns None on 502/timeout; that is not "no access".
+                    if data is None or inv in last_good:
+                        _LOGGER.warning("Data fetch failed for inverter %s, keeping it", inv)
+                    else:
+                        _LOGGER.info("No access to inverter %s, removing", inv)
+                        del self._inverter_list[inv]
             if len(self._inverter_list) == 0:
                 _LOGGER.warning("No valid inverters found")
             else:
+                self._last_good_inverters[plant_id] = dict(self._inverter_list)
                 _LOGGER.debug("Valid inverters: %s", list(self._inverter_list.keys()))
             try:
                 if not self.config._password:
@@ -434,6 +461,7 @@ class SoliscloudAPI(BaseAPI):
                     device_ids[serial] = device_id
             except TypeError:
                 _LOGGER.debug("Response contains unexpected data: %s", result_json)
+                raise SoliscloudApiError("Inverter list response contains unexpected data")
         elif result[STATUS_CODE] == 408:
             now = datetime.now().strftime("%d-%m-%Y %H:%M GMT")
             raise SoliscloudApiError(
